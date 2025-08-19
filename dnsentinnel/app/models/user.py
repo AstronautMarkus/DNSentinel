@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 
@@ -9,6 +9,8 @@ class User(Base):
     name = Column(String(100), nullable=False)
     email = Column(String(120), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
+
+    zones = relationship("Zone", back_populates="user")
 
     def __repr__(self):
         return f"<User(name={self.name}, email={self.email})>"

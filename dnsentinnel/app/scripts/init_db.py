@@ -10,6 +10,9 @@ from app.config.config import Config
 from app.models.user import Base
 from sqlalchemy import create_engine
 
+# Import all models so they are registered in Base.metadata
+import app.models
+
 def init_db():
     """Creates the tables in the database."""
     engine = create_engine(Config.SQLALCHEMY_DATABASE_URL, echo=True)
