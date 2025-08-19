@@ -1,7 +1,7 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, render_template
 
 base_bp = Blueprint('base', __name__)
 
 @base_bp.route('/')
 def index():
-    return jsonify({'message': 'Bienvenido a DNSentinnel'})
+    return render_template('index.html')

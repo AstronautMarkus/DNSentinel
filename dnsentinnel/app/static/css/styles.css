@@ -1,0 +1,60 @@
+html,
+body,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a,
+span,
+div,
+li,
+ul,
+ol,
+button,
+input,
+textarea,
+label,
+th,
+td,
+strong,
+em,
+b,
+i,
+small,
+code,
+pre {
+    font-family: "Inter", sans-serif;
+}
+
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.nav-underline {
+    position: relative;
+    display: inline-block;
+}
+
+.nav-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background: #d33;
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+}
+
+.nav-underline:hover::after {
+    transform: scaleX(1);
+}
