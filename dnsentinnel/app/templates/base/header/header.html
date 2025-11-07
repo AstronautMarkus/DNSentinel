@@ -1,7 +1,7 @@
 <nav class="navbar is-dark mb-4" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
         <a class="navbar-item" {% if session.get('user_id') %} href="{{ url_for('dashboard.home') }}" {% else %} href="{{ url_for('main.index') }}" {% endif %}>
-            <img src="{{ url_for('static', filename='img/DNSentinnel.svg') }}" alt="DNSentinnel Logo">
+            <img style="pointer-events: none;" src="{{ url_for('static', filename='img/DNSentinnel.svg') }}" alt="DNSentinnel Logo">
             <span class="is-size-4 has-text-weight-semibold has-text-white">DNSentinnel</span>
         </a>
         <a role="button" class="navbar-burger has-text-white" aria-label="menu" aria-expanded="false" data-target="navbarNav">
