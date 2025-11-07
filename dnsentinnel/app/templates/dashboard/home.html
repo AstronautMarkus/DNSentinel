@@ -2,12 +2,12 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 
-<div class="columns is-vcentered mb-5">
-  <div class="column is-two-thirds">
+<div class="columns is-vcentered mb-5" style="max-width: 1200px; margin: 0 auto;">
+  <div class="column is-three-fifths">
     <h1 class="title is-2">Admin Dashboard</h1>
     <p class="subtitle is-4">Manage your DNS and monitor your dynamic IPs.</p>
   </div>
-  <div class="column is-one-third">
+  <div class="column is-two-fifths">
     <div class="box has-text-centered">
       <p class="heading">Your ISP Address</p>
       <p class="title">{{ isp_ip }}</p>
