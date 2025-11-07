@@ -1,9 +1,185 @@
 {% extends 'base/base.html' %}
-{% block title %}Home | DNSentinnel{% endblock %}
+{% block title %}Index{% endblock %}
 {% block content %}
-<div class="has-text-centered mt-6">
-    <h1 class="title is-2">Welcome to DNSentinnel</h1>
-    <p class="subtitle is-4">Your platform for DNS monitoring and management.</p>
-    <a href="/" class="button is-info mt-4">Get Started</a>
-</div>
+
+<section class="hero is-info is-medium" style="position: relative; overflow: hidden;">
+    <img src="{{ url_for('static', filename='img/index/header-background.jpg') }}" alt="Background"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;">
+    <div class="hero-body" style="position: relative; z-index: 1;">
+        <div class="container has-text-centered">
+            <div class="is-flex is-align-items-center is-justify-content-center" style="gap: 24px;">
+                <img src="{{ url_for('static',filename='/img/DNSentinnel.svg') }}" alt="DNSentinnel Logo" style="max-width: 80px; margin-bottom: 0; pointer-events: none;">
+                <h1 class="title is-1 has-text-white" style="margin-bottom: 0;">
+                    DNSentinnel
+                </h1>
+            </div>
+            <h2 class="subtitle is-3 has-text-white">
+                Comprehensive solution for DNS management in dynamic IPs.
+            </h2>
+            <a href="/" class="button is-light is-large mt-4">Get Started</a>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="columns is-vcentered">
+            <div class="column is-half mr-4">
+                <h2 class="title is-3">What is DNSentinnel?</h2>
+                <p class="is-size-5"></p>
+                    <strong>DNSentinnel</strong> is a <span class="has-text-weight-semibold">simple yet powerful</span> web application designed with a single, focused purpose: <strong class="has-text-danger">automatically keep your dynamic IP address synchronized with your DNS server</strong>, especially when your Internet Service Provider (ISP) frequently changes your IP address.
+                </p>
+                <p class="is-size-6 has-text-grey">
+                    Perfect for users managing <span class="has-text-weight-medium">home servers, IoT devices, or remote services</span> that need consistent domain resolution. 
+                </p>
+            </div>
+            <div class="column is-two-thirds">
+                <div id="dynamic-ip-demo" class="box mt-5" style="overflow:hidden; position:relative; min-height:260px; min-width:520px; max-width:800px; margin:0 auto;">
+                    <h4 class="title is-5 mb-3 has-text-centered">The problem with having a dynamic IP address</h4>
+                    <div id="animation-phases" style="position:relative; height:170px;">
+                    </div>
+                </div>
+                <style>
+                #dynamic-ip-demo .phase {
+                    display: none;
+                    position: absolute;
+                    left: 0; top: 0; width: 100%; height: 100%;
+                }
+                #dynamic-ip-demo .phase.is-active {
+                    display: block;
+                }
+                #animation-phases {
+                    position: relative;
+                    height: 170px;
+                }
+                #dynamic-ip-demo {
+                    min-height: 260px;
+                    min-width: 520px;
+                    max-width: 800px;
+                    margin: 0 auto;
+                }
+                @media (max-width: 900px) {
+                    #dynamic-ip-demo {
+                        min-width: 100%;
+                        max-width: 100%;
+                    }
+                }
+                </style>
+                <script>
+                function randomIp() {
+                    return Array(4).fill(0).map(() => Math.floor(Math.random() * 256)).join('.');
+                }
+                document.addEventListener('DOMContentLoaded', function() {
+                    const animationPhases = document.getElementById('animation-phases');
+                    
+                    function renderPhases(ip1, ip2) {
+                        return `
+                        <div class="phase phase-1 is-active" style="position:absolute; left:0; top:0; width:100%; height:100%;">
+                            <div class="columns is-mobile is-vcentered" style="height:100%;">
+                                <div class="column has-text-centered" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+                                    <div>
+                                        <img src="{{ url_for('static', filename='/img/index/user-laptop.png') }}" style="height:60px; pointer-events:none;">
+                                        <div class="has-text-weight-semibold mt-2">1. User<br><span class="has-text-info">Visits site</span></div>
+                                    </div>
+                                </div>
+                                <div class="column has-text-centered" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+                                    <div>
+                                        <img src="{{ url_for('static', filename='/img/index/web-internet.png') }}" style="height:60px; pointer-events:none;">
+                                        <div class="has-text-weight-semibold mt-2">2. DNS<br>IP: <span class="has-text-primary">${ip1}</span></div>
+                                    </div>
+                                </div>
+                                <div class="column has-text-centered" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+                                    <div>
+                                        <img src="{{ url_for('static', filename='/img/index/modem-device.png') }}" style="height:60px; pointer-events:none;">
+                                        <div class="has-text-weight-semibold mt-2">3. Router<br><span class="has-text-primary">${ip1}</span></div>
+                                        <div class="tag is-success mt-2">OK</div>
+                                    </div>
+                                </div>
+                                <div class="column has-text-centered" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+                                    <div>
+                                        <img src="{{ url_for('static', filename='/img/index/server.png') }}" style="height:60px; pointer-events:none;">
+                                        <div class="has-text-weight-semibold mt-2">4. Server<br><span class="has-text-success">Received</span></div>
+                                        <div class="tag is-success mt-2">Response</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="phase phase-2" style="position:absolute; left:0; top:0; width:100%; height:100%;">
+                            <div class="columns is-mobile is-vcentered" style="height:100%;">
+                                <div class="column has-text-centered" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+                                    <div>
+                                        <img src="{{ url_for('static', filename='/img/index/user-laptop.png') }}" style="height:60px; opacity:0.7; pointer-events:none;">
+                                        <div class="has-text-weight-semibold mt-2">1. User<br><span class="has-text-info">Visits site</span></div>
+                                    </div>
+                                </div>
+                                <div class="column has-text-centered" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+                                    <div>
+                                        <img src="{{ url_for('static', filename='/img/index/web-internet.png') }}" style="height:60px; opacity:0.7; pointer-events:none;">
+                                        <div class="has-text-weight-semibold mt-2">2. DNS<br>IP: <span class="has-text-primary">${ip1}</span></div>
+                                    </div>
+                                </div>
+                                <div class="column has-text-centered" style="height:100%; display:flex; flex-direction:column; justify-content:center; pointer-events:none;">
+                                    <div>
+                                        <img src="{{ url_for('static', filename='/img/index/modem-device.png') }}" style="height:60px;">
+                                        <div class="has-text-weight-semibold mt-2">3. Router<br><span class="has-text-danger">${ip2}</span></div>
+                                        <div class="tag is-danger mt-2">Error</div>
+                                    </div>
+                                </div>
+                                <div class="column has-text-centered" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+                                    <div>
+                                        <img src="{{ url_for('static', filename='/img/index/server.png') }}" style="height:60px; opacity:0.7; pointer-events:none;">
+                                        <div class="has-text-weight-semibold mt-2">4. Server<br><span class="has-text-danger">Not received</span></div>
+                                        <div class="tag is-danger mt-2">No response</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }
+
+                    function loopAnimation() {
+                        const ip1 = randomIp();
+                        let ip2 = randomIp();
+                        while (ip2 === ip1) ip2 = randomIp();
+                        animationPhases.innerHTML = renderPhases(ip1, ip2);
+                        const phase1 = animationPhases.querySelector('.phase-1');
+                        const phase2 = animationPhases.querySelector('.phase-2');
+                        phase1.classList.add('is-active');
+                        phase2.classList.remove('is-active');
+                        setTimeout(() => {
+                            phase1.classList.remove('is-active');
+                            phase2.classList.add('is-active');
+                            setTimeout(loopAnimation, 4000);
+                        }, 4000);
+                    }
+                    loopAnimation();
+                });
+                </script>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section has-background-light">
+    <div class="container">
+        <div class="columns">
+            <div class="column">
+                <h3 class="title is-4">How it works</h3>
+                <p>
+                    <strong>DNSentinnel</strong> automatically updates your router's IP address <span class="has-text-weight-semibold">in the background</span>, ensuring your DNS always points to the correct IP. This way, your <span class="has-text-weight-medium">services and websites</span> remain accessible regardless of any IP changes made by your Internet provider.
+                </p>
+            </div>
+            <div class="column">
+                <h3 class="title is-4">Benefits</h3>
+                <ul>
+                    <li>Automatic IP address updates</li>
+                    <li>Secure: DNSentinel runs only in your local network</li>
+                    <li>Reduced downtime due to IP changes</li>
+                    <li>Easy setup and configuration</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
 {% endblock %}
