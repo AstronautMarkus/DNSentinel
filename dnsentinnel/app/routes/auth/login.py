@@ -5,6 +5,7 @@ from werkzeug.security import check_password_hash
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    email = ''
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -14,10 +15,11 @@ def login():
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
             session['user_name'] = user.name
-            flash('Login successful', 'success')
+            flash(f'Login successful. Welcome, {user.name}!', 'success')
             session_db.close()
             return redirect(url_for('dashboard.home'))
         else:
-            flash('Email or password is incorrect', 'danger')
+            flash('Email or password is incorrect. Please try again.', 'danger')
             session_db.close()
-    return render_template('login.html')
+            return render_template('login.html', email=email)
+    return render_template('login.html', email=email)

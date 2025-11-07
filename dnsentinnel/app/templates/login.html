@@ -7,7 +7,7 @@
         <div class="field">
             <label for="email" class="label">Email</label>
             <div class="control">
-                <input type="email" class="input" id="email" name="email" required placeholder="john@example.com">
+                <input type="email" class="input" id="email" name="email" required placeholder="john@example.com" value="{{ email|default('') }}">
             </div>
         </div>
         <div class="field">
