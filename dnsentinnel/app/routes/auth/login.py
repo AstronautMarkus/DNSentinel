@@ -16,7 +16,7 @@ def add_login_route(auth_bp):
                 session['user_name'] = user.name
                 flash('Login successful', 'success')
                 session_db.close()
-                return redirect(url_for('main.index'))
+                return redirect(url_for('dashboard.home'))
             else:
                 flash('Email or password is incorrect', 'danger')
             session_db.close()
