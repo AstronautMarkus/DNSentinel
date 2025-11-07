@@ -24,19 +24,24 @@
 <section class="section">
     <div class="container">
         <div class="columns is-vcentered">
-            <div class="column is-half mr-4">
+            <div class="column is-half">
                 <h2 class="title is-3">What is DNSentinnel?</h2>
-                <p class="is-size-5"></p>
+                <p class="is-size-5">
                     <strong>DNSentinnel</strong> is a <span class="has-text-weight-semibold">simple yet powerful</span> web application designed with a single, focused purpose: <strong class="has-text-danger">automatically keep your dynamic IP address synchronized with your DNS server</strong>, especially when your Internet Service Provider (ISP) frequently changes your IP address.
                 </p>
+            </div>
+            <div class="column is-half">
+                <h2 class="title is-4">Who is it for?</h2>
                 <p class="is-size-6 has-text-grey">
-                    Perfect for users managing <span class="has-text-weight-medium">home servers, IoT devices, or remote services</span> that need consistent domain resolution. 
+                    <span>Perfect for users who manage services at home or in small offices with <strong>dynamic IP addresses</strong>, meaning their Internet Service Provider (ISP) changes their IP address periodically, often without them even noticing. <strong>DNSentinnel</strong> ensures their services and websites remain accessible without interruptions, even when their IP changes.</span>
                 </p>
             </div>
-            <div class="column is-two-thirds">
-                <div id="dynamic-ip-demo" class="box mt-5" style="overflow:hidden; position:relative; min-height:260px; min-width:520px; max-width:800px; margin:0 auto;">
+        </div>
+        <div class="columns is-vcentered">
+            <div class="column is-12">
+                <div id="dynamic-ip-demo" class="box mt-5" style="overflow:hidden; position:relative; min-height:220px; min-width:0; max-width:100%; margin:0 auto;">
                     <h4 class="title is-5 mb-3 has-text-centered">The problem with having a dynamic IP address</h4>
-                    <div id="animation-phases" style="position:relative; height:170px;">
+                    <div id="animation-phases" style="position:relative; height:150px;">
                     </div>
                 </div>
                 <style>
@@ -50,18 +55,29 @@
                 }
                 #animation-phases {
                     position: relative;
-                    height: 170px;
+                    height: 150px;
                 }
                 #dynamic-ip-demo {
-                    min-height: 260px;
-                    min-width: 520px;
-                    max-width: 800px;
+                    min-height: 220px;
+                    min-width: 0;
+                    max-width: 100%;
                     margin: 0 auto;
                 }
                 @media (max-width: 900px) {
                     #dynamic-ip-demo {
-                        min-width: 100%;
+                        min-width: 0;
                         max-width: 100%;
+                    }
+                    #animation-phases {
+                        height: 120px;
+                    }
+                }
+                @media (max-width: 600px) {
+                    #animation-phases {
+                        height: 90px;
+                    }
+                    #dynamic-ip-demo {
+                        min-height: 140px;
                     }
                 }
                 </style>
