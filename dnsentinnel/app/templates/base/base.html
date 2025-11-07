@@ -41,5 +41,14 @@
     </main>
     {% include 'base/footer/footer.html' %}
     {% block scripts %}{% endblock %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.notification .delete').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    btn.parentElement.remove();
+                });
+            });
+        });
+    </script>
 </body>
 </html>
