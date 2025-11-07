@@ -8,24 +8,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="shortcut icon" href="{{ url_for('static', filename="favicon.png")}}" type="image/x-icon">
     <link href="{{ url_for('static', filename='css/bulma.min.css')}}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css')}}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     {% block head %}{% endblock %}
-    <style>
-        html, body {
-            height: 100%;
-        }
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        main {
-            flex: 1;
-        }
-    </style>
 </head>
 <body>
-    {% include 'base/header/header.html' %}
+    <header>
+        {% include 'base/header/header.html' %}
+    </header>
     <main class="container is-fluid mt-5">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
