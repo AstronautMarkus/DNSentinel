@@ -1,6 +1,6 @@
 <nav class="navbar is-dark mb-4" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-        <a class="navbar-item" {% if session.get('user_id') %} href="{{ url_for('dashboard.home') }}" {% else %} href="{{ url_for('main.index') }}" {% endif %}>
+        <a class="navbar-item" {% if current_user.is_authenticated %} href="{{ url_for('dashboard.home') }}" {% else %} href="{{ url_for('main.index') }}" {% endif %}>
             <img style="pointer-events: none;" src="{{ url_for('static', filename='img/DNSentinnel.svg') }}" alt="DNSentinnel Logo">
             <span class="is-size-4 has-text-weight-semibold has-text-white">DNSentinnel</span>
         </a>
@@ -15,16 +15,16 @@
 
         </div>
         <div class="navbar-end">
-            {% if session.get('user_id') %}
+            {% if current_user.is_authenticated %}
                 <div class="navbar-item has-dropdown" id="user-dropdown">
                     <a class="navbar-link" id="user-dropdown-link">
-                        <span class="has-text-weight-semibold">{{ session.get('user_name') }}</span>
+                        <span class="has-text-weight-semibold">{{ current_user.name }}</span>
                     </a>
                     <div class="navbar-dropdown is-right">
                         <div class="navbar-item" style="border-bottom: 1px solid #eee;">
                             <div>
-                                <span class="has-text-weight-semibold">{{ session.get('user_name') }}</span><br>
-                                <span class="is-size-7 has-text-grey">{{ session.get('user_email') }}</span>
+                                <span class="has-text-weight-semibold">{{ current_user.name }}</span><br>
+                                <span class="is-size-7 has-text-grey">{{ current_user.email }}</span>
                             </div>
                         </div>
                         <a class="navbar-item" href="{{ url_for('auth.logout') }}">Log out</a>
