@@ -19,6 +19,7 @@
             <th>Zone ID</th>
             <th>Zone Token</th>
             <th>Created At</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -38,6 +39,22 @@
               </button>
             </td>
             <td>{{ zone.created_at.strftime('%Y-%m-%d') }}</td>
+            <td>
+              <div class="is-flex is-flex-direction-column">
+                <a href="" class="button is-small is-info is-light mb-1" title="View">
+                  <span class="icon is-small"><i class="fas fa-eye"></i></span>
+                  <span>Domains List</span>
+                </a>
+                <a href="" class="button is-small is-warning is-light mb-1" title="Edit">
+                  <span class="icon is-small"><i class="fas fa-edit"></i></span>
+                  <span>Edit</span>
+                </a>
+                <a href="" class="button is-small is-danger is-light" title="Delete">
+                  <span class="icon is-small"><i class="fas fa-trash-alt"></i></span>
+                  <span>Delete</span>
+                </a>
+              </div>
+            </td>
           </tr>
           {% else %}
           <tr>
@@ -63,7 +80,6 @@
 {{ super() }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Copy Zone ID
   document.querySelectorAll('.copy-zoneid').forEach(function(btn) {
     btn.addEventListener('click', function() {
       const zoneId = btn.closest('td').querySelector('.zone-id').dataset.zoneid;
@@ -79,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   });
-  // Copy Token
   document.querySelectorAll('.copy-token').forEach(function(btn) {
     btn.addEventListener('click', function() {
       const token = btn.closest('td').querySelector('.zone-token').dataset.token;

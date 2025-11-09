@@ -1,0 +1,74 @@
+{% extends 'base/admin_base.html' %}
+{% block title %}DNS Records{% endblock %}
+{% block content %}
+
+<div class="section">
+  <div class="container is-fullwidth">
+    <div class="box">
+      <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
+        <h2 class="subtitle is-5 mb-0">DNS Record List</h2>
+      </div>
+      <table class="table is-fullwidth is-striped is-hoverable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>TTL</th>
+            <th>Proxied</th>
+            <th>Active</th>
+            <th>Created At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for record in records %}
+          <tr>
+            <td>{{ record.name }}</td>
+            <td>{{ record.type }}</td>
+            <td>{{ record.ttl }}</td>
+            <td>
+              {% if record.proxied %}
+                <span class="tag is-success">Yes</span>
+              {% else %}
+                <span class="tag is-light">No</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if record.active %}
+                <span class="tag is-success">Active</span>
+              {% else %}
+                <span class="tag is-danger">Inactive</span>
+              {% endif %}
+            </td>
+            <td>{{ record.created_at.strftime('%Y-%m-%d') }}</td>
+            <td>
+              <div class="is-flex is-flex-direction-column">
+                <a href="" class="button is-small is-info is-light mb-1" title="View">
+                  <span class="icon is-small"><i class="fas fa-eye"></i></span>
+                  <span>View</span>
+                </a>
+                <a href="" class="button is-small is-warning is-light mb-1" title="Edit">
+                  <span class="icon is-small"><i class="fas fa-edit"></i></span>
+                  <span>Edit</span>
+                </a>
+                <a href="" class="button is-small is-danger is-light" title="Delete">
+                  <span class="icon is-small"><i class="fas fa-trash-alt"></i></span>
+                  <span>Delete</span>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" class="has-text-centered">
+              No records available.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

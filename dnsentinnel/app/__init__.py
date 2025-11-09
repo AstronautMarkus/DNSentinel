@@ -4,6 +4,7 @@ from app.routes.auth import auth_bp
 from app.routes.main import main_bp
 from app.routes.dashboard import dashboard_bp
 from app.routes.zones import zones_bp
+from app.routes.records import records_bp
 from flask_login import LoginManager
 from app.models.models import User, db
 
@@ -25,5 +26,6 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
     app.register_blueprint(zones_bp, url_prefix='/dashboard/zones')
+    app.register_blueprint(records_bp, url_prefix='/dashboard')
 
     return app
