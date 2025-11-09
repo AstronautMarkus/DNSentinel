@@ -42,7 +42,11 @@
 
             <div class="field is-grouped is-grouped-centered mt-5">
               <div class="control">
-                <button class="button is-link is-rounded" type="submit">
+                <button id="validateBtn" class="button is-link is-rounded" type="button">
+                  <span class="icon"><i class="fas fa-check-circle"></i></span>
+                  <span>Validate Credentials</span>
+                </button>
+                <button id="createBtn" class="button is-success is-rounded is-hidden" type="submit">
                   <span class="icon"><i class="fas fa-plus-circle"></i></span>
                   <span>Create Zone</span>
                 </button>
@@ -68,15 +72,20 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.getElementById('zoneForm');
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
+  const validateBtn = document.getElementById('validateBtn');
+  const createBtn = document.getElementById('createBtn');
+
+  // Solo permite submit cuando ya se validó
+  let validated = false;
+
+  validateBtn.addEventListener('click', function() {
     const name = form.elements['name'].value;
     const zone_id = form.elements['zone_id'].value;
     const api_token = form.elements['api_token'].value;
 
     Swal.fire({
-      title: 'Validando...',
-      text: 'Verificando credenciales con Cloudflare',
+      title: 'Validating...',
+      text: 'Checking credentials with Cloudflare',
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
@@ -93,17 +102,19 @@ document.addEventListener('DOMContentLoaded', function() {
       if (data.ok) {
         Swal.fire({
           icon: 'success',
-          title: '¡Validado!',
+          title: 'Validated!',
           html: `<p>${data.msg}</p>`,
           confirmButtonText: 'OK',
           allowOutsideClick: false
         }).then(() => {
-          form.submit();
+          validated = true;
+          validateBtn.classList.add('is-hidden');
+          createBtn.classList.remove('is-hidden');
         });
       } else {
         Swal.fire({
           icon: 'error',
-          title: 'Error de validación',
+          title: 'Validation Error',
           html: `<p>${data.msg}</p>`,
           confirmButtonText: 'OK',
           allowOutsideClick: false
@@ -114,11 +125,22 @@ document.addEventListener('DOMContentLoaded', function() {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        html: '<p>No se pudo validar. Intenta de nuevo o revisa tu conexión.</p>',
+        html: '<p>Could not validate. Please try again or check your connection.</p>',
         confirmButtonText: 'OK',
         allowOutsideClick: false
       });
     });
+  });
+
+  form.addEventListener('submit', function(e) {
+    if (!validated) {
+      e.preventDefault();
+      Swal.fire({
+        icon: 'warning',
+        title: 'Please validate credentials first',
+        confirmButtonText: 'OK'
+      });
+    }
   });
 });
 </script>
