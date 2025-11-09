@@ -6,7 +6,7 @@ from flask_login import current_user, login_required
 from app.models.models import Zone
 
 
-@dashboard_bp.route('/dashboard/home')
+@dashboard_bp.route('/home')
 @login_required
 def home():
     

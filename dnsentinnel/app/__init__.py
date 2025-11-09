@@ -3,6 +3,7 @@ from app.config.config import Config
 from app.routes.auth import auth_bp
 from app.routes.main import main_bp
 from app.routes.dashboard import dashboard_bp
+from app.routes.zones import zones_bp
 from flask_login import LoginManager
 from app.models.models import User, db
 
@@ -21,7 +22,8 @@ def create_app():
         return User.query.get(int(user_id))
     
     app.register_blueprint(main_bp)
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(dashboard_bp)
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
+    app.register_blueprint(zones_bp, url_prefix='/zones')
 
     return app
