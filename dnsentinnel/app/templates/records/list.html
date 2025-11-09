@@ -5,11 +5,15 @@
 <div class="section">
   <div class="container is-fullwidth is-widescreen" style="max-width: 98vw;">
     <div class="box">
-      <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
-        <h2 class="subtitle is-5 mb-0">DNS Record List</h2>
+      <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+        <h2 class="title is-4 mb-0">
+          <span class="icon has-text-primary"><i class="fas fa-database"></i></span>
+          <span>DNS Record List</span>
+        </h2>
         <div class="dropdown is-right" id="addDropdown">
           <div class="dropdown-trigger">
-            <button class="button is-primary" aria-haspopup="true" aria-controls="dropdown-menu">
+            <button class="button is-primary is-rounded" aria-haspopup="true" aria-controls="dropdown-menu">
+              <span class="icon"><i class="fas fa-plus"></i></span>
               <span>Add</span>
               <span class="icon is-small">
                 <i class="fas fa-angle-down" aria-hidden="true"></i>
@@ -18,113 +22,136 @@
           </div>
           <div class="dropdown-menu" id="dropdown-menu" role="menu">
             <div class="dropdown-content">
-              <a href="#" class="dropdown-item" id="addSingleBtn">Single</a>
-              <a href="#" class="dropdown-item" id="addFullListBtn">Full list</a>
+              <a href="#" class="dropdown-item" id="addSingleBtn">
+                <span class="icon"><i class="fas fa-file-import"></i></span>
+                <span>Single</span>
+              </a>
+              <a href="#" class="dropdown-item" id="addFullListBtn">
+                <span class="icon"><i class="fas fa-list"></i></span>
+                <span>Full list</span>
+              </a>
             </div>
           </div>
         </div>
       </div>
-      <table class="table is-fullwidth is-striped is-hoverable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>TTL</th>
-            <th>Proxied</th>
-            <th>Proxiable</th>
-            <th>Active</th>
-            <th>Content</th>
-            <th>Comment</th>
-            <th>Settings</th>
-            <th>Tags</th>
-            <th>Created On</th>
-            <th>Modified On</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for record in records %}
-          <tr>
-            <td>{{ record.name }}</td>
-            <td>{{ record.type }}</td>
-            <td>{{ record.ttl }}</td>
-            <td>
-              {% if record.proxied %}
-                <span class="tag is-success">Yes</span>
-              {% else %}
-                <span class="tag is-light">No</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if record.proxiable %}
-                <span class="tag is-success">Yes</span>
-              {% else %}
-                <span class="tag is-light">No</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if record.active %}
-                <span class="tag is-success">Active</span>
-              {% else %}
-                <span class="tag is-danger">Inactive</span>
-              {% endif %}
-            </td>
-            <td>{{ record.content or '' }}</td>
-            <td>{{ record.comment or '' }}</td>
-            <td>
-              {% if record.settings %}
-                <pre style="white-space: pre-wrap; word-break: break-all;">{{ record.settings | tojson }}</pre>
-              {% else %}
-                <span class="has-text-grey-light">-</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if record.tags %}
-                <pre style="white-space: pre-wrap; word-break: break-all;">{{ record.tags | tojson }}</pre>
-              {% else %}
-                <span class="has-text-grey-light">-</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if record.created_on %}
-                {{ record.created_on.strftime('%Y-%m-%d') }}
-              {% else %}
-                <span class="has-text-grey-light">-</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if record.modified_on %}
-                {{ record.modified_on.strftime('%Y-%m-%d') }}
-              {% else %}
-                <span class="has-text-grey-light">-</span>
-              {% endif %}
-            </td>
-            <td>
-              <div class="is-flex is-flex-direction-column">
-                <a href="" class="button is-small is-info is-light mb-1" title="View">
-                  <span class="icon is-small"><i class="fas fa-eye"></i></span>
-                  <span>View</span>
-                </a>
-                <a href="" class="button is-small is-warning is-light mb-1" title="Edit">
-                  <span class="icon is-small"><i class="fas fa-edit"></i></span>
-                  <span>Edit</span>
-                </a>
-                <a href="" class="button is-small is-danger is-light" title="Delete">
-                  <span class="icon is-small"><i class="fas fa-trash-alt"></i></span>
-                  <span>Delete</span>
-                </a>
-              </div>
-            </td>
-          </tr>
-          {% else %}
-          <tr>
-            <td colspan="13" class="has-text-centered">
-              No records available.
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <div class="table-container">
+        <table class="table is-fullwidth is-striped is-hoverable is-bordered">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>TTL</th>
+              <th>Proxied</th>
+              <th>Proxiable</th>
+              <th>Active</th>
+              <th>Content</th>
+              <th>Comment</th>
+              <th>Settings</th>
+              <th>Tags</th>
+              <th>Created On</th>
+              <th>Modified On</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in records %}
+            <tr>
+              <td>
+                <span class="icon-text">
+                  <span class="icon has-text-info"><i class="fas fa-globe"></i></span>
+                  <span>{{ record.name }}</span>
+                </span>
+              </td>
+              <td>
+                <span class="tag is-info is-light">{{ record.type }}</span>
+              </td>
+              <td>
+                <span class="tag is-light">{{ record.ttl }}</span>
+              </td>
+              <td>
+                {% if record.proxied %}
+                  <span class="tag is-success is-light"><i class="fas fa-check"></i> Yes</span>
+                {% else %}
+                  <span class="tag is-light"><i class="fas fa-times"></i> No</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if record.proxiable %}
+                  <span class="tag is-success is-light"><i class="fas fa-check"></i> Yes</span>
+                {% else %}
+                  <span class="tag is-light"><i class="fas fa-times"></i> No</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if record.active %}
+                  <span class="tag is-success"><i class="fas fa-check-circle"></i> Active</span>
+                {% else %}
+                  <span class="tag is-danger"><i class="fas fa-ban"></i> Inactive</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="has-text-dark">{{ record.content or '-' }}</span>
+              </td>
+              <td>
+                <span class="has-text-grey-dark">{{ record.comment or '-' }}</span>
+              </td>
+              <td>
+                {% if record.settings %}
+                  <span class="icon has-text-grey-light" title="Settings"><i class="fas fa-cog"></i></span>
+                  <pre class="is-size-7" style="white-space: pre-wrap; word-break: break-all; background: #f8f9fa; border-radius: 4px;">{{ record.settings | tojson }}</pre>
+                {% else %}
+                  <span class="has-text-grey-light">-</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if record.tags %}
+                  <span class="icon has-text-grey-light" title="Tags"><i class="fas fa-tags"></i></span>
+                  <pre class="is-size-7" style="white-space: pre-wrap; word-break: break-all; background: #f8f9fa; border-radius: 4px;">{{ record.tags | tojson }}</pre>
+                {% else %}
+                  <span class="has-text-grey-light">-</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if record.created_on %}
+                  <span class="has-text-grey-dark">{{ record.created_on.strftime('%Y-%m-%d') }}</span>
+                {% else %}
+                  <span class="has-text-grey-light">-</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if record.modified_on %}
+                  <span class="has-text-grey-dark">{{ record.modified_on.strftime('%Y-%m-%d') }}</span>
+                {% else %}
+                  <span class="has-text-grey-light">-</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="buttons are-small is-flex-direction-column">
+                  <a href="{{ url_for('records.detail_record', record_id=record.record_id, zone_id=zone_id) }}" class="button is-info is-light mb-1" title="View">
+                    <span class="icon"><i class="fas fa-eye"></i></span>
+                  </a>
+                  <a href="#" class="button is-warning is-light mb-1" title="Edit">
+                    <span class="icon"><i class="fas fa-edit"></i></span>
+                  </a>
+                  <a href="#" class="button is-danger is-light" title="Delete">
+                    <span class="icon"><i class="fas fa-trash-alt"></i></span>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="13" class="has-text-centered">
+                <span class="icon-text has-text-grey-light">
+                  <span class="icon"><i class="fas fa-info-circle"></i></span>
+                  <span>No records available.</span>
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
