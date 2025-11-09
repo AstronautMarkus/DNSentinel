@@ -1,0 +1,100 @@
+{% extends 'base/admin_base.html' %}
+{% block title %}DNS Zones{% endblock %}
+{% block content %}
+
+<div class="section">
+  <div class="container is-fullwidth">
+    <div class="box">
+      <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
+        <h2 class="subtitle is-5 mb-0">DNS Zone List</h2>
+        <a href="{{ url_for('zones.create_zone') }}" class="button is-info is-info is-small">
+          <span class="icon is-small"><i class="fas fa-plus-circle"></i></span>
+          <span>Create Zone</span>
+        </a>
+      </div>
+      <table class="table is-fullwidth is-striped is-hoverable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Zone ID</th>
+            <th>Zone Token</th>
+            <th>Created At</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for zone in user_zones %}
+          <tr>
+            <td>{{ zone.name }}</td>
+            <td>
+              <span class="zone-id" data-zoneid="{{ zone.zone_id }}">{{ zone.zone_id }}</span>
+              <button class="button is-small is-light copy-zoneid" type="button" title="Copy" style="margin-left:2px;">
+                <span class="icon is-small"><i class="fas fa-copy"></i></span>
+              </button>
+            </td>
+            <td>
+              <span class="zone-token" style="letter-spacing:2px;" data-token="{{ zone.api_token }}">{{ zone.api_token }}</span>
+              <button class="button is-small is-light copy-token" type="button" title="Copy" style="margin-left:2px;">
+                <span class="icon is-small"><i class="fas fa-copy"></i></span>
+              </button>
+            </td>
+            <td>{{ zone.created_at.strftime('%Y-%m-%d') }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="4" class="has-text-centered">
+              No zones available.
+              <br>
+              <a href="{{ url_for('zones.create_zone') }}" class="button is-info is-rounded is-small mt-3">
+                <span class="icon is-small"><i class="fas fa-plus-circle"></i></span>
+                <span>Create Zone</span>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Copy Zone ID
+  document.querySelectorAll('.copy-zoneid').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const zoneId = btn.closest('td').querySelector('.zone-id').dataset.zoneid;
+      navigator.clipboard.writeText(zoneId).then(function() {
+        btn.classList.add('is-success');
+        btn.querySelector('i').classList.remove('fa-copy');
+        btn.querySelector('i').classList.add('fa-check');
+        setTimeout(function() {
+          btn.classList.remove('is-success');
+          btn.querySelector('i').classList.remove('fa-check');
+          btn.querySelector('i').classList.add('fa-copy');
+        }, 1200);
+      });
+    });
+  });
+  // Copy Token
+  document.querySelectorAll('.copy-token').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const token = btn.closest('td').querySelector('.zone-token').dataset.token;
+      navigator.clipboard.writeText(token).then(function() {
+        btn.classList.add('is-success');
+        btn.querySelector('i').classList.remove('fa-copy');
+        btn.querySelector('i').classList.add('fa-check');
+        setTimeout(function() {
+          btn.classList.remove('is-success');
+          btn.querySelector('i').classList.remove('fa-check');
+          btn.querySelector('i').classList.add('fa-copy');
+        }, 1200);
+      });
+    });
+  });
+});
+</script>
+{% endblock %}
