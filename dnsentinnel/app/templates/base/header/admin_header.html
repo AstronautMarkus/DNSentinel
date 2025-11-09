@@ -1,0 +1,65 @@
+<nav class="navbar is-dark mb-4" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" {% if session.get('user_id') %} href="{{ url_for('dashboard.home') }}" {% else %} href="{{ url_for('main.index') }}" {% endif %}>
+            <img style="pointer-events: none;" src="{{ url_for('static', filename='img/DNSentinnel.svg') }}" alt="DNSentinnel Logo">
+            <span class="is-size-4 has-text-weight-semibold has-text-white">DNSentinnel</span>
+        </a>
+        <a role="button" class="navbar-burger has-text-white" aria-label="menu" aria-expanded="false" data-target="navbarNav">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+    <div id="navbarNav" class="navbar-menu">
+        <div class="navbar-start">
+
+        </div>
+        <div class="navbar-end">
+            {% if session.get('user_id') %}
+                <div class="navbar-item has-dropdown" id="user-dropdown">
+                    <a class="navbar-link" id="user-dropdown-link">
+                        <span class="has-text-weight-semibold">{{ session.get('user_name') }}</span>
+                    </a>
+                    <div class="navbar-dropdown is-right">
+                        <div class="navbar-item" style="border-bottom: 1px solid #eee;">
+                            <div>
+                                <span class="has-text-weight-semibold">{{ session.get('user_name') }}</span><br>
+                                <span class="is-size-7 has-text-grey">{{ session.get('user_email') }}</span>
+                            </div>
+                        </div>
+                        <a class="navbar-item" href="{{ url_for('auth.logout') }}">Log out</a>
+                    </div>
+                </div>
+            {% else %}
+                <a class="navbar-item " href="{{ url_for('auth.login') }}">Login</a>
+                <a class="navbar-item" href="{{ url_for('auth.register') }}">Register</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var burger = document.querySelector('.navbar-burger');
+    var menu = document.getElementById(burger.dataset.target);
+
+    burger.addEventListener('click', function () {
+        burger.classList.toggle('is-active');
+        menu.classList.toggle('is-active');
+    });
+
+    var userDropdown = document.getElementById('user-dropdown');
+    var userDropdownLink = document.getElementById('user-dropdown-link');
+    if (userDropdown && userDropdownLink) {
+        userDropdownLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            userDropdown.classList.toggle('is-active');
+        });
+        
+        document.addEventListener('click', function(event) {
+            if (!userDropdown.contains(event.target) && userDropdown.classList.contains('is-active')) {
+                userDropdown.classList.remove('is-active');
+            }
+        });
+    }
+});
+</script>

@@ -15,6 +15,7 @@ def login():
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
             session['user_name'] = user.name
+            session['user_email'] = user.email
             flash(f'Login successful. Welcome, {user.name}!', 'success')
             session_db.close()
             return redirect(url_for('dashboard.home'))
