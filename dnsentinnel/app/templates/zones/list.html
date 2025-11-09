@@ -4,10 +4,14 @@
 
 <div class="section">
   <div class="container is-fullwidth">
-    <h1 class="title">DNS Zones</h1>
+    <div class="is-flex is-align-items-center mb-4">
+      <img src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="Cloudflare"
+        style="height:40px; width:auto; pointer-events: none; margin-right: 12px;">
+      <h1 class="title mb-0">Cloudflare DNS Zones</h1>
+    </div>
     <div class="box">
       <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
-        <h2 class="subtitle is-5 mb-0">DNS Zone List</h2>
+        <h2 class="subtitle is-5 mb-0">Added Zones</h2>
         <a href="{{ url_for('zones.create_zone') }}" class="button is-info is-info is-small">
           <span class="icon is-small"><i class="fas fa-plus-circle"></i></span>
           <span>Create Zone</span>
@@ -34,7 +38,8 @@
               </button>
             </td>
             <td>
-              <span class="zone-token" style="letter-spacing:2px;" data-token="{{ zone.api_token }}">••••••••••••••••</span>
+              <span class="zone-token" style="letter-spacing:2px;"
+                data-token="{{ zone.api_token }}">••••••••••••••••</span>
               <button class="button is-small is-light toggle-token" type="button" style="margin-left:5px;">
                 <span class="icon is-small"><i class="fas fa-eye"></i></span>
               </button>
@@ -45,7 +50,8 @@
             <td>{{ zone.created_at.strftime('%Y-%m-%d') }}</td>
             <td>
               <div class="is-flex is-flex-direction-column">
-                <a href="{{ url_for('records.list_records', zone_id=zone.zone_id) }}" class="button is-small is-info is-light mb-1" title="View">
+                <a href="{{ url_for('records.list_records', zone_id=zone.zone_id) }}"
+                  class="button is-small is-info is-light mb-1" title="View">
                   <span class="icon is-small"><i class="fas fa-eye"></i></span>
                   <span>DNS Record List</span>
                 </a>
@@ -83,53 +89,53 @@
 {% block scripts %}
 {{ super() }}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.copy-zoneid').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      const zoneId = btn.closest('td').querySelector('.zone-id').dataset.zoneid;
-      navigator.clipboard.writeText(zoneId).then(function() {
-        btn.classList.add('is-success');
-        btn.querySelector('i').classList.remove('fa-copy');
-        btn.querySelector('i').classList.add('fa-check');
-        setTimeout(function() {
-          btn.classList.remove('is-success');
-          btn.querySelector('i').classList.remove('fa-check');
-          btn.querySelector('i').classList.add('fa-copy');
-        }, 1200);
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.copy-zoneid').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const zoneId = btn.closest('td').querySelector('.zone-id').dataset.zoneid;
+        navigator.clipboard.writeText(zoneId).then(function () {
+          btn.classList.add('is-success');
+          btn.querySelector('i').classList.remove('fa-copy');
+          btn.querySelector('i').classList.add('fa-check');
+          setTimeout(function () {
+            btn.classList.remove('is-success');
+            btn.querySelector('i').classList.remove('fa-check');
+            btn.querySelector('i').classList.add('fa-copy');
+          }, 1200);
+        });
+      });
+    });
+    document.querySelectorAll('.copy-token').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const token = btn.closest('td').querySelector('.zone-token').dataset.token;
+        navigator.clipboard.writeText(token).then(function () {
+          btn.classList.add('is-success');
+          btn.querySelector('i').classList.remove('fa-copy');
+          btn.querySelector('i').classList.add('fa-check');
+          setTimeout(function () {
+            btn.classList.remove('is-success');
+            btn.querySelector('i').classList.remove('fa-check');
+            btn.querySelector('i').classList.add('fa-copy');
+          }, 1200);
+        });
+      });
+    });
+    document.querySelectorAll('.toggle-token').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var tokenSpan = btn.parentElement.querySelector('.zone-token');
+        var token = tokenSpan.getAttribute('data-token');
+        var isHidden = tokenSpan.textContent.includes('•');
+        if (isHidden) {
+          tokenSpan.textContent = token;
+          btn.querySelector('i').classList.remove('fa-eye');
+          btn.querySelector('i').classList.add('fa-eye-slash');
+        } else {
+          tokenSpan.textContent = '••••••••••••••••';
+          btn.querySelector('i').classList.remove('fa-eye-slash');
+          btn.querySelector('i').classList.add('fa-eye');
+        }
       });
     });
   });
-  document.querySelectorAll('.copy-token').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      const token = btn.closest('td').querySelector('.zone-token').dataset.token;
-      navigator.clipboard.writeText(token).then(function() {
-        btn.classList.add('is-success');
-        btn.querySelector('i').classList.remove('fa-copy');
-        btn.querySelector('i').classList.add('fa-check');
-        setTimeout(function() {
-          btn.classList.remove('is-success');
-          btn.querySelector('i').classList.remove('fa-check');
-          btn.querySelector('i').classList.add('fa-copy');
-        }, 1200);
-      });
-    });
-  });
-  document.querySelectorAll('.toggle-token').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var tokenSpan = btn.parentElement.querySelector('.zone-token');
-      var token = tokenSpan.getAttribute('data-token');
-      var isHidden = tokenSpan.textContent.includes('•');
-      if (isHidden) {
-        tokenSpan.textContent = token;
-        btn.querySelector('i').classList.remove('fa-eye');
-        btn.querySelector('i').classList.add('fa-eye-slash');
-      } else {
-        tokenSpan.textContent = '••••••••••••••••';
-        btn.querySelector('i').classList.remove('fa-eye-slash');
-        btn.querySelector('i').classList.add('fa-eye');
-      }
-    });
-  });
-});
 </script>
 {% endblock %}

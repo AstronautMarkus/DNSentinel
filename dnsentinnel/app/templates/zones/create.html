@@ -5,10 +5,15 @@
 <div class="section">
   <div class="container">
     <div class="columns is-centered">
-      <div class="column is-6-tablet is-5-desktop is-4-widescreen">
+      <div class="column is-6-tablet is-5-desktop is-5-widescreen">
         <div class="box has-shadow">
-          <h1 class="title is-2 has-text-centered mb-2">Create a New DNS Zone</h1>
-          <p class="subtitle is-5 has-text-centered mb-5">Fill out the form below to create a new DNS zone.</p>
+          <div class="is-flex is-align-items-center mb-4">
+            <img src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="Cloudflare"
+              style="height:40px; width:auto; pointer-events: none; margin-right: 12px;">
+            <h1 class="title mb-0">Add Cloudflare DNS Zone</h1>
+          </div>
+          <p class="subtitle is-5 has-text-centered mb-5">Fill out the form below to add a Cloudflare DNS zone in DNSentinel.
+          </p>
           <form id="zoneForm" method="POST" action="{{ url_for('zones.create_zone') }}">
             <div class="field">
               <label class="label">Name <span class="has-text-danger">*</span></label>
@@ -70,78 +75,77 @@
 {% block scripts %}
 {{ super() }}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const form = document.getElementById('zoneForm');
-  const validateBtn = document.getElementById('validateBtn');
-  const createBtn = document.getElementById('createBtn');
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('zoneForm');
+    const validateBtn = document.getElementById('validateBtn');
+    const createBtn = document.getElementById('createBtn');
 
-  // Solo permite submit cuando ya se validó
-  let validated = false;
+    let validated = false;
 
-  validateBtn.addEventListener('click', function() {
-    const name = form.elements['name'].value;
-    const zone_id = form.elements['zone_id'].value;
-    const api_token = form.elements['api_token'].value;
+    validateBtn.addEventListener('click', function () {
+      const name = form.elements['name'].value;
+      const zone_id = form.elements['zone_id'].value;
+      const api_token = form.elements['api_token'].value;
 
-    Swal.fire({
-      title: 'Validating...',
-      text: 'Checking credentials with Cloudflare',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
+      Swal.fire({
+        title: 'Validating...',
+        text: 'Checking credentials with Cloudflare',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      fetch("{{ url_for('zones.validate_zone') }}", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ zone_id, api_token })
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.ok) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Validated!',
+              html: `<p>${data.msg}</p>`,
+              confirmButtonText: 'OK',
+              allowOutsideClick: false
+            }).then(() => {
+              validated = true;
+              validateBtn.classList.add('is-hidden');
+              createBtn.classList.remove('is-hidden');
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Validation Error',
+              html: `<p>${data.msg}</p>`,
+              confirmButtonText: 'OK',
+              allowOutsideClick: false
+            });
+          }
+        })
+        .catch(() => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            html: '<p>Could not validate. Please try again or check your connection.</p>',
+            confirmButtonText: 'OK',
+            allowOutsideClick: false
+          });
+        });
     });
 
-    fetch("{{ url_for('zones.validate_zone') }}", {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({zone_id, api_token})
-    })
-    .then(r => r.json())
-    .then(data => {
-      if (data.ok) {
+    form.addEventListener('submit', function (e) {
+      if (!validated) {
+        e.preventDefault();
         Swal.fire({
-          icon: 'success',
-          title: 'Validated!',
-          html: `<p>${data.msg}</p>`,
-          confirmButtonText: 'OK',
-          allowOutsideClick: false
-        }).then(() => {
-          validated = true;
-          validateBtn.classList.add('is-hidden');
-          createBtn.classList.remove('is-hidden');
-        });
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Validation Error',
-          html: `<p>${data.msg}</p>`,
-          confirmButtonText: 'OK',
-          allowOutsideClick: false
+          icon: 'warning',
+          title: 'Please validate credentials first',
+          confirmButtonText: 'OK'
         });
       }
-    })
-    .catch(() => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        html: '<p>Could not validate. Please try again or check your connection.</p>',
-        confirmButtonText: 'OK',
-        allowOutsideClick: false
-      });
     });
   });
-
-  form.addEventListener('submit', function(e) {
-    if (!validated) {
-      e.preventDefault();
-      Swal.fire({
-        icon: 'warning',
-        title: 'Please validate credentials first',
-        confirmButtonText: 'OK'
-      });
-    }
-  });
-});
 </script>
 {% endblock %}

@@ -2,7 +2,7 @@ from . import zones_bp
 from flask import request, jsonify
 import requests
 
-@zones_bp.route('/validate', methods=['POST'])
+@zones_bp.route('/cloudflare/validate', methods=['POST'])
 def validate_zone():
     data = request.json
     zone_id = data.get('zone_id')

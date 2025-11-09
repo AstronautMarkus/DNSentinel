@@ -3,7 +3,7 @@ from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app.models.models import db, Zone
 
-@zones_bp.route('/create', methods=['GET', 'POST'])
+@zones_bp.route('/cloudflare/create', methods=['GET', 'POST'])
 @login_required
 def create_zone():
     if request.method == 'POST':
