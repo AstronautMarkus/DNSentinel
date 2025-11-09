@@ -7,33 +7,33 @@ project_root = os.path.abspath(os.path.join(current_dir, '..', '..'))
 sys.path.insert(0, project_root)
 
 from app.config.config import Config
-from app.models.user import Base
-from sqlalchemy import create_engine
+from app.models.models import db
+from app import create_app
 
-# Import all models so they are registered in Base.metadata
-import app.models
 
 def init_db():
     """Creates the tables in the database."""
-    engine = create_engine(Config.SQLALCHEMY_DATABASE_URL, echo=True)
-    Base.metadata.create_all(bind=engine)
-    print("✅ Database initialized.")
+    app = create_app()
+    with app.app_context():
+        db.create_all()
+        print("✅ Database initialized.")
 
 def reset_db(auto_confirm=False):
     """Drops all tables and recreates them."""
-    engine = create_engine(Config.SQLALCHEMY_DATABASE_URL, echo=True)
-    print("⚠️  This will delete all existing tables and data.")
-    if auto_confirm:
-        confirm = "yes"
-    else:
-        confirm = input("Are you sure? (yes/no): ")
-    if confirm.lower() in ['yes', 'y', 'sí', 'si']:
-        Base.metadata.drop_all(bind=engine)
-        print("✅ Tables dropped.")
-        Base.metadata.create_all(bind=engine)
-        print("✅ Database reinitialized.")
-    else:
-        print("❌ Operation cancelled.")
+    app = create_app()
+    with app.app_context():
+        print("⚠️  This will delete all existing tables and data.")
+        if auto_confirm:
+            confirm = "yes"
+        else:
+            confirm = input("Are you sure? (yes/no): ")
+        if confirm.lower() in ['yes', 'y', 'sí', 'si']:
+            db.drop_all()
+            print("✅ Tables dropped.")
+            db.create_all()
+            print("✅ Database reinitialized.")
+        else:
+            print("❌ Operation cancelled.")
 
 def print_help():
     print("Usage: python init_db.py [FLAG]")

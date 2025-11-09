@@ -4,16 +4,15 @@ from app.routes.auth import auth_bp
 from app.routes.main import main_bp
 from app.routes.dashboard import dashboard_bp
 from flask_login import LoginManager
-from app.models.user import User
+from app.models.models import User, db
 
 login_manager = LoginManager()
 
 def create_app():
-
     app = Flask(__name__)
     app.config.from_object(Config)
-    app.config['engine'] = Config.engine
-    app.config['SessionLocal'] = Config.SessionLocal
+
+    db.init_app(app)
 
     login_manager.init_app(app)
 
@@ -25,5 +24,4 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
 
-    
     return app

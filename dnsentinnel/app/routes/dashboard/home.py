@@ -1,10 +1,13 @@
-from flask import render_template
+from flask import render_template, flash
 from app.routes.dashboard import dashboard_bp
 import requests
 import socket
+from flask_login import current_user, login_required
+from app.models.models import Zone
 
 
 @dashboard_bp.route('/dashboard/home')
+@login_required
 def home():
     
     try:
@@ -22,4 +25,6 @@ def home():
     finally:
         s.close()
 
-    return render_template('dashboard/home.html', isp_ip=isp_ip, ethernet_ip=ethernet_ip)
+    user_zones = Zone.query.filter_by(user_id=current_user.id).all()
+
+    return render_template('dashboard/home.html', isp_ip=isp_ip, ethernet_ip=ethernet_ip, user_zones=user_zones)

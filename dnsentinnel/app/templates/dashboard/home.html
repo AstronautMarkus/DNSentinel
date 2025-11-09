@@ -50,35 +50,33 @@
   <div class="columns">
     <div class="column is-two-thirds">
       <div class="box">
-        <h2 class="subtitle is-5">Latest IP Changes</h2>
+        <h2 class="subtitle is-5">DNS Zone List</h2>
         <table class="table is-fullwidth is-striped is-hoverable">
           <thead>
             <tr>
-              <th>Date</th>
-              <th>Domain</th>
-              <th>Old IP</th>
-              <th>New IP</th>
+              <th>Name</th>
+              <th>Zone ID</th>
+              <th>Zone Token</th>
+              <th>Created At</th>
             </tr>
           </thead>
           <tbody>
+            {% for zone in user_zones %}
             <tr>
-              <td>2024-06-01 14:23</td>
-              <td>example.com</td>
-              <td>192.168.1.10</td>
-              <td>192.168.1.15</td>
+              <td>{{ zone.name }}</td>
+              <td>{{ zone.zone_id }}</td>
+              <td>{{ zone.api_token }}</td>
+              <td>{{ zone.created_at.strftime('%Y-%m-%d') }}</td>
             </tr>
+            {% else %}
             <tr>
-              <td>2024-05-30 09:12</td>
-              <td>mydomain.net</td>
-              <td>10.0.0.2</td>
-              <td>10.0.0.8</td>
+              <td colspan="4" class="has-text-centered">
+              No zones available.
+              <br>
+              <a href="" class="button is-info is-small mt-3">Create a Zone</a>
+              </td>
             </tr>
-            <tr>
-              <td>2024-05-28 17:45</td>
-              <td>test.org</td>
-              <td>172.16.0.5</td>
-              <td>172.16.0.9</td>
-            </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
