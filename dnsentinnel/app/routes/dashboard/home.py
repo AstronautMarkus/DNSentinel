@@ -25,6 +25,6 @@ def home():
     finally:
         s.close()
 
-    user_zones = Zone.query.filter_by(user_id=current_user.id).all()
+    user_zones = Zone.query.filter_by(user_id=current_user.id).order_by(Zone.id.desc()).limit(3).all()
 
     return render_template('dashboard/home.html', isp_ip=isp_ip, ethernet_ip=ethernet_ip, user_zones=user_zones)
