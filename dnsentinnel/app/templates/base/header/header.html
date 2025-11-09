@@ -15,19 +15,8 @@
 
         </div>
         <div class="navbar-end">
-            {% if session.get('user_id') %}
-                <div class="navbar-item has-dropdown is-hoverable">
-                    <a class="navbar-link">
-                        {{ session.get('user_name') }}
-                    </a>
-                    <div class="navbar-dropdown is-right">
-                        <a class="navbar-item" href="{{ url_for('auth.logout') }}">Log out</a>
-                    </div>
-                </div>
-            {% else %}
-                <a class="navbar-item " href="{{ url_for('auth.login') }}">Login</a>
-                <a class="navbar-item" href="{{ url_for('auth.register') }}">Register</a>
-            {% endif %}
+            <a class="navbar-item " href="{{ url_for('auth.login') }}">Login</a>
+            <a class="navbar-item" href="{{ url_for('auth.register') }}">Register</a>
         </div>
     </div>
 </nav>
