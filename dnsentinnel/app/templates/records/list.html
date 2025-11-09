@@ -196,7 +196,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }).join('');
       const { value: selectedId } = await Swal.fire({
         title: 'Select a record to import',
-        html: `<select id="swal-record-select" class="swal2-select" style="width:100%">${options}</select>`,
+        width: '40em',
+        html: `<select id="swal-record-select" class="swal2-select" style="width:90%;max-width:400px;">${options}</select>`,
         focusConfirm: false,
         showCancelButton: true,
         preConfirm: () => {
