@@ -1,7 +1,7 @@
 from . import zones_bp
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from ...models.models import db, Zone
+from app.models.models import db, Zone
 
 @zones_bp.route('/create', methods=['GET', 'POST'])
 @login_required

@@ -3,10 +3,26 @@
 {% block content %}
 
 <div class="section">
-  <div class="container is-fullwidth">
+  <div class="container is-fullwidth is-widescreen" style="max-width: 98vw;">
     <div class="box">
       <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
         <h2 class="subtitle is-5 mb-0">DNS Record List</h2>
+        <div class="dropdown is-right" id="addDropdown">
+          <div class="dropdown-trigger">
+            <button class="button is-primary" aria-haspopup="true" aria-controls="dropdown-menu">
+              <span>Add</span>
+              <span class="icon is-small">
+                <i class="fas fa-angle-down" aria-hidden="true"></i>
+              </span>
+            </button>
+          </div>
+          <div class="dropdown-menu" id="dropdown-menu" role="menu">
+            <div class="dropdown-content">
+              <a href="#" class="dropdown-item" id="addSingleBtn">Single</a>
+              <a href="#" class="dropdown-item" id="addFullListBtn">Full list</a>
+            </div>
+          </div>
+        </div>
       </div>
       <table class="table is-fullwidth is-striped is-hoverable">
         <thead>
@@ -15,8 +31,14 @@
             <th>Type</th>
             <th>TTL</th>
             <th>Proxied</th>
+            <th>Proxiable</th>
             <th>Active</th>
-            <th>Created At</th>
+            <th>Content</th>
+            <th>Comment</th>
+            <th>Settings</th>
+            <th>Tags</th>
+            <th>Created On</th>
+            <th>Modified On</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -34,13 +56,49 @@
               {% endif %}
             </td>
             <td>
+              {% if record.proxiable %}
+                <span class="tag is-success">Yes</span>
+              {% else %}
+                <span class="tag is-light">No</span>
+              {% endif %}
+            </td>
+            <td>
               {% if record.active %}
                 <span class="tag is-success">Active</span>
               {% else %}
                 <span class="tag is-danger">Inactive</span>
               {% endif %}
             </td>
-            <td>{{ record.created_at.strftime('%Y-%m-%d') }}</td>
+            <td>{{ record.content or '' }}</td>
+            <td>{{ record.comment or '' }}</td>
+            <td>
+              {% if record.settings %}
+                <pre style="white-space: pre-wrap; word-break: break-all;">{{ record.settings | tojson }}</pre>
+              {% else %}
+                <span class="has-text-grey-light">-</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if record.tags %}
+                <pre style="white-space: pre-wrap; word-break: break-all;">{{ record.tags | tojson }}</pre>
+              {% else %}
+                <span class="has-text-grey-light">-</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if record.created_on %}
+                {{ record.created_on.strftime('%Y-%m-%d') }}
+              {% else %}
+                <span class="has-text-grey-light">-</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if record.modified_on %}
+                {{ record.modified_on.strftime('%Y-%m-%d') }}
+              {% else %}
+                <span class="has-text-grey-light">-</span>
+              {% endif %}
+            </td>
             <td>
               <div class="is-flex is-flex-direction-column">
                 <a href="" class="button is-small is-info is-light mb-1" title="View">
@@ -60,7 +118,7 @@
           </tr>
           {% else %}
           <tr>
-            <td colspan="7" class="has-text-centered">
+            <td colspan="13" class="has-text-centered">
               No records available.
             </td>
           </tr>
@@ -70,5 +128,95 @@
     </div>
   </div>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const dropdown = document.getElementById('addDropdown');
+  const trigger = dropdown.querySelector('.dropdown-trigger');
+  trigger.addEventListener('click', function(e) {
+    e.stopPropagation();
+    dropdown.classList.toggle('is-active');
+  });
+  document.addEventListener('click', function() {
+    dropdown.classList.remove('is-active');
+  });
+
+  const zoneId = "{{ zone_id|default('') }}";
+
+  document.getElementById('addSingleBtn').addEventListener('click', async function(e) {
+    e.preventDefault();
+    dropdown.classList.remove('is-active');
+    Swal.fire({
+      title: 'Fetching Cloudflare records...',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+    try {
+      const resp = await fetch(`/dashboard/${zoneId}/records/cloudflare`);
+      if (!resp.ok) throw new Error('Failed to fetch records');
+      const data = await resp.json();
+      if (!data.result || !Array.isArray(data.result) || data.result.length === 0) {
+        Swal.fire('No records found', '', 'info');
+        return;
+      }
+      const options = data.result.map(r => {
+        return `<option value="${r.id}">${r.type} - ${r.name} (${r.content})</option>`;
+      }).join('');
+      const { value: selectedId } = await Swal.fire({
+        title: 'Select a record to import',
+        html: `<select id="swal-record-select" class="swal2-select" style="width:100%">${options}</select>`,
+        focusConfirm: false,
+        showCancelButton: true,
+        preConfirm: () => {
+          const sel = document.getElementById('swal-record-select');
+          return sel ? sel.value : null;
+        }
+      });
+      if (!selectedId) return;
+      const selectedRecord = data.result.find(r => r.id === selectedId);
+      if (!selectedRecord) {
+        Swal.fire('Record not found', '', 'error');
+        return;
+      }
+      const confirm = await Swal.fire({
+        title: 'Import this record?',
+        html: `<pre style="text-align:left">${JSON.stringify(selectedRecord, null, 2)}</pre>`,
+        showCancelButton: true,
+        confirmButtonText: 'Import'
+      });
+      if (!confirm.isConfirmed) return;
+      Swal.fire({
+        title: 'Importing...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+      const importResp = await fetch(`/dashboard/${zoneId}/records/import`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(selectedRecord)
+      });
+      if (!importResp.ok) {
+        const err = await importResp.json().catch(() => ({}));
+        Swal.fire('Error', err.error || 'Failed to import', 'error');
+        return;
+      }
+      Swal.fire('Imported!', '', 'success').then(() => window.location.reload());
+    } catch (err) {
+      Swal.fire('Error', err.message || 'Unexpected error', 'error');
+    }
+  });
+
+  document.getElementById('addFullListBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    dropdown.classList.remove('is-active');
+    Swal.fire('Not implemented yet', '', 'info');
+  });
+});
+</script>
 
 {% endblock %}
