@@ -9,7 +9,7 @@
         <div class="box has-shadow">
           <h1 class="title is-2 has-text-centered mb-2">Create a New DNS Zone</h1>
           <p class="subtitle is-5 has-text-centered mb-5">Fill out the form below to create a new DNS zone.</p>
-          <form method="POST" action="{{ url_for('zones.create_zone') }}">
+          <form id="zoneForm" method="POST" action="{{ url_for('zones.create_zone') }}">
             <div class="field">
               <label class="label">Name <span class="has-text-danger">*</span></label>
               <div class="control has-icons-left">
@@ -61,4 +61,65 @@
   </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('zoneForm');
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = form.elements['name'].value;
+    const zone_id = form.elements['zone_id'].value;
+    const api_token = form.elements['api_token'].value;
+
+    Swal.fire({
+      title: 'Validando...',
+      text: 'Verificando credenciales con Cloudflare',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    fetch("{{ url_for('zones.validate_zone') }}", {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({zone_id, api_token})
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: '¡Validado!',
+          html: `<p>${data.msg}</p>`,
+          confirmButtonText: 'OK',
+          allowOutsideClick: false
+        }).then(() => {
+          form.submit();
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error de validación',
+          html: `<p>${data.msg}</p>`,
+          confirmButtonText: 'OK',
+          allowOutsideClick: false
+        });
+      }
+    })
+    .catch(() => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        html: '<p>No se pudo validar. Intenta de nuevo o revisa tu conexión.</p>',
+        confirmButtonText: 'OK',
+        allowOutsideClick: false
+      });
+    });
+  });
+});
+</script>
 {% endblock %}
