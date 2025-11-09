@@ -41,9 +41,9 @@
             <td>{{ zone.created_at.strftime('%Y-%m-%d') }}</td>
             <td>
               <div class="is-flex is-flex-direction-column">
-                <a href="" class="button is-small is-info is-light mb-1" title="View">
+                <a href="{{ url_for('records.list_records', zone_id=zone.zone_id) }}" class="button is-small is-info is-light mb-1" title="View">
                   <span class="icon is-small"><i class="fas fa-eye"></i></span>
-                  <span>Domains List</span>
+                  <span>DNS Record List</span>
                 </a>
                 <a href="" class="button is-small is-warning is-light mb-1" title="Edit">
                   <span class="icon is-small"><i class="fas fa-edit"></i></span>

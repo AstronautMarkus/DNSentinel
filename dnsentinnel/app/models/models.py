@@ -50,10 +50,17 @@ class Record(db.Model):
     name = db.Column(db.String(255), nullable=False)
     type = db.Column(db.String(10), nullable=False)
     proxied = db.Column(db.Boolean, default=False)
+    proxiable = db.Column(db.Boolean, default=True)
     ttl = db.Column(db.Integer, nullable=False)
     active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    content = db.Column(db.String(255), nullable=True)
+    comment = db.Column(db.Text, nullable=True)
+    created_on = db.Column(db.DateTime, nullable=True)
+    modified_on = db.Column(db.DateTime, nullable=True)
+    settings = db.Column(db.JSON, nullable=True)
+    tags = db.Column(db.JSON, nullable=True)
 
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     zone = db.relationship("Zone", back_populates="records")
     updates = db.relationship("Update", back_populates="record")
 
