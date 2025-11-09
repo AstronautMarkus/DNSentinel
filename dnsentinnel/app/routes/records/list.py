@@ -11,4 +11,4 @@ def list_records(zone_id):
     records = []
     if zone:
         records = Record.query.filter_by(zone_id_fk=zone.id).all()
-    return render_template('records/list.html', zone_id=zone_id, records=records)
+    return render_template('records/list.html', records=records, zone=zone)
