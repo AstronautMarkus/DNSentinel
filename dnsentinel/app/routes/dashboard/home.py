@@ -3,7 +3,7 @@ from app.routes.dashboard import dashboard_bp
 import requests
 import socket
 from flask_login import current_user, login_required
-from app.models.models import Zone
+from app.models.models import Zone, Record
 
 
 @dashboard_bp.route('/home')
@@ -26,5 +26,6 @@ def home():
         s.close()
 
     user_zones = Zone.query.filter_by(user_id=current_user.id).order_by(Zone.id.desc()).limit(3).all()
+    user_records = Record.query.filter_by(zone_id_fk=user_zones[0].id).count() if user_zones else 0
 
-    return render_template('dashboard/home.html', isp_ip=isp_ip, ethernet_ip=ethernet_ip, user_zones=user_zones)
+    return render_template('dashboard/home.html', isp_ip=isp_ip, ethernet_ip=ethernet_ip, user_zones=user_zones, user_records=user_records)

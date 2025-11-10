@@ -69,7 +69,7 @@
           <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
             <div class="is-flex is-align-items-center" style="gap: 16px;">
               <img src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="Cloudflare" style="height:40px; width:auto; pointer-events: none;">
-              <span class="title is-5 mb-0">Cloudflare</span>
+              <span class="title is-5 mb-0">Cloudflare DNS Zones</span>
             </div>
             <a href="{{ url_for('zones.list_zones') }}" class="button is-link is-light is-small">
               <span>View All</span>
@@ -82,6 +82,7 @@
                 <th>Name</th>
                 <th>Zone ID</th>
                 <th>Zone Token</th>
+                <th>Records</th>
                 <th>Created At</th>
               </tr>
             </thead>
@@ -106,6 +107,7 @@
                     <span class="icon is-small"><i class="fas fa-copy"></i></span>
                   </button>
                 </td>
+                <td>{{ user_records }}</td>
                 <td>{{ zone.created_at.strftime('%Y-%m-%d') }}</td>
               </tr>
               {% else %}
