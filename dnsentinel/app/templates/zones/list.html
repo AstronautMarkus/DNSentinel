@@ -30,7 +30,7 @@
         <tbody>
           {% for zone in user_zones %}
           <tr>
-            <td>{{ zone.name }}</td>
+            <td><a href="{{ url_for('zones.zone_detail', zone_id=zone.zone_id) }}">{{ zone.name }}</a></td>
             <td>
               <span class="zone-id" data-zoneid="{{ zone.zone_id }}">{{ zone.zone_id }}</span>
               <button class="button is-small is-light copy-zoneid" type="button" title="Copy" style="margin-left:2px;">

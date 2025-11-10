@@ -1,7 +1,7 @@
 from . import zones_bp
 from flask import render_template
 from flask_login import login_required, current_user
-from ...models.models import Zone
+from app.models.models import Zone
 
 @zones_bp.route('/cloudflare', methods=['GET'])
 @login_required
