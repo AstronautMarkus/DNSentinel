@@ -182,9 +182,11 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   const zoneId = "{{ zone.zone_id }}";
-
   const cloudflareUrl = "{{ url_for('records.get_cloudflare_records', zone_id=zone.zone_id) }}";
   const importUrl = "{{ url_for('records.import_record', zone_id=zone.zone_id) }}";
+  // Add endpoints for bulk
+  const checkExistingUrl = "{{ url_for('records.check_existing_records', zone_id=zone.zone_id) }}";
+  const importBulkUrl = "{{ url_for('records.import_bulk_records', zone_id=zone.zone_id) }}";
 
   document.getElementById('addSingleBtn').addEventListener('click', async function(e) {
     e.preventDefault();
@@ -252,10 +254,94 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  document.getElementById('addFullListBtn').addEventListener('click', function(e) {
+  document.getElementById('addFullListBtn').addEventListener('click', async function(e) {
     e.preventDefault();
     dropdown.classList.remove('is-active');
-    Swal.fire('Not implemented yet', '', 'info');
+    Swal.fire({
+      title: 'Fetching Cloudflare records...',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading()
+    });
+    try {
+      // 1. Get all records from Cloudflare
+      const resp = await fetch(cloudflareUrl);
+      if (!resp.ok) throw new Error('Failed to fetch records');
+      const data = await resp.json();
+      if (!data.result || !Array.isArray(data.result) || data.result.length === 0) {
+        Swal.fire('No records found', '', 'info');
+        return;
+      }
+      // 2. Ask backend which records already exist
+      const recordIds = data.result.map(r => r.id);
+      const checkResp = await fetch(checkExistingUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ record_ids: recordIds })
+      });
+      if (!checkResp.ok) throw new Error('Failed to check existing records');
+      const checkData = await checkResp.json();
+      const existing = checkData.existing || [];
+      // 3. If some exist, ask user what to do
+      let action = 'ignore';
+      if (existing.length > 0) {
+        const names = existing.map(r => r.name).join('<br>');
+        const { value: userAction } = await Swal.fire({
+          title: 'Some records already exist',
+          html: `The following records already exist:<br><b>${names}</b><br><br>What do you want to do?`,
+          icon: 'warning',
+          showCancelButton: true,
+          showDenyButton: true,
+          confirmButtonText: 'Replace',
+          denyButtonText: 'Ignore',
+          cancelButtonText: 'Cancel',
+          focusCancel: true
+        });
+        if (userAction === true) {
+          action = 'replace';
+        } else if (userAction === false) {
+          action = 'ignore';
+        } else {
+          // Cancelled
+          return;
+        }
+      }
+      // 4. Confirm import
+      const confirm = await Swal.fire({
+        title: 'Import all records?',
+        html: `You are about to import <b>${data.result.length}</b> records.<br>Action: <b>${action.charAt(0).toUpperCase() + action.slice(1)}</b>`,
+        showCancelButton: true,
+        confirmButtonText: 'Import'
+      });
+      if (!confirm.isConfirmed) return;
+      // 5. Import all
+      Swal.fire({
+        title: 'Importing records...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+      const importResp = await fetch(importBulkUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ records: data.result, action })
+      });
+      if (!importResp.ok) {
+        const err = await importResp.json().catch(() => ({}));
+        Swal.fire('Error', err.error || 'Failed to import', 'error');
+        return;
+      }
+      const result = await importResp.json();
+      Swal.fire({
+        title: 'Import finished',
+        html: `
+          <b>Added:</b> ${result.added?.length || 0}<br>
+          <b>Updated:</b> ${result.updated?.length || 0}<br>
+          <b>Skipped:</b> ${result.skipped?.length || 0}
+        `,
+        icon: 'success'
+      }).then(() => window.location.reload());
+    } catch (err) {
+      Swal.fire('Error', err.message || 'Unexpected error', 'error');
+    }
   });
 });
 </script>
