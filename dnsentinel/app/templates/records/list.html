@@ -43,12 +43,8 @@
               <th>Type</th>
               <th>TTL</th>
               <th>Proxied</th>
-              <th>Proxiable</th>
               <th>Active</th>
               <th>Content</th>
-              <th>Comment</th>
-              <th>Settings</th>
-              <th>Tags</th>
               <th>Created On</th>
               <th>Modified On</th>
               <th>Actions</th>
@@ -77,13 +73,6 @@
                 {% endif %}
               </td>
               <td>
-                {% if record.proxiable %}
-                  <span class="tag is-success is-light"><i class="fas fa-check"></i> Yes</span>
-                {% else %}
-                  <span class="tag is-light"><i class="fas fa-times"></i> No</span>
-                {% endif %}
-              </td>
-              <td>
                 {% if record.active %}
                   <span class="tag is-success"><i class="fas fa-check-circle"></i> Active</span>
                 {% else %}
@@ -92,25 +81,6 @@
               </td>
               <td>
                 <span class="has-text-dark">{{ record.content or '-' }}</span>
-              </td>
-              <td>
-                <span class="has-text-grey-dark">{{ record.comment or '-' }}</span>
-              </td>
-              <td>
-                {% if record.settings %}
-                  <span class="icon has-text-grey-light" title="Settings"><i class="fas fa-cog"></i></span>
-                  <pre class="is-size-7" style="white-space: pre-wrap; word-break: break-all; background: #f8f9fa; border-radius: 4px;">{{ record.settings | tojson }}</pre>
-                {% else %}
-                  <span class="has-text-grey-light">-</span>
-                {% endif %}
-              </td>
-              <td>
-                {% if record.tags %}
-                  <span class="icon has-text-grey-light" title="Tags"><i class="fas fa-tags"></i></span>
-                  <pre class="is-size-7" style="white-space: pre-wrap; word-break: break-all; background: #f8f9fa; border-radius: 4px;">{{ record.tags | tojson }}</pre>
-                {% else %}
-                  <span class="has-text-grey-light">-</span>
-                {% endif %}
               </td>
               <td>
                 {% if record.created_on %}
@@ -145,7 +115,7 @@
             </tr>
             {% else %}
             <tr>
-              <td colspan="13" class="has-text-centered">
+              <td colspan="9" class="has-text-centered">
                 <span class="icon-text has-text-grey-light">
                   <span class="icon"><i class="fas fa-info-circle"></i></span>
                   <span>No records available.</span>
