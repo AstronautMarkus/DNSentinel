@@ -7,7 +7,7 @@
     <div class="is-flex is-align-items-center mb-4">
       <img src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="Cloudflare"
         style="height:40px; width:auto; pointer-events: none; margin-right: 12px;">
-      <h1 class="title mb-0">Cloudflare DNS Zone Detail</h1>
+      <h1 class="title mb-0">Cloudflare DNS Zone Detail "{{ zone.name }}"</h1>
     </div>
     <div class="box">
       <h2 class="subtitle is-5 mb-4">Zone Information</h2>
@@ -15,6 +15,70 @@
         <div class="column is-6">
           <strong>Name:</strong>
           <span>{{ zone.name }}</span>
+        </div>
+        <div class="column is-6">
+          <strong>Status:</strong>
+          <span>{{ zone.status or '' }}</span>
+        </div>
+        <div class="column is-6">
+          <strong>Paused:</strong>
+          {% if zone.paused %}
+            <span class="tag is-danger">Yes</span>
+          {% else %}
+            <span class="tag is-success">No</span>
+          {% endif %}
+        </div>
+        <div class="column is-6">
+          <strong>Type:</strong>
+          <span>{{ zone.type or '' }}</span>
+        </div>
+        <div class="column is-6">
+          <strong>Development Mode:</strong>
+          {% if zone.development_mode %}
+            <span class="tag is-warning">On</span>
+          {% else %}
+            <span class="tag is-light">Off</span>
+          {% endif %}
+        </div>
+        <div class="column is-6">
+          <strong>Name Servers:</strong>
+          {% if zone.name_servers %}
+            <ul style="margin-bottom:0;">
+              {% for ns in zone.name_servers %}
+              <li>{{ ns }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        <div class="column is-6">
+          <strong>Original Name Servers:</strong>
+          {% if zone.original_name_servers %}
+            <ul style="margin-bottom:0;">
+              {% for ons in zone.original_name_servers %}
+              <li>{{ ons }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        <div class="column is-6">
+          <strong>Registrar:</strong>
+          <span>{{ zone.original_registrar or '' }}</span>
+        </div>
+        <div class="column is-6">
+          <strong>DNS Host:</strong>
+          <span>{{ zone.original_dnshost or '' }}</span>
+        </div>
+        <div class="column is-6">
+          <strong>Modified On:</strong>
+          {% if zone.modified_on %}
+            <span>{{ zone.modified_on.strftime('%Y-%m-%d %H:%M') }}</span>
+          {% endif %}
+        </div>
+        <div class="column is-6">
+          <strong>Created On:</strong>
+          {% if zone.created_on %}
+            <span>{{ zone.created_on.strftime('%Y-%m-%d %H:%M') }}</span>
+          {% endif %}
         </div>
         <div class="column is-6">
           <strong>Zone ID:</strong>
@@ -36,10 +100,6 @@
         <div class="column is-6">
           <strong>Created At:</strong>
           <span>{{ zone.created_at.strftime('%Y-%m-%d') }}</span>
-        </div>
-        <div class="column is-6">
-          <strong>User ID:</strong>
-          <span>{{ zone.user_id }}</span>
         </div>
       </div>
       <div class="buttons mt-4">

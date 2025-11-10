@@ -1,5 +1,5 @@
 {% extends 'base/admin_base.html' %}
-{% block title %}DNS Zones{% endblock %}
+{% block title %}Cloudflare DNS Zones{% endblock %}
 {% block content %}
 
 <div class="section">
@@ -30,7 +30,7 @@
         <tbody>
           {% for zone in user_zones %}
           <tr>
-            <td><a href="{{ url_for('zones.zone_detail', zone_id=zone.zone_id) }}">{{ zone.name }}</a></td>
+            <td><a href="{{ url_for('zones.zone_detail', zone_id=zone.zone_id) }}" class="has-text-link">{{ zone.name }}</a></td>
             <td>
               <span class="zone-id" data-zoneid="{{ zone.zone_id }}">{{ zone.zone_id }}</span>
               <button class="button is-small is-light copy-zoneid" type="button" title="Copy" style="margin-left:2px;">
@@ -50,18 +50,15 @@
             <td>{{ zone.created_at.strftime('%Y-%m-%d') }}</td>
             <td>
               <div class="is-flex is-flex-direction-column">
+                <a href="{{ url_for('zones.zone_detail', zone_id=zone.zone_id) }}"
+                  class="button is-small is-primary mb-1" title="View">
+                  <span class="icon is-small"><i class="fas fa-info-circle"></i></span>
+                  <span>Zone Details</span>
+                </a>
                 <a href="{{ url_for('records.list_records', zone_id=zone.zone_id) }}"
-                  class="button is-small is-info is-light mb-1" title="View">
+                  class="button is-small is-info mb-1" title="View">
                   <span class="icon is-small"><i class="fas fa-eye"></i></span>
                   <span>DNS Record List</span>
-                </a>
-                <a href="" class="button is-small is-warning is-light mb-1" title="Edit">
-                  <span class="icon is-small"><i class="fas fa-edit"></i></span>
-                  <span>Edit</span>
-                </a>
-                <a href="" class="button is-small is-danger is-light" title="Delete">
-                  <span class="icon is-small"><i class="fas fa-trash-alt"></i></span>
-                  <span>Delete</span>
                 </a>
               </div>
             </td>

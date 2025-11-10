@@ -15,16 +15,7 @@
           <p class="subtitle is-5 has-text-centered mb-5">Fill out the form below to add a Cloudflare DNS zone in DNSentinel.
           </p>
           <form id="zoneForm" method="POST" action="{{ url_for('zones.create_zone') }}">
-            <div class="field">
-              <label class="label">Name <span class="has-text-danger">*</span></label>
-              <div class="control has-icons-left">
-                <input class="input" type="text" name="name" placeholder="Zone Name" required>
-                <span class="icon is-small is-left">
-                  <i class="fas fa-globe"></i>
-                </span>
-              </div>
-            </div>
-
+            <!-- Remove Name field -->
             <div class="field">
               <label class="label">Zone Identifier (zone_id) <span class="has-text-danger">*</span></label>
               <div class="control has-icons-left">
@@ -83,7 +74,7 @@
     let validated = false;
 
     validateBtn.addEventListener('click', function () {
-      const name = form.elements['name'].value;
+      // Only get zone_id and api_token
       const zone_id = form.elements['zone_id'].value;
       const api_token = form.elements['api_token'].value;
 
