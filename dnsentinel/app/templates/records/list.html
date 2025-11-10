@@ -172,7 +172,10 @@ document.addEventListener('DOMContentLoaded', function() {
     dropdown.classList.remove('is-active');
   });
 
-  const zoneId = "{{ zone_id|default('') }}";
+  const zoneId = "{{ zone.zone_id }}";
+
+  const cloudflareUrl = "{{ url_for('records.get_cloudflare_records', zone_id=zone.zone_id) }}";
+  const importUrl = "{{ url_for('records.import_record', zone_id=zone.zone_id) }}";
 
   document.getElementById('addSingleBtn').addEventListener('click', async function(e) {
     e.preventDefault();
@@ -185,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     try {
-      const resp = await fetch(`/dashboard/${zoneId}/records/cloudflare`);
+      const resp = await fetch(cloudflareUrl);
       if (!resp.ok) throw new Error('Failed to fetch records');
       const data = await resp.json();
       if (!data.result || !Array.isArray(data.result) || data.result.length === 0) {
@@ -224,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
       });
-      const importResp = await fetch(`/dashboard/${zoneId}/records/import`, {
+      const importResp = await fetch(importUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(selectedRecord)
@@ -247,5 +250,4 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
-
 {% endblock %}
