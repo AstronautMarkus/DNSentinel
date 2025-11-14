@@ -59,4 +59,4 @@ In development mode, access the dashboard at `0.0.0.0:5010`.
 
 Check <a href="LICENSE">LICENSE</a> for more information.
 
-> Created with a lot of Monster Energy and a need that few understand. <a href="astronautmarkus.dev" target="_blank">astronautmarkus.dev</a>
+> Created with a lot of Monster Energy and a need that few understand. <a href="https://astronautmarkus.dev">astronautmarkus.dev</a>
