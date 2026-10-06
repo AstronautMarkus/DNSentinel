@@ -21,6 +21,13 @@
                 </a>
                 <a href="#how-it-works" class="btn btn--on-dark btn--lg">How it works</a>
             </div>
+            <p class="hero__note">
+                <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                <span>
+                    Requires a public IP from your ISP. It won't help behind CG-NAT, and you don't need it
+                    if you use a tunnel. <a href="#before-you-start">Check your connection</a>.
+                </span>
+            </p>
         </div>
         <div class="hero__visual" aria-hidden="true">
             <div class="hero__emblem">
@@ -258,7 +265,75 @@
     </div>
 </section>
 
-<section class="section">
+<section class="section" id="before-you-start">
+    <div class="container">
+        <div class="section__header">
+            <p class="eyebrow">Before you start</p>
+            <h2 class="section__title">Is DNSentinel right for your connection?</h2>
+            <p class="section__lead">
+                DNSentinel solves one specific problem: a <strong>public IP address that changes</strong>.
+                Updating DNS only helps if visitors from the Internet can actually reach that IP, so check
+                which of these cases matches your connection before you set it up.
+            </p>
+        </div>
+        <div class="fit-grid">
+            <article class="fit fit--yes">
+                <div class="fit__head">
+                    <span class="fit__icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span>
+                    <span class="badge badge--success">Works</span>
+                </div>
+                <h3 class="fit__title">Dynamic public IP</h3>
+                <p class="fit__text">
+                    Your router gets a real public IP from your ISP, and that IP changes from time to time.
+                    Port forwarding works, but your DNS records go stale after every change.
+                    This is exactly the case DNSentinel is built for.
+                </p>
+                <p class="fit__hint">
+                    <strong>What to do:</strong> connect your Cloudflare zone and import the records
+                    that point to your home IP.
+                </p>
+            </article>
+            <article class="fit fit--no">
+                <div class="fit__head">
+                    <span class="fit__icon"><i class="fa-solid fa-ban" aria-hidden="true"></i></span>
+                    <span class="badge badge--danger">Won't work</span>
+                </div>
+                <h3 class="fit__title">Behind CG-NAT</h3>
+                <p class="fit__text">
+                    With Carrier-Grade NAT, your ISP shares one public IP among many customers and your
+                    router only gets a private address. DNSentinel would detect that shared IP and write it
+                    to your records, but incoming connections stop at your ISP's NAT and never reach your
+                    network. Your sites stay unreachable no matter how up to date your DNS is.
+                </p>
+                <p class="fit__hint">
+                    <strong>How to tell:</strong> look at the WAN IP on your router's status page. If it
+                    doesn't match your public IP, especially if it's in the <code>100.64.x.x</code>
+                    to <code>100.127.x.x</code> range, you are most likely behind CG-NAT. Ask your ISP for a
+                    public IP, or use a tunnel instead.
+                </p>
+            </article>
+            <article class="fit fit--skip">
+                <div class="fit__head">
+                    <span class="fit__icon"><i class="fa-solid fa-route" aria-hidden="true"></i></span>
+                    <span class="badge">Not needed</span>
+                </div>
+                <h3 class="fit__title">Using a tunnel</h3>
+                <p class="fit__text">
+                    Cloudflare Tunnel, ngrok, Tailscale Funnel and similar tools open an outbound connection
+                    from your server, and your DNS points to the tunnel (for example a CNAME to
+                    <code>&lt;id&gt;.cfargotunnel.com</code>), not to your IP. Your IP can change and
+                    nothing breaks, so there is nothing for DNSentinel to update.
+                </p>
+                <p class="fit__hint">
+                    <strong>What to do:</strong> keep the tunnel and leave its records out of DNSentinel.
+                    Replacing the tunnel's CNAME with an A record would send traffic around the tunnel.
+                </p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section section--flush-top">
     <div class="container">
         <div class="cta">
             <div>
