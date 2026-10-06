@@ -1,6 +1,6 @@
 from . import records_bp
 from flask import jsonify, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from app.models.models import db, Zone, Record
 from datetime import datetime
 from app.i18n import t
@@ -8,7 +8,7 @@ from app.i18n import t
 @records_bp.route('/<zone_id>/records/import', methods=['POST'])
 @login_required
 def import_record(zone_id):
-    zone = Zone.query.filter_by(zone_id=zone_id).first()
+    zone = Zone.query.filter_by(zone_id=zone_id, user_id=current_user.id).first()
     if not zone:
         return jsonify({'error': t('records.api.zone_not_found')}), 404
 
@@ -51,7 +51,7 @@ def check_existing_records(zone_id):
     Receive: { "record_ids": [ ... ] }
     Return: { "existing": [ { "record_id": ..., "name": ... }, ... ] }
     """
-    zone = Zone.query.filter_by(zone_id=zone_id).first()
+    zone = Zone.query.filter_by(zone_id=zone_id, user_id=current_user.id).first()
     if not zone:
         return jsonify({'error': t('records.api.zone_not_found')}), 404
 
@@ -78,7 +78,7 @@ def import_bulk_records(zone_id):
         "action": "replace" | "ignore" | "cancel"
     }
     """
-    zone = Zone.query.filter_by(zone_id=zone_id).first()
+    zone = Zone.query.filter_by(zone_id=zone_id, user_id=current_user.id).first()
     if not zone:
         return jsonify({'error': t('records.api.zone_not_found')}), 404
 

@@ -1,6 +1,6 @@
 from . import records_bp
 from flask import jsonify
-from flask_login import login_required
+from flask_login import login_required, current_user
 from app.models.models import Zone
 import requests
 from app.i18n import t
@@ -9,11 +9,7 @@ from app.i18n import t
 @login_required
 def get_cloudflare_records(zone_id):
     
-    zone = Zone.query.filter_by(zone_id=zone_id).first()
-
-    print(f"Retrieved zone: {zone}")
-    if zone:
-        print(f"Using API token: {zone.api_token}")
+    zone = Zone.query.filter_by(zone_id=zone_id, user_id=current_user.id).first()
 
     if not zone or not zone.api_token:
         return jsonify({'error': t('records.api.zone_or_token_missing')}), 404

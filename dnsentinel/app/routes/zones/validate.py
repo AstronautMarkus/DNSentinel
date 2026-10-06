@@ -1,9 +1,11 @@
 from . import zones_bp
 from flask import request, jsonify
+from flask_login import login_required
 import requests
 from app.i18n import t
 
 @zones_bp.route('/cloudflare/validate', methods=['POST'])
+@login_required
 def validate_zone():
     data = request.json
     zone_id = data.get('zone_id')
