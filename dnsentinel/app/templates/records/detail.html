@@ -1,135 +1,147 @@
 {% extends 'base/admin_base.html' %}
+{% import 'base/partials/macros.html' as ui %}
 {% block title %}Record Detail{% endblock %}
 {% block content %}
-<div class="section">
-  <div class="container" style="max-width: 900px;">
-    <h1 class="title">DNS Record Detail</h1>
-    <div class="box">
-      {% if record %}
-      <table class="table is-fullwidth is-striped is-hoverable is-bordered">
-        <tbody>
-          <tr>
-            <th>Name</th>
-            <td>
-              <span class="icon-text">
-                <span class="icon has-text-info"><i class="fas fa-globe"></i></span>
-                <span>{{ record.name }}</span>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <th>Type</th>
-            <td><span class="tag is-info is-light">{{ record.type }}</span></td>
-          </tr>
-          <tr>
-            <th>TTL</th>
-            <td><span class="tag is-light">{{ record.ttl }}</span></td>
-          </tr>
-          <tr>
-            <th>Proxied</th>
-            <td>
-              {% if record.proxied %}
-                <span class="tag is-success is-light"><i class="fas fa-check"></i> Yes</span>
-              {% else %}
-                <span class="tag is-light"><i class="fas fa-times"></i> No</span>
-              {% endif %}
-            </td>
-          </tr>
-          <tr>
-            <th>Proxiable</th>
-            <td>
-              {% if record.proxiable %}
-                <span class="tag is-success is-light"><i class="fas fa-check"></i> Yes</span>
-              {% else %}
-                <span class="tag is-light"><i class="fas fa-times"></i> No</span>
-              {% endif %}
-            </td>
-          </tr>
-          <tr>
-            <th>Active</th>
-            <td>
-              {% if record.active %}
-                <span class="tag is-success"><i class="fas fa-check-circle"></i> Active</span>
-              {% else %}
-                <span class="tag is-danger"><i class="fas fa-ban"></i> Inactive</span>
-              {% endif %}
-            </td>
-          </tr>
-          <tr>
-            <th>Content</th>
-            <td><span class="has-text-dark">{{ record.content or '-' }}</span></td>
-          </tr>
-          <tr>
-            <th>Comment</th>
-            <td><span class="has-text-grey-dark">{{ record.comment or '-' }}</span></td>
-          </tr>
-          <tr>
-            <th>Settings</th>
-            <td>
-              {% if record.settings %}
-                <span class="icon has-text-grey-light" title="Settings"><i class="fas fa-cog"></i></span>
-                <pre class="is-size-7" style="white-space: pre-wrap; word-break: break-all; background: #f8f9fa; border-radius: 4px;">{{ record.settings | tojson }}</pre>
-              {% else %}
-                <span class="has-text-grey-light">-</span>
-              {% endif %}
-            </td>
-          </tr>
-          <tr>
-            <th>Tags</th>
-            <td>
-              {% if record.tags %}
-                <span class="icon has-text-grey-light" title="Tags"><i class="fas fa-tags"></i></span>
-                <pre class="is-size-7" style="white-space: pre-wrap; word-break: break-all; background: #f8f9fa; border-radius: 4px;">{{ record.tags | tojson }}</pre>
-              {% else %}
-                <span class="has-text-grey-light">-</span>
-              {% endif %}
-            </td>
-          </tr>
-          <tr>
-            <th>Created On</th>
-            <td>
-              {% if record.created_on %}
-                <span class="has-text-grey-dark">{{ record.created_on.strftime('%Y-%m-%d') if record.created_on.strftime else record.created_on }}</span>
-              {% else %}
-                <span class="has-text-grey-light">-</span>
-              {% endif %}
-            </td>
-          </tr>
-          <tr>
-            <th>Modified On</th>
-            <td>
-              {% if record.modified_on %}
-                <span class="has-text-grey-dark">{{ record.modified_on.strftime('%Y-%m-%d') if record.modified_on.strftime else record.modified_on }}</span>
-              {% else %}
-                <span class="has-text-grey-light">-</span>
-              {% endif %}
-            </td>
-          </tr>
-          <tr>
-            <th>Record ID</th>
-            <td>{{ record.record_id }}</td>
-          </tr>
-          <tr>
-            <th>Zone ID FK</th>
-            <td>{{ record.zone_id_fk }}</td>
-          </tr>
-          <tr>
-            <th>Created At</th>
-            <td>{{ record.created_at or '-' }}</td>
-          </tr>
-        </tbody>
-      </table>
-      {% else %}
-        <div class="notification is-warning is-light">
-          <span class="icon"><i class="fas fa-exclamation-triangle"></i></span>
-          Record not found.
-        </div>
-      {% endif %}
-      <a href="{{ url_for('records.list_records', zone_id=zone_id) }}" class="button is-danger is-light mt-4">
-        <span class="icon"><i class="fas fa-arrow-left"></i></span>
-        <span>Back to Records</span>
-      </a>
+
+<div class="page-header">
+    <div class="page-header__main">
+        {{ ui.breadcrumb([
+            ('DNS zones', url_for('zones.list_zones')),
+            ('DNS records', url_for('records.list_records', zone_id=zone_id)),
+            (record.name if record else 'Not found', none)
+        ]) }}
+        <h1 class="page-title">
+            {% if record %}
+                {{ record.name }}
+                <span class="badge badge--code badge--lg">{{ record.type }}</span>
+            {% else %}
+                DNS record detail
+            {% endif %}
+        </h1>
+        <p class="page-subtitle">DNS record detail.</p>
     </div>
-  </div>
+    <div class="page-header__actions">
+        <a href="{{ url_for('records.list_records', zone_id=zone_id) }}" class="btn">
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+            <span>Back to records</span>
+        </a>
+    </div>
 </div>
+
+{% if record %}
+<div class="grid grid--main-aside">
+    <div class="stack">
+        <section class="card">
+            <div class="card__header">
+                <h2 class="card__title">Record</h2>
+                {{ ui.record_status(record.active) }}
+            </div>
+            <dl class="properties">
+                <div class="properties__item">
+                    <dt>Name</dt>
+                    <dd>{{ record.name }}</dd>
+                </div>
+                <div class="properties__item">
+                    <dt>Type</dt>
+                    <dd><span class="badge badge--code">{{ record.type }}</span></dd>
+                </div>
+                <div class="properties__item">
+                    <dt>Content</dt>
+                    <dd class="mono">{{ record.content or '—' }}</dd>
+                </div>
+                <div class="properties__item">
+                    <dt>TTL</dt>
+                    <dd class="tabular">{{ 'Auto' if record.ttl == 1 else record.ttl }}</dd>
+                </div>
+                <div class="properties__item">
+                    <dt>Proxy status</dt>
+                    <dd>{{ ui.proxy_status(record.proxied) }}</dd>
+                </div>
+                <div class="properties__item">
+                    <dt>Proxiable</dt>
+                    <dd>{{ ui.bool_badge(record.proxiable) }}</dd>
+                </div>
+                <div class="properties__item">
+                    <dt>Created on</dt>
+                    <dd class="tabular">{{ ui.date(record.created_on) }}</dd>
+                </div>
+                <div class="properties__item">
+                    <dt>Modified on</dt>
+                    <dd class="tabular">{{ ui.date(record.modified_on) }}</dd>
+                </div>
+            </dl>
+        </section>
+
+        <section class="card">
+            <div class="card__header">
+                <h2 class="card__title">Comment</h2>
+            </div>
+            <div class="card__body">
+                {% if record.comment %}
+                    <p>{{ record.comment }}</p>
+                {% else %}
+                    <p class="text-muted">No comment.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card__header">
+                <h2 class="card__title">Settings &amp; tags</h2>
+            </div>
+            <dl class="properties properties--stacked">
+                <div class="properties__item">
+                    <dt>Settings</dt>
+                    <dd>
+                        {% if record.settings %}
+                            <pre class="code-block">{{ record.settings | tojson(indent=2) }}</pre>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </dd>
+                </div>
+                <div class="properties__item">
+                    <dt>Tags</dt>
+                    <dd>
+                        {% if record.tags %}
+                            <pre class="code-block">{{ record.tags | tojson(indent=2) }}</pre>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </dd>
+                </div>
+            </dl>
+        </section>
+    </div>
+
+    <section class="card">
+        <div class="card__header">
+            <h2 class="card__title">
+                <i class="fa-solid fa-fingerprint text-muted" aria-hidden="true"></i>
+                Identifiers
+            </h2>
+        </div>
+        <dl class="properties properties--single properties--stacked">
+            <div class="properties__item">
+                <dt>Record ID</dt>
+                <dd>{{ ui.copyable(record.record_id, 'Copy record ID', wrap=true) }}</dd>
+            </div>
+            <div class="properties__item">
+                <dt>Zone ID FK</dt>
+                <dd class="mono">{{ record.zone_id_fk }}</dd>
+            </div>
+            <div class="properties__item">
+                <dt>Added to DNSentinel</dt>
+                <dd class="tabular">{{ ui.date(record.created_at, '%Y-%m-%d %H:%M') }}</dd>
+            </div>
+        </dl>
+    </section>
+</div>
+{% else %}
+<div class="alert alert--warning" role="alert">
+    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+    <span>Record not found.</span>
+</div>
+{% endif %}
+
 {% endblock %}

@@ -10,30 +10,29 @@ from app.config.config import Config
 from app.models.models import db
 from app import create_app
 
-
 def init_db():
     """Creates the tables in the database."""
     app = create_app()
     with app.app_context():
         db.create_all()
-        print("✅ Database initialized.")
+        print("Database initialized.")
 
 def reset_db(auto_confirm=False):
     """Drops all tables and recreates them."""
     app = create_app()
     with app.app_context():
-        print("⚠️  This will delete all existing tables and data.")
+        print("This will delete all existing tables and data.")
         if auto_confirm:
             confirm = "yes"
         else:
             confirm = input("Are you sure? (yes/no): ")
         if confirm.lower() in ['yes', 'y', 'sí', 'si']:
             db.drop_all()
-            print("✅ Tables dropped.")
+            print("Tables dropped.")
             db.create_all()
-            print("✅ Database reinitialized.")
+            print("Database reinitialized.")
         else:
-            print("❌ Operation cancelled.")
+            print("Operation cancelled.")
 
 def print_help():
     print("Usage: python init_db.py [FLAG]")
@@ -54,7 +53,7 @@ if __name__ == "__main__":
         elif flag == "--help":
             print_help()
         else:
-            print(f"❌ Invalid flag: {flag}")
+            print(f"Invalid flag: {flag}")
             print_help()
             print("No action was performed.")
     else:

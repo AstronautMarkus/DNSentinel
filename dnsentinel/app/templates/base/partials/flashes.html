@@ -1,0 +1,17 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="toast-stack" aria-live="polite">
+    {% for category, message in messages %}
+    {% set is_problem = category in ('danger', 'warning') %}
+    {% set icon = {'success': 'fa-circle-check', 'danger': 'fa-circle-exclamation', 'warning': 'fa-triangle-exclamation'}.get(category, 'fa-circle-info') %}
+    <div class="toast toast--{{ category }}" role="{{ 'alert' if is_problem else 'status' }}" data-autohide="{{ 'false' if is_problem else 'true' }}">
+        <i class="fa-solid {{ icon }} toast__icon" aria-hidden="true"></i>
+        <div class="toast__body">{{ message }}</div>
+        <button type="button" class="toast__close" data-dismiss aria-label="Dismiss notification">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}

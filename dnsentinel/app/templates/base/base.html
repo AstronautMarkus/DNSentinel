@@ -4,43 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %} | DNSentinel</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="shortcut icon" href="{{ url_for('static', filename="favicon.png")}}" type="image/x-icon">
-    <link href="{{ url_for('static', filename='css/bulma.min.css')}}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css')}}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% include 'base/partials/head.html' %}
     {% block head %}{% endblock %}
 </head>
-<body>
-    <header>
-        {% include 'base/header/header.html' %}
-    </header>
-    <main class="container is-fluid mt-5">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="notification is-{{ category }} is-light is-dismissible">
-                        {{ message }}
-                        <button class="delete" aria-label="delete"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+<body class="site">
+    {% include 'base/header/header.html' %}
+    {% include 'base/partials/flashes.html' %}
+    <main class="site__main">
         {% block content %}{% endblock %}
     </main>
     {% include 'base/footer/footer.html' %}
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     {% block scripts %}{% endblock %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.notification .delete').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    btn.parentElement.remove();
-                });
-            });
-        });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>

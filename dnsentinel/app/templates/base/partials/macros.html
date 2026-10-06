@@ -1,0 +1,84 @@
+{# Reusable UI building blocks. Import with:
+   {% import 'base/partials/macros.html' as ui %} #}
+
+{% macro copy_button(value, label='Copy') -%}
+<button type="button" class="btn btn--ghost btn--icon btn--xs" data-copy="{{ value }}" title="{{ label }}" aria-label="{{ label }}">
+    <i class="fa-regular fa-copy" aria-hidden="true"></i>
+</button>
+{%- endmacro %}
+
+{# Monospace value + copy button. `wrap` lets long values break instead of truncating. #}
+{% macro copyable(value, label='Copy', wrap=false) -%}
+<span class="copyable{% if wrap %} copyable--wrap{% endif %}">
+    <span class="copyable__value" title="{{ value }}">{{ value }}</span>
+    {{ copy_button(value, label) }}
+</span>
+{%- endmacro %}
+
+{# Masked secret with reveal + copy buttons (behaviour lives in static/js/app.js). #}
+{% macro secret(value, wrap=false) -%}
+<span class="copyable{% if wrap %} copyable--wrap{% endif %}">
+    <span class="copyable__value is-masked" data-secret="{{ value or '' }}">••••••••••••</span>
+    <button type="button" class="btn btn--ghost btn--icon btn--xs" data-secret-toggle aria-pressed="false" title="Show token" aria-label="Show token">
+        <i class="fa-regular fa-eye" aria-hidden="true"></i>
+    </button>
+    {{ copy_button(value or '', 'Copy token') }}
+</span>
+{%- endmacro %}
+
+{# items: list of (label, url) tuples; the last item is the current page. #}
+{% macro breadcrumb(items) -%}
+<nav class="breadcrumb" aria-label="Breadcrumb">
+    <ol>
+        {% for label, url in items %}
+            {% if loop.last %}
+                <li aria-current="page">{{ label }}</li>
+            {% else %}
+                <li><a href="{{ url }}">{{ label }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+</nav>
+{%- endmacro %}
+
+{% macro empty_state(icon, title, text, action_url=none, action_label=none, action_icon='fa-plus') -%}
+<div class="empty-state">
+    <span class="empty-state__icon"><i class="fa-solid {{ icon }}" aria-hidden="true"></i></span>
+    <p class="empty-state__title">{{ title }}</p>
+    <p class="empty-state__text">{{ text }}</p>
+    {% if action_url %}
+        <a href="{{ action_url }}" class="btn btn--primary btn--sm">
+            <i class="fa-solid {{ action_icon }}" aria-hidden="true"></i>
+            <span>{{ action_label }}</span>
+        </a>
+    {% endif %}
+</div>
+{%- endmacro %}
+
+{% macro bool_badge(value, yes='Yes', no='No', yes_variant='success', no_variant='') -%}
+{% if value %}
+<span class="badge{% if yes_variant %} badge--{{ yes_variant }}{% endif %}">{{ yes }}</span>
+{% else %}
+<span class="badge{% if no_variant %} badge--{{ no_variant }}{% endif %}">{{ no }}</span>
+{% endif %}
+{%- endmacro %}
+
+{% macro proxy_status(proxied) -%}
+{% if proxied %}
+<span class="proxy proxy--on"><i class="fa-solid fa-cloud" aria-hidden="true"></i>Proxied</span>
+{% else %}
+<span class="proxy"><i class="fa-solid fa-cloud" aria-hidden="true"></i>DNS only</span>
+{% endif %}
+{%- endmacro %}
+
+{% macro record_status(active) -%}
+{% if active %}
+<span class="badge badge--success badge--dot">Active</span>
+{% else %}
+<span class="badge badge--danger badge--dot">Inactive</span>
+{% endif %}
+{%- endmacro %}
+
+{% macro date(value, fmt='%Y-%m-%d') -%}
+{% if value and value.strftime is defined %}{{ value.strftime(fmt) }}{% elif value %}{{ value }}{% else %}<span class="text-muted">—</span>{% endif %}
+{%- endmacro %}

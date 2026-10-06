@@ -1,139 +1,115 @@
 {% extends 'base/admin_base.html' %}
+{% import 'base/partials/macros.html' as ui %}
 {% block title %}DNS Records{% endblock %}
 {% block content %}
 
-<div class="section">
-  <div class="container is-fullwidth is-widescreen" style="max-width: 98vw;">
-    <h1 class="title">DNS Record List from "{{ zone.name }}" Zone</h1>
-    <div class="box">
-      <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
-        <h2 class="title is-4 mb-0">
-          <span class="icon has-text-primary"><i class="fas fa-database"></i></span>
-          <span>DNS Record List</span>
-        </h2>
-        <div class="dropdown is-right" id="addDropdown">
-          <div class="dropdown-trigger">
-            <button class="button is-primary is-rounded" aria-haspopup="true" aria-controls="dropdown-menu">
-              <span class="icon"><i class="fas fa-plus"></i></span>
-              <span>Add</span>
-              <span class="icon is-small">
-                <i class="fas fa-angle-down" aria-hidden="true"></i>
-              </span>
+<div class="page-header">
+    <div class="page-header__main">
+        {{ ui.breadcrumb([
+            ('DNS zones', url_for('zones.list_zones')),
+            (zone.name, url_for('zones.zone_detail', zone_id=zone_id)),
+            ('DNS records', none)
+        ]) }}
+        <h1 class="page-title">DNS records</h1>
+        <p class="page-subtitle">DNS record list from the <strong>{{ zone.name }}</strong> zone.</p>
+    </div>
+    <div class="page-header__actions">
+        <a href="{{ url_for('zones.zone_detail', zone_id=zone_id) }}" class="btn">
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+            <span>Back to zone</span>
+        </a>
+        <div class="dropdown dropdown--right" id="addDropdown" data-dropdown>
+            <button type="button" class="btn btn--primary" data-dropdown-toggle aria-haspopup="menu" aria-expanded="false">
+                <i class="fa-solid fa-file-import" aria-hidden="true"></i>
+                <span>Import records</span>
+                <i class="fa-solid fa-chevron-down btn__caret" aria-hidden="true"></i>
             </button>
-          </div>
-          <div class="dropdown-menu" id="dropdown-menu" role="menu">
-            <div class="dropdown-content">
-              <a href="#" class="dropdown-item" id="addSingleBtn">
-                <span class="icon"><i class="fas fa-file-import"></i></span>
-                <span>Single</span>
-              </a>
-              <a href="#" class="dropdown-item" id="addFullListBtn">
-                <span class="icon"><i class="fas fa-list"></i></span>
-                <span>Full list</span>
-              </a>
+            <div class="dropdown__menu" role="menu">
+                <a href="#" class="dropdown__item" id="addSingleBtn" role="menuitem">
+                    <i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i>
+                    <span>
+                        <span class="dropdown__item-title">Single record</span>
+                        <span class="dropdown__item-desc">Pick one record from Cloudflare</span>
+                    </span>
+                </a>
+                <a href="#" class="dropdown__item" id="addFullListBtn" role="menuitem">
+                    <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+                    <span>
+                        <span class="dropdown__item-title">Full list</span>
+                        <span class="dropdown__item-desc">Import every record in the zone</span>
+                    </span>
+                </a>
             </div>
-          </div>
         </div>
-      </div>
-      <div class="table-container">
-        <table class="table is-fullwidth is-striped is-hoverable is-bordered">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Type</th>
-              <th>TTL</th>
-              <th>Proxied</th>
-              <th>Active</th>
-              <th>Content</th>
-              <th>Created On</th>
-              <th>Modified On</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for record in records %}
-            <tr>
-              <td>
-                <span class="icon-text">
-                  <span class="icon has-text-info"><i class="fas fa-globe"></i></span>
-                  <span>{{ record.name }}</span>
-                </span>
-              </td>
-              <td>
-                <span class="tag is-info is-light">{{ record.type }}</span>
-              </td>
-              <td>
-                <span class="tag is-light">{{ record.ttl }}</span>
-              </td>
-              <td>
-                {% if record.proxied %}
-                  <span class="tag is-success is-light"><i class="fas fa-check"></i> Yes</span>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card__header">
+        <h2 class="card__title">
+            <i class="fa-solid fa-database text-muted" aria-hidden="true"></i>
+            Imported records
+            <span class="badge">{{ records|length }}</span>
+        </h2>
+    </div>
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Content</th>
+                    <th>TTL</th>
+                    <th>Proxy status</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Modified</th>
+                    <th class="col-actions"><span class="visually-hidden">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>
+                        <a class="table__primary" href="{{ url_for('records.detail_record', record_id=record.record_id, zone_id=zone_id) }}">
+                            {{ record.name }}
+                        </a>
+                    </td>
+                    <td><span class="badge badge--code">{{ record.type }}</span></td>
+                    <td>
+                        <span class="table__content truncate mono" title="{{ record.content or '' }}">{{ record.content or '—' }}</span>
+                    </td>
+                    <td class="tabular nowrap">{{ 'Auto' if record.ttl == 1 else record.ttl }}</td>
+                    <td>{{ ui.proxy_status(record.proxied) }}</td>
+                    <td>{{ ui.record_status(record.active) }}</td>
+                    <td class="col-date">{{ ui.date(record.created_on) }}</td>
+                    <td class="col-date">{{ ui.date(record.modified_on) }}</td>
+                    <td class="col-actions">
+                        <div class="btn-group">
+                            <a href="{{ url_for('records.detail_record', record_id=record.record_id, zone_id=zone_id) }}"
+                               class="btn btn--ghost btn--icon btn--sm" title="View" aria-label="View {{ record.name }}">
+                                <i class="fa-regular fa-eye" aria-hidden="true"></i>
+                            </a>
+                            <a href="#" class="btn btn--ghost btn--icon btn--sm" title="Edit" aria-label="Edit {{ record.name }}">
+                                <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
+                            </a>
+                            <a href="#" class="btn btn--ghost btn--ghost-danger btn--icon btn--sm" title="Delete" aria-label="Delete {{ record.name }}">
+                                <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
                 {% else %}
-                  <span class="tag is-light"><i class="fas fa-times"></i> No</span>
-                {% endif %}
-              </td>
-              <td>
-                {% if record.active %}
-                  <span class="tag is-success"><i class="fas fa-check-circle"></i> Active</span>
-                {% else %}
-                  <span class="tag is-danger"><i class="fas fa-ban"></i> Inactive</span>
-                {% endif %}
-              </td>
-              <td>
-                <span class="has-text-dark">{{ record.content or '-' }}</span>
-              </td>
-              <td>
-                {% if record.created_on %}
-                  <span class="has-text-grey-dark">{{ record.created_on.strftime('%Y-%m-%d') }}</span>
-                {% else %}
-                  <span class="has-text-grey-light">-</span>
-                {% endif %}
-              </td>
-              <td>
-                {% if record.modified_on %}
-                  <span class="has-text-grey-dark">{{ record.modified_on.strftime('%Y-%m-%d') }}</span>
-                {% else %}
-                  <span class="has-text-grey-light">-</span>
-                {% endif %}
-              </td>
-              <td>
-                <div class="buttons are-small is-flex-direction-column">
-                  <a href="{{ url_for('records.detail_record', record_id=record.record_id, zone_id=zone_id) }}" class="button is-info is-light mb-1" title="View">
-                    <span class="icon"><i class="fas fa-eye"></i></span>
-                    <span>View</span>
-                  </a>
-                  <a href="#" class="button is-warning is-light mb-1" title="Edit">
-                    <span class="icon"><i class="fas fa-edit"></i></span>
-                    <span>Edit</span>
-                  </a>
-                  <a href="#" class="button is-danger is-light" title="Delete">
-                    <span class="icon"><i class="fas fa-trash-alt"></i></span>
-                    <span>Delete</span>
-                  </a>
-                </div>
-              </td>
-            </tr>
-            {% else %}
-            <tr>
-              <td colspan="9" class="has-text-centered">
-                <span class="icon-text has-text-grey-light">
-                  <span class="icon"><i class="fas fa-info-circle"></i></span>
-                  <span>No records available.</span>
-                </span>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
+                <tr class="is-empty">
+                    <td colspan="9">
+                        {{ ui.empty_state('fa-database', 'No records available',
+                            'Import records from Cloudflare to start managing them with DNSentinel.') }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
-      </div>
     </div>
-    <div class="buttons mt-4">
-      <a href="{{ url_for('zones.list_zones') }}" class="button is-danger is-light">
-        <span class="icon is-small"><i class="fas fa-arrow-left"></i></span>
-        <span>Go back</span>
-      </a>
-    </div>
-  </div>
 </div>
 
 {% endblock %}
@@ -141,16 +117,6 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const dropdown = document.getElementById('addDropdown');
-  const trigger = dropdown.querySelector('.dropdown-trigger');
-  trigger.addEventListener('click', function(e) {
-    e.stopPropagation();
-    dropdown.classList.toggle('is-active');
-  });
-  document.addEventListener('click', function() {
-    dropdown.classList.remove('is-active');
-  });
-
   const zoneId = "{{ zone.zone_id }}";
   const cloudflareUrl = "{{ url_for('records.get_cloudflare_records', zone_id=zone.zone_id) }}";
   const importUrl = "{{ url_for('records.import_record', zone_id=zone.zone_id) }}";
@@ -160,7 +126,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('addSingleBtn').addEventListener('click', async function(e) {
     e.preventDefault();
-    dropdown.classList.remove('is-active');
     Swal.fire({
       title: 'Fetching Cloudflare records...',
       allowOutsideClick: false,
@@ -226,7 +191,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('addFullListBtn').addEventListener('click', async function(e) {
     e.preventDefault();
-    dropdown.classList.remove('is-active');
     Swal.fire({
       title: 'Fetching Cloudflare records...',
       allowOutsideClick: false,

@@ -1,236 +1,253 @@
 {% extends 'base/admin_base.html' %}
+{% import 'base/partials/macros.html' as ui %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 
-<div class="section">
-  <div class="container">
-    <div class="columns is-vcentered mb-5" style="max-width: 1200px; margin: 0 auto;">
-      <div class="column is-three-fifths is-flex is-align-items-center">
-        <div class="mr-5">
-          <img src="{{ url_for('static', filename='img/DNSentinel.svg') }}" alt="" style="max-width:120px; pointer-events: none;">
-        </div>
-        <div>
-          <h2 class="title is-3">Welcome back, {{ current_user.name }}!</h2>
-          <p class="subtitle is-5">Your DNS and IP status at a glance.</p>
-        </div>
-      </div>
-      <div class="column is-two-fifths">
-        <div class="box is-flex is-align-items-center mb-3">
-          <span class="icon is-large mr-3"><i class="fas fa-globe fa-2x has-text-info"></i></span>
-          <div>
-            <p class="heading mb-1">Your ISP IP Address</p>
-            <p class="title mb-0">{{ isp_ip }}</p>
-          </div>
-        </div>
-        <div class="box is-flex is-align-items-center">
-          <span class="icon is-large mr-3"><i class="fas fa-ethernet fa-2x has-text-primary"></i></span>
-          <div>
-            <p class="heading mb-1">Your Ethernet IP Address</p>
-            <p class="title mb-0">{{ ethernet_ip }}</p>
-          </div>
-        </div>
-      </div>
+<div class="page-header">
+    <div class="page-header__main">
+        <h1 class="page-title">Welcome back, {{ current_user.name }}</h1>
+        <p class="page-subtitle">Your DNS and IP status at a glance.</p>
     </div>
-
-    <div class="columns is-multiline">
-      <div class="column is-one-quarter">
-        <div class="box has-text-centered">
-          <span class="icon is-large mb-2"><i class="fas fa-globe fa-2x has-text-info"></i></span>
-          <p class="heading">Zones</p>
-          <p class="title">{{ user_zones|length }}</p>
-        </div>
-      </div>
-      <div class="column is-one-quarter">
-        <div class="box has-text-centered">
-          <span class="icon is-large mb-2"><i class="fas fa-bell fa-2x has-text-warning"></i></span>
-          <p class="heading">Alerts</p>
-          <p class="title">3</p>
-        </div>
-      </div>
-      <div class="column is-one-quarter">
-        <div class="box has-text-centered">
-          <span class="icon is-large mb-2"><i class="fas fa-sync-alt fa-2x has-text-success"></i></span>
-          <p class="heading">Updates</p>
-          <p class="title">5</p>
-        </div>
-      </div>
-      <div class="column is-one-quarter">
-        <div class="box has-text-centered">
-          <span class="icon is-large mb-2"><i class="fas fa-users fa-2x has-text-primary"></i></span>
-          <p class="heading">Users</p>
-          <p class="title">2</p>
-        </div>
-      </div>
+    <div class="page-header__actions">
+        <a href="{{ url_for('zones.list_zones') }}" class="btn">
+            <i class="fa-solid fa-cloud" aria-hidden="true"></i>
+            <span>View zones</span>
+        </a>
+        <a href="{{ url_for('zones.create_zone') }}" class="btn btn--primary">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            <span>Add zone</span>
+        </a>
     </div>
+</div>
 
-    <div class="columns">
-      <div class="column is-two-thirds">
-        <div class="box">
-          <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
-            <div class="is-flex is-align-items-center" style="gap: 16px;">
-              <img src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="Cloudflare" style="height:40px; width:auto; pointer-events: none;">
-              <span class="title is-5 mb-0">Cloudflare DNS Zones</span>
+<div class="stack">
+    <section class="grid grid--2" aria-label="Network addresses">
+        <div class="card ip-card">
+            <span class="ip-card__icon"><i class="fa-solid fa-globe" aria-hidden="true"></i></span>
+            <div class="ip-card__body">
+                <p class="ip-card__label">Public IP address (ISP)</p>
+                <p class="ip-card__value">{{ isp_ip }}</p>
             </div>
-            <a href="{{ url_for('zones.list_zones') }}" class="button is-link is-light is-small">
-              <span>View All</span>
-              <span class="icon is-small"><i class="fas fa-arrow-right"></i></span>
-            </a>
-          </div>
-          <table class="table is-fullwidth is-striped is-hoverable">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Zone ID</th>
-                <th>Zone Token</th>
-                <th>Records</th>
-                <th>Created At</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for zone in user_zones %}
-              <tr>
-                <td>{{ zone.name }}</td>
-                <td>
-                  <span class="zone-id" data-zoneid="{{ zone.zone_id }}"></span>
-                  <button class="button is-small is-light copy-zoneid" type="button" title="Copy" style="margin-left:2px;">
-                    <span class="icon is-small"><i class="fas fa-copy"></i></span>
-                  </button>
-                </td>
-                <td>
-                  <span class="zone-token" style="letter-spacing:2px;" data-token="{{ zone.api_token }}">
-                    •••••••••••••••••
-                  </span>
-                  <button class="button is-small is-light toggle-token" type="button" style="margin-left:5px;">
-                    <span class="icon is-small"><i class="fas fa-eye"></i></span>
-                  </button>
-                  <button class="button is-small is-light copy-token" type="button" title="Copy" style="margin-left:2px;">
-                    <span class="icon is-small"><i class="fas fa-copy"></i></span>
-                  </button>
-                </td>
-                <td>{{ user_records }}</td>
-                <td>{{ zone.created_at.strftime('%Y-%m-%d') }}</td>
-              </tr>
-              {% else %}
-              <tr>
-                <td colspan="4" class="has-text-centered">
-                No zones available.
-                <br>
-                <a href="{{ url_for('zones.create_zone') }}" class="button is-info is-rounded is-small mt-3">
-                  <span class="icon is-small"><i class="fas fa-plus-circle"></i></span>
-                  <span>Create Zone</span>
+            {{ ui.copy_button(isp_ip, 'Copy public IP') }}
+        </div>
+        <div class="card ip-card">
+            <span class="ip-card__icon"><i class="fa-solid fa-ethernet" aria-hidden="true"></i></span>
+            <div class="ip-card__body">
+                <p class="ip-card__label">Local IP address (Ethernet)</p>
+                <p class="ip-card__value">{{ ethernet_ip }}</p>
+            </div>
+            {{ ui.copy_button(ethernet_ip, 'Copy local IP') }}
+        </div>
+    </section>
+
+    <section class="grid grid--4" aria-label="Summary">
+        <div class="card stat">
+            <div class="stat__head">
+                <p class="stat__label">Zones</p>
+                <span class="stat__icon"><i class="fa-solid fa-cloud" aria-hidden="true"></i></span>
+            </div>
+            <p class="stat__value">{{ user_zones|length }}</p>
+        </div>
+        <div class="card stat">
+            <div class="stat__head">
+                <p class="stat__label">Alerts</p>
+                <span class="stat__icon"><i class="fa-solid fa-bell" aria-hidden="true"></i></span>
+            </div>
+            <p class="stat__value">3</p>
+        </div>
+        <div class="card stat">
+            <div class="stat__head">
+                <p class="stat__label">Updates</p>
+                <span class="stat__icon"><i class="fa-solid fa-rotate" aria-hidden="true"></i></span>
+            </div>
+            <p class="stat__value">5</p>
+        </div>
+        <div class="card stat">
+            <div class="stat__head">
+                <p class="stat__label">Users</p>
+                <span class="stat__icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
+            </div>
+            <p class="stat__value">2</p>
+        </div>
+    </section>
+
+    <section class="grid grid--main-aside grid--wide-main">
+        <div class="card">
+            <div class="card__header">
+                <h2 class="card__title">
+                    <img class="cf-logo" src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="">
+                    Cloudflare DNS zones
+                </h2>
+                <a href="{{ url_for('zones.list_zones') }}" class="card__link">
+                    View all <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                 </a>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+            </div>
+            <div class="table-wrap">
+                <table class="table table--compact">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Zone ID</th>
+                            <th>API token</th>
+                            <th>Records</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for zone in user_zones %}
+                        <tr>
+                            <td>
+                                <a class="table__primary" href="{{ url_for('zones.zone_detail', zone_id=zone.zone_id) }}">
+                                    <i class="fa-solid fa-globe" aria-hidden="true"></i>{{ zone.name }}
+                                </a>
+                            </td>
+                            <td>{{ ui.copyable(zone.zone_id, 'Copy zone ID') }}</td>
+                            <td>{{ ui.secret(zone.api_token) }}</td>
+                            <td class="tabular">{{ user_records }}</td>
+                            <td class="col-date">{{ ui.date(zone.created_at) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr class="is-empty">
+                            <td colspan="5">
+                                {{ ui.empty_state('fa-cloud', 'No zones yet',
+                                    'Connect a Cloudflare zone to start keeping its DNS records in sync.',
+                                    url_for('zones.create_zone'), 'Add zone') }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-      </div>
-      <div class="column is-one-third">
-        <div class="box" style="margin: auto;">
-          <h2 class="subtitle is-6 has-text-centered">Alerts this week</h2>
-          <div style="width:100%;">
-            <canvas id="alertsChart" style="width:100%;max-width:100%;height:180px;"></canvas>
-          </div>
+
+        <div class="card">
+            <div class="card__header">
+                <div>
+                    <h2 class="card__title">Alerts this week</h2>
+                    <p class="card__description">Daily alert count, last 7 days</p>
+                </div>
+            </div>
+            <div class="card__body">
+                <div class="chart">
+                    <canvas id="alertsChart" role="img" aria-label="Line chart of alerts per day this week"></canvas>
+                </div>
+                <p class="chart-summary" id="alertsSummary"></p>
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
+    </section>
 </div>
 
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    var ctx2 = document.getElementById('alertsChart').getContext('2d');
-    new Chart(ctx2, {
-      type: 'line',
-      data: {
-        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-        datasets: [{
-          label: 'Alertas',
-          data: [0, 1, 0, 2, 1, 0, 3],
-          borderColor: 'rgba(255, 99, 132, 0.8)',
-          backgroundColor: 'rgba(255, 99, 132, 0.2)',
-          fill: true,
-          tension: 0.3
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { display: false },
-          y: { display: false }
+document.addEventListener('DOMContentLoaded', function () {
+    var labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    var values = [0, 1, 0, 2, 1, 0, 3];
+
+    // Chart colors come from the design tokens so the chart follows the theme.
+    var css = getComputedStyle(document.documentElement);
+    var token = function (name) { return css.getPropertyValue(name).trim(); };
+    var series = token('--color-primary');
+    var surface = token('--color-surface');
+    var muted = token('--color-text-muted');
+    var grid = token('--color-divider');
+    var baseline = token('--color-border-strong');
+    var tooltipBg = token('--gray-900');
+
+    function withAlpha(hex, alpha) {
+        var n = parseInt(hex.replace('#', ''), 16);
+        return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + alpha + ')';
+    }
+
+    // Vertical hover guide drawn beneath the line.
+    var crosshair = {
+        id: 'crosshair',
+        beforeDatasetsDraw: function (chart) {
+            var active = chart.tooltip && chart.tooltip.getActiveElements();
+            if (!active || !active.length) return;
+            var x = active[0].element.x;
+            var area = chart.chartArea;
+            var ctx = chart.ctx;
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(x, area.top);
+            ctx.lineTo(x, area.bottom);
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = baseline;
+            ctx.stroke();
+            ctx.restore();
         }
-      }
+    };
+
+    var font = { family: token('--font-sans'), size: 12 };
+
+    new Chart(document.getElementById('alertsChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Alerts',
+                data: values,
+                borderColor: series,
+                backgroundColor: withAlpha(series, 0.1),
+                borderWidth: 2,
+                borderCapStyle: 'round',
+                borderJoinStyle: 'round',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 0,
+                pointHitRadius: 16,
+                pointHoverRadius: 5,
+                pointHoverBorderWidth: 2,
+                pointHoverBackgroundColor: series,
+                pointHoverBorderColor: surface
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: tooltipBg,
+                    padding: 10,
+                    cornerRadius: 6,
+                    displayColors: false,
+                    titleFont: { family: font.family, size: 12, weight: '600' },
+                    bodyFont: { family: font.family, size: 12 },
+                    callbacks: {
+                        label: function (ctx) {
+                            var n = ctx.parsed.y;
+                            return n + (n === 1 ? ' alert' : ' alerts');
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    border: { color: baseline },
+                    ticks: { color: muted, font: font }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: grid },
+                    border: { display: false },
+                    ticks: { color: muted, font: font, precision: 0, stepSize: 1 }
+                }
+            }
+        },
+        plugins: [crosshair]
     });
 
-    document.querySelectorAll('.zone-id').forEach(function(span) {
-      var fullId = span.getAttribute('data-zoneid');
-      if (fullId && fullId.length > 20) {
-        span.textContent = fullId.slice(0, 20) + '...';
-      } else {
-        span.textContent = fullId;
-      }
-    });
-
-    document.querySelectorAll('.toggle-token').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var tokenSpan = btn.parentElement.querySelector('.zone-token');
-        var token = tokenSpan.getAttribute('data-token');
-        var isHidden = tokenSpan.textContent.includes('•');
-        if (isHidden) {
-          if (token.length > 10) {
-            tokenSpan.textContent = token.slice(0, 10) + '...';
-          } else {
-            tokenSpan.textContent = token;
-          }
-          btn.querySelector('i').classList.remove('fa-eye');
-          btn.querySelector('i').classList.add('fa-eye-slash');
-        } else {
-          tokenSpan.textContent = '••••••••••••••••';
-          btn.querySelector('i').classList.remove('fa-eye-slash');
-          btn.querySelector('i').classList.add('fa-eye');
-        }
-      });
-    });
-
-    document.querySelectorAll('.copy-token').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var tokenSpan = btn.parentElement.querySelector('.zone-token');
-        var token = tokenSpan.getAttribute('data-token');
-        navigator.clipboard.writeText(token).then(function() {
-          btn.classList.add('is-success');
-          btn.querySelector('i').classList.remove('fa-copy');
-          btn.querySelector('i').classList.add('fa-check');
-          setTimeout(function() {
-            btn.classList.remove('is-success');
-            btn.querySelector('i').classList.remove('fa-check');
-            btn.querySelector('i').classList.add('fa-copy');
-          }, 1200);
-        });
-      });
-    });
-
-    document.querySelectorAll('.copy-zoneid').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var idSpan = btn.parentElement.querySelector('.zone-id');
-        var zoneid = idSpan.getAttribute('data-zoneid');
-        navigator.clipboard.writeText(zoneid).then(function() {
-          btn.classList.add('is-success');
-          btn.querySelector('i').classList.remove('fa-copy');
-          btn.querySelector('i').classList.add('fa-check');
-          setTimeout(function() {
-            btn.classList.remove('is-success');
-            btn.querySelector('i').classList.remove('fa-check');
-            btn.querySelector('i').classList.add('fa-copy');
-          }, 1200);
-        });
-      });
-    });
-  });
+    var total = values.reduce(function (a, b) { return a + b; }, 0);
+    var peak = Math.max.apply(null, values);
+    document.getElementById('alertsSummary').innerHTML =
+        '<span>Total: <strong>' + total + '</strong></span>' +
+        '<span>Peak: <strong>' + peak + '</strong> on ' + labels[values.indexOf(peak)] + '</span>';
+});
 </script>
 {% endblock %}

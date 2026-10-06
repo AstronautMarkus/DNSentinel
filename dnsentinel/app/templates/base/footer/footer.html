@@ -1,15 +1,22 @@
-<footer class="footer has-background-dark has-text-white-ter" style="padding: 2rem 0;">
-    <div class="content has-text-centered">
-        <p>&copy;
-            <script>document.write(new Date().getFullYear())</script> DNSentinel. All rights reserved.
-        </p>
-        <div style="margin-top: 1.5rem;">
-            <span>
-                Created by <a href="https://github.com/astronautmarkus" target="_blank" rel="noopener"
-                    class="has-text-white-ter has-text-weight-bold">
-                    <strong class="has-text-info">AstronautMarkusDev</strong>
+<footer class="site-footer">
+    <div class="container">
+        <div class="site-footer__top">
+            <div>
+                <a class="brand brand--inverse" href="{{ url_for('main.index') }}">
+                    <img class="brand__logo" src="{{ url_for('static', filename='img/DNSentinel.svg') }}" alt="">
+                    <span>DNSentinel</span>
                 </a>
-            </span>
+                <p class="site-footer__tagline">Autonomous Cloudflare DNS manager that keeps your records in sync with your dynamic IP address.</p>
+            </div>
+            <nav class="site-footer__links" aria-label="Footer">
+                <a href="{{ url_for('auth.login') }}">Sign in</a>
+                <a href="{{ url_for('auth.register') }}">Create account</a>
+                <a href="https://github.com/astronautmarkus" target="_blank" rel="noopener">GitHub</a>
+            </nav>
+        </div>
+        <div class="site-footer__bottom">
+            <span>&copy; <span data-current-year></span> DNSentinel. All rights reserved.</span>
+            <span>Created by <a href="https://github.com/astronautmarkus" target="_blank" rel="noopener"><strong>AstronautMarkusDev</strong></a></span>
         </div>
     </div>
 </footer>

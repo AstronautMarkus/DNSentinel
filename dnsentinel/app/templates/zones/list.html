@@ -1,138 +1,77 @@
 {% extends 'base/admin_base.html' %}
+{% import 'base/partials/macros.html' as ui %}
 {% block title %}Cloudflare DNS Zones{% endblock %}
 {% block content %}
 
-<div class="section">
-  <div class="container is-fullwidth">
-    <div class="is-flex is-align-items-center mb-4">
-      <img src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="Cloudflare"
-        style="height:40px; width:auto; pointer-events: none; margin-right: 12px;">
-      <h1 class="title mb-0">Cloudflare DNS Zones</h1>
+<div class="page-header">
+    <div class="page-header__main">
+        {{ ui.breadcrumb([('Dashboard', url_for('dashboard.home')), ('DNS zones', none)]) }}
+        <h1 class="page-title">DNS zones</h1>
+        <p class="page-subtitle">Cloudflare zones connected to DNSentinel.</p>
     </div>
-    <div class="box">
-      <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
-        <h2 class="subtitle is-5 mb-0">Added Zones</h2>
-        <a href="{{ url_for('zones.create_zone') }}" class="button is-info is-info is-small">
-          <span class="icon is-small"><i class="fas fa-plus-circle"></i></span>
-          <span>Create Zone</span>
+    <div class="page-header__actions">
+        <a href="{{ url_for('zones.create_zone') }}" class="btn btn--primary">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            <span>Add zone</span>
         </a>
-      </div>
-      <table class="table is-fullwidth is-striped is-hoverable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Zone ID</th>
-            <th>Zone Token</th>
-            <th>Created At</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for zone in user_zones %}
-          <tr>
-            <td><a href="{{ url_for('zones.zone_detail', zone_id=zone.zone_id) }}" class="has-text-link">{{ zone.name }}</a></td>
-            <td>
-              <span class="zone-id" data-zoneid="{{ zone.zone_id }}">{{ zone.zone_id }}</span>
-              <button class="button is-small is-light copy-zoneid" type="button" title="Copy" style="margin-left:2px;">
-                <span class="icon is-small"><i class="fas fa-copy"></i></span>
-              </button>
-            </td>
-            <td>
-              <span class="zone-token" style="letter-spacing:2px;"
-                data-token="{{ zone.api_token }}">••••••••••••••••</span>
-              <button class="button is-small is-light toggle-token" type="button" style="margin-left:5px;">
-                <span class="icon is-small"><i class="fas fa-eye"></i></span>
-              </button>
-              <button class="button is-small is-light copy-token" type="button" title="Copy" style="margin-left:2px;">
-                <span class="icon is-small"><i class="fas fa-copy"></i></span>
-              </button>
-            </td>
-            <td>{{ zone.created_at.strftime('%Y-%m-%d') }}</td>
-            <td>
-              <div class="is-flex is-flex-direction-column">
-                <a href="{{ url_for('zones.zone_detail', zone_id=zone.zone_id) }}"
-                  class="button is-small is-primary mb-1" title="View">
-                  <span class="icon is-small"><i class="fas fa-info-circle"></i></span>
-                  <span>Zone Details</span>
-                </a>
-                <a href="{{ url_for('records.list_records', zone_id=zone.zone_id) }}"
-                  class="button is-small is-info mb-1" title="View">
-                  <span class="icon is-small"><i class="fas fa-eye"></i></span>
-                  <span>DNS Record List</span>
-                </a>
-              </div>
-            </td>
-          </tr>
-          {% else %}
-          <tr>
-            <td colspan="5" class="has-text-centered">
-              No zones available.
-              <br>
-              <a href="{{ url_for('zones.create_zone') }}" class="button is-info is-rounded is-small mt-3">
-                <span class="icon is-small"><i class="fas fa-plus-circle"></i></span>
-                <span>Create Zone</span>
-              </a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
     </div>
-  </div>
 </div>
 
-{% endblock %}
+<div class="card">
+    <div class="card__header">
+        <h2 class="card__title">
+            <img class="cf-logo" src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="">
+            Added zones
+            <span class="badge">{{ user_zones|length }}</span>
+        </h2>
+    </div>
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Zone ID</th>
+                    <th>API token</th>
+                    <th>Created</th>
+                    <th class="col-actions"><span class="visually-hidden">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for zone in user_zones %}
+                <tr>
+                    <td>
+                        <a class="table__primary" href="{{ url_for('zones.zone_detail', zone_id=zone.zone_id) }}">
+                            <i class="fa-solid fa-globe" aria-hidden="true"></i>{{ zone.name }}
+                        </a>
+                    </td>
+                    <td>{{ ui.copyable(zone.zone_id, 'Copy zone ID') }}</td>
+                    <td>{{ ui.secret(zone.api_token) }}</td>
+                    <td class="col-date">{{ ui.date(zone.created_at) }}</td>
+                    <td class="col-actions">
+                        <div class="btn-group">
+                            <a href="{{ url_for('zones.zone_detail', zone_id=zone.zone_id) }}" class="btn btn--sm">
+                                <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                                <span>Details</span>
+                            </a>
+                            <a href="{{ url_for('records.list_records', zone_id=zone.zone_id) }}" class="btn btn--sm">
+                                <i class="fa-solid fa-list" aria-hidden="true"></i>
+                                <span>DNS records</span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr class="is-empty">
+                    <td colspan="5">
+                        {{ ui.empty_state('fa-cloud', 'No zones yet',
+                            'Connect a Cloudflare zone with its Zone ID and an API token to start managing its DNS records.',
+                            url_for('zones.create_zone'), 'Add zone') }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-{% block scripts %}
-{{ super() }}
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.copy-zoneid').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        const zoneId = btn.closest('td').querySelector('.zone-id').dataset.zoneid;
-        navigator.clipboard.writeText(zoneId).then(function () {
-          btn.classList.add('is-success');
-          btn.querySelector('i').classList.remove('fa-copy');
-          btn.querySelector('i').classList.add('fa-check');
-          setTimeout(function () {
-            btn.classList.remove('is-success');
-            btn.querySelector('i').classList.remove('fa-check');
-            btn.querySelector('i').classList.add('fa-copy');
-          }, 1200);
-        });
-      });
-    });
-    document.querySelectorAll('.copy-token').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        const token = btn.closest('td').querySelector('.zone-token').dataset.token;
-        navigator.clipboard.writeText(token).then(function () {
-          btn.classList.add('is-success');
-          btn.querySelector('i').classList.remove('fa-copy');
-          btn.querySelector('i').classList.add('fa-check');
-          setTimeout(function () {
-            btn.classList.remove('is-success');
-            btn.querySelector('i').classList.remove('fa-check');
-            btn.querySelector('i').classList.add('fa-copy');
-          }, 1200);
-        });
-      });
-    });
-    document.querySelectorAll('.toggle-token').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var tokenSpan = btn.parentElement.querySelector('.zone-token');
-        var token = tokenSpan.getAttribute('data-token');
-        var isHidden = tokenSpan.textContent.includes('•');
-        if (isHidden) {
-          tokenSpan.textContent = token;
-          btn.querySelector('i').classList.remove('fa-eye');
-          btn.querySelector('i').classList.add('fa-eye-slash');
-        } else {
-          tokenSpan.textContent = '••••••••••••••••';
-          btn.querySelector('i').classList.remove('fa-eye-slash');
-          btn.querySelector('i').classList.add('fa-eye');
-        }
-      });
-    });
-  });
-</script>
 {% endblock %}

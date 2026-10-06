@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY', 'dnsentinnel-default-secret-key')
+    SECRET_KEY = os.getenv('SECRET_KEY', 'dnsentinel-default-secret-key')
     load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '.env'))
     MYSQL_USER = os.getenv('MYSQL_USER')
     MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')

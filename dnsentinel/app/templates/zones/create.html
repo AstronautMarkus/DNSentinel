@@ -1,64 +1,90 @@
 {% extends 'base/admin_base.html' %}
-{% block title %}Create a Zone{% endblock %}
+{% import 'base/partials/macros.html' as ui %}
+{% block title %}Add a Zone{% endblock %}
 {% block content %}
 
-<div class="section">
-  <div class="container">
-    <div class="columns is-centered">
-      <div class="column is-6-tablet is-5-desktop is-5-widescreen">
-        <div class="box has-shadow">
-          <div class="is-flex is-align-items-center mb-4">
-            <img src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="Cloudflare"
-              style="height:40px; width:auto; pointer-events: none; margin-right: 12px;">
-            <h1 class="title mb-0">Add Cloudflare DNS Zone</h1>
-          </div>
-          <p class="subtitle is-5 has-text-centered mb-5">Fill out the form below to add a Cloudflare DNS zone in DNSentinel.
-          </p>
-          <form id="zoneForm" method="POST" action="{{ url_for('zones.create_zone') }}">
-            <!-- Remove Name field -->
-            <div class="field">
-              <label class="label">Zone Identifier (zone_id) <span class="has-text-danger">*</span></label>
-              <div class="control has-icons-left">
-                <input class="input" type="text" name="zone_id" placeholder="Zone ID" required>
-                <span class="icon is-small is-left">
-                  <i class="fas fa-id-badge"></i>
-                </span>
-              </div>
-            </div>
-
-            <div class="field">
-              <label class="label">API Token <span class="has-text-danger">*</span></label>
-              <div class="control has-icons-left">
-                <input class="input" type="text" name="api_token" placeholder="API Token" required>
-                <span class="icon is-small is-left">
-                  <i class="fas fa-key"></i>
-                </span>
-              </div>
-            </div>
-
-            <div class="field is-grouped is-grouped-centered mt-5">
-              <div class="control">
-                <button id="validateBtn" class="button is-link is-rounded" type="button">
-                  <span class="icon"><i class="fas fa-check-circle"></i></span>
-                  <span>Validate Credentials</span>
-                </button>
-                <button id="createBtn" class="button is-success is-rounded is-hidden" type="submit">
-                  <span class="icon"><i class="fas fa-plus-circle"></i></span>
-                  <span>Create Zone</span>
-                </button>
-              </div>
-              <div class="control">
-                <a class="button is-light is-rounded" href="{{ url_for('zones.list_zones') }}">
-                  <span class="icon"><i class="fas fa-times"></i></span>
-                  <span>Cancel</span>
-                </a>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
+<div class="page-header">
+    <div class="page-header__main">
+        {{ ui.breadcrumb([('DNS zones', url_for('zones.list_zones')), ('Add zone', none)]) }}
+        <h1 class="page-title">Add Cloudflare DNS zone</h1>
+        <p class="page-subtitle">Fill out the form below to add a Cloudflare DNS zone in DNSentinel.</p>
     </div>
-  </div>
+</div>
+
+<div class="grid grid--main-aside">
+    <form id="zoneForm" class="card" method="POST" action="{{ url_for('zones.create_zone') }}">
+        <div class="card__header">
+            <h2 class="card__title">
+                <img class="cf-logo" src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="">
+                Zone credentials
+            </h2>
+        </div>
+        <div class="card__body form">
+            <div class="field">
+                <label for="zone_id" class="field__label">Zone ID<span class="field__required" aria-hidden="true">*</span></label>
+                <div class="input-group">
+                    <i class="fa-solid fa-fingerprint input-group__icon" aria-hidden="true"></i>
+                    <input class="input input--mono" type="text" id="zone_id" name="zone_id" placeholder="023e105f4ecef8ad9ca31a8372d0c353"
+                           required autocomplete="off" spellcheck="false">
+                </div>
+                <p class="field__hint">The zone identifier shown on the zone's Overview page in Cloudflare.</p>
+            </div>
+            <div class="field">
+                <label for="api_token" class="field__label">API token<span class="field__required" aria-hidden="true">*</span></label>
+                <div class="input-group">
+                    <i class="fa-solid fa-key input-group__icon" aria-hidden="true"></i>
+                    <input class="input input--mono" type="text" id="api_token" name="api_token" placeholder="API token"
+                           required autocomplete="off" spellcheck="false">
+                </div>
+                <p class="field__hint">Credentials are validated against Cloudflare before the zone is created.</p>
+            </div>
+        </div>
+        <div class="card__footer">
+            <a class="btn" href="{{ url_for('zones.list_zones') }}">Cancel</a>
+            <button id="validateBtn" class="btn btn--primary" type="button">
+                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                <span>Validate credentials</span>
+            </button>
+            <button id="createBtn" class="btn btn--success" type="submit" hidden>
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                <span>Create zone</span>
+            </button>
+        </div>
+    </form>
+
+    <aside class="card">
+        <div class="card__header">
+            <h2 class="card__title">
+                <i class="fa-solid fa-circle-question text-muted" aria-hidden="true"></i>
+                Where to find these
+            </h2>
+        </div>
+        <div class="card__body">
+            <ol class="help-list">
+                <li>
+                    <span class="help-list__step">1</span>
+                    <div>
+                        <strong>Zone ID</strong>
+                        In the Cloudflare dashboard, open your domain. The Zone ID is in the API section of the Overview page.
+                    </div>
+                </li>
+                <li>
+                    <span class="help-list__step">2</span>
+                    <div>
+                        <strong>API token</strong>
+                        Go to My Profile → API Tokens and create a token with access to this zone.
+                    </div>
+                </li>
+                <li>
+                    <span class="help-list__step">3</span>
+                    <div>
+                        <strong>Validate, then create</strong>
+                        DNSentinel checks the credentials with Cloudflare before the zone can be created.
+                    </div>
+                </li>
+            </ol>
+        </div>
+    </aside>
 </div>
 
 {% endblock %}
@@ -103,8 +129,8 @@
               allowOutsideClick: false
             }).then(() => {
               validated = true;
-              validateBtn.classList.add('is-hidden');
-              createBtn.classList.remove('is-hidden');
+              validateBtn.hidden = true;
+              createBtn.hidden = false;
             });
           } else {
             Swal.fire({

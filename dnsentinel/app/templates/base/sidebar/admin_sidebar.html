@@ -1,0 +1,36 @@
+{% set endpoint = request.endpoint or '' %}
+{% set nav_items = [
+    {'section': 'General'},
+    {'label': 'Dashboard', 'icon': 'fa-gauge-high', 'url': url_for('dashboard.home'),
+     'active': endpoint.startswith('dashboard.')},
+    {'section': 'Cloudflare'},
+    {'label': 'DNS zones', 'icon': 'fa-cloud', 'url': url_for('zones.list_zones'),
+     'active': endpoint in ('zones.list_zones', 'zones.zone_detail') or endpoint.startswith('records.')},
+    {'label': 'Add zone', 'icon': 'fa-circle-plus', 'url': url_for('zones.create_zone'),
+     'active': endpoint == 'zones.create_zone'},
+] %}
+<aside class="sidebar" id="sidebar" aria-label="Sidebar">
+    <a class="sidebar__brand" href="{{ url_for('dashboard.home') }}">
+        <img src="{{ url_for('static', filename='img/DNSentinel.svg') }}" alt="">
+        <span>DNSentinel</span>
+    </a>
+    <nav class="sidebar__nav" aria-label="Main navigation">
+        {% for item in nav_items %}
+            {% if item.section %}
+                <p class="sidebar__heading">{{ item.section }}</p>
+            {% else %}
+                <a class="sidebar__link{% if item.active %} is-active{% endif %}" href="{{ item.url }}"{% if item.active %} aria-current="page"{% endif %}>
+                    <i class="fa-solid {{ item.icon }}" aria-hidden="true"></i>
+                    <span>{{ item.label }}</span>
+                </a>
+            {% endif %}
+        {% endfor %}
+    </nav>
+    <div class="sidebar__footer">
+        <img class="cf-logo" src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="">
+        <div>
+            <strong>Cloudflare DNS</strong>
+            <span>Dynamic IP manager</span>
+        </div>
+    </div>
+</aside>
