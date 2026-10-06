@@ -7,9 +7,9 @@ Keys are namespaced by area (`zones.create.title`, `records.api.zone_not_found`)
 and `js.*` keys are also sent to the browser. Run app/scripts/check_i18n.py
 after editing to catch missing translations and unknown keys.
 """
-from . import auth, common, dashboard, js, records, zones
+from . import auth, common, dashboard, js, records, sentinel, zones
 
-MODULES = (common, auth, dashboard, zones, records, js)
+MODULES = (common, auth, dashboard, zones, records, sentinel, js)
 
 
 def _merge(modules):

@@ -114,24 +114,117 @@
         </section>
     </div>
 
-    <section class="card">
-        <div class="card__header">
-            <h2 class="card__title">
-                <i class="fa-solid fa-key text-muted" aria-hidden="true"></i>
-                {{ t('zones.detail.credentials') }}
-            </h2>
-        </div>
-        <dl class="properties properties--single properties--stacked">
-            <div class="properties__item">
-                <dt>{{ t('common.zone_id') }}</dt>
-                <dd>{{ ui.copyable(zone.zone_id, t('common.copy_zone_id'), wrap=true) }}</dd>
+    <div class="stack">
+        <section class="card">
+            <div class="card__header">
+                <h2 class="card__title">
+                    <i class="fa-solid fa-key text-muted" aria-hidden="true"></i>
+                    {{ t('zones.detail.credentials') }}
+                </h2>
             </div>
-            <div class="properties__item">
-                <dt>{{ t('common.api_token') }}</dt>
-                <dd>{{ ui.secret(zone.api_token, wrap=true) }}</dd>
+            <dl class="properties properties--single properties--stacked">
+                <div class="properties__item">
+                    <dt>{{ t('common.zone_id') }}</dt>
+                    <dd>{{ ui.copyable(zone.zone_id, t('common.copy_zone_id'), wrap=true) }}</dd>
+                </div>
+                <div class="properties__item">
+                    <dt>{{ t('common.api_token') }}</dt>
+                    <dd>{{ ui.secret(zone.api_token, wrap=true) }}</dd>
+                </div>
+            </dl>
+            <div class="card__footer">
+                <button type="button" class="btn btn--sm" id="replaceTokenBtn">
+                    <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+                    <span>{{ t('zones.detail.replace_token') }}</span>
+                </button>
+                <button type="button" class="btn btn--primary btn--sm" id="checkZoneBtn">
+                    <i class="fa-solid fa-plug-circle-check" aria-hidden="true"></i>
+                    <span>{{ t('zones.detail.check') }}</span>
+                </button>
             </div>
-        </dl>
-    </section>
+        </section>
+
+        <section class="card danger-zone">
+            <div class="card__header">
+                <h2 class="card__title">{{ t('zones.detail.danger_zone') }}</h2>
+            </div>
+            <div class="card__body danger-zone__row">
+                <p>{{ t('zones.detail.delete_text') }}</p>
+                <form method="post" action="{{ url_for('zones.delete_zone', zone_id=zone.zone_id) }}" class="inline-form"
+                      data-confirm="{{ t('zones.detail.delete_confirm', zone=zone.name) }}"
+                      data-confirm-title="{{ t('zones.detail.delete_title') }}"
+                      data-confirm-button="{{ t('zones.detail.delete') }}"
+                      data-confirm-danger>
+                    <button type="submit" class="btn btn--danger btn--sm">
+                        <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+                        <span>{{ t('zones.detail.delete') }}</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+    </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var checkUrl = "{{ url_for('zones.check_zone', zone_id=zone.zone_id) }}";
+  var tokenUrl = "{{ url_for('zones.replace_zone_token', zone_id=zone.zone_id) }}";
+
+  function showResult(data) {
+    return Swal.fire({
+      icon: data.ok ? 'success' : 'error',
+      title: data.ok ? t('js.zones.validated') : t('js.zones.validation_error'),
+      text: data.msg
+    }).then(function () {
+      if (data.ok) window.location.reload();
+    });
+  }
+
+  function showError(err) {
+    Swal.fire({ icon: 'error', title: t('js.common.error'), text: err.message || t('js.zones.validation_failed') });
+  }
+
+  document.getElementById('checkZoneBtn').addEventListener('click', function () {
+    Swal.fire({
+      title: t('js.zones.validating'),
+      text: t('js.zones.validating_text'),
+      allowOutsideClick: false,
+      didOpen: function () { Swal.showLoading(); }
+    });
+    postJSON(checkUrl).then(showResult).catch(showError);
+  });
+
+  document.getElementById('replaceTokenBtn').addEventListener('click', function () {
+    Swal.fire({
+      title: t('js.zones.replace_token_title'),
+      text: t('js.zones.replace_token_text'),
+      input: 'text',
+      inputAttributes: { autocomplete: 'off', spellcheck: 'false', 'aria-label': t('js.zones.new_token') },
+      inputPlaceholder: t('js.zones.new_token'),
+      showCancelButton: true,
+      confirmButtonText: t('js.zones.replace_token_button'),
+      showLoaderOnConfirm: true,
+      allowOutsideClick: function () { return !Swal.isLoading(); },
+      inputValidator: function (value) {
+        if (!value.trim()) return t('js.zones.new_token_required');
+      },
+      preConfirm: function (value) {
+        return postJSON(tokenUrl, { api_token: value.trim() })
+          .then(function (data) {
+            if (!data.ok) Swal.showValidationMessage(data.msg);
+            return data;
+          })
+          .catch(function (err) {
+            Swal.showValidationMessage(err.message || t('js.zones.validation_failed'));
+          });
+      }
+    }).then(function (result) {
+      if (result.isConfirmed && result.value && result.value.ok) showResult(result.value);
+    });
+  });
+});
+</script>
 {% endblock %}

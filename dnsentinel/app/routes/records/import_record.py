@@ -2,7 +2,6 @@ from . import records_bp
 from flask import jsonify, request
 from flask_login import login_required, current_user
 from app.models.models import db, Zone, Record
-from datetime import datetime
 from app.i18n import t
 
 @records_bp.route('/<zone_id>/records/import', methods=['POST'])
@@ -16,27 +15,14 @@ def import_record(zone_id):
     if not data:
         return jsonify({'error': t('records.api.invalid_json')}), 400
 
-    existing_record = Record.query.filter_by(zone_id_fk=zone.id, name=data.get('name')).first()
+    # Several records can share a name (A + AAAA + TXT…); the Cloudflare ID is what's unique.
+    existing_record = Record.query.filter_by(zone_id_fk=zone.id, record_id=data.get('id')).first()
     if existing_record:
-        return jsonify({'error': t('records.api.name_exists')}), 409
+        return jsonify({'error': t('records.api.already_imported')}), 409
 
     try:
-        record = Record(
-            zone_id_fk=zone.id,
-            record_id=data.get('id'),
-            name=data.get('name'),
-            type=data.get('type'),
-            proxied=data.get('proxied', False),
-            proxiable=data.get('proxiable', True),
-            ttl=data.get('ttl', 1),
-            active=True,
-            content=data.get('content'),
-            comment=data.get('comment'),
-            created_on=datetime.fromisoformat(data['created_on'].replace('Z', '+00:00')) if data.get('created_on') else None,
-            modified_on=datetime.fromisoformat(data['modified_on'].replace('Z', '+00:00')) if data.get('modified_on') else None,
-            settings=data.get('settings'),
-            tags=data.get('tags'),
-        )
+        record = Record(zone_id_fk=zone.id)
+        record.update_from_cloudflare(data)
         db.session.add(record)
         db.session.commit()
         return jsonify({'success': True, 'id': record.id})
@@ -102,42 +88,13 @@ def import_bulk_records(zone_id):
         rec_id = rec.get('id')
         if rec_id in existing_map:
             if action == 'replace':
-                # Update existing record
-                record = existing_map[rec_id]
-                record.name = rec.get('name')
-                record.type = rec.get('type')
-                record.proxied = rec.get('proxied', False)
-                record.proxiable = rec.get('proxiable', True)
-                record.ttl = rec.get('ttl', 1)
-                record.active = True
-                record.content = rec.get('content')
-                record.comment = rec.get('comment')
-                record.created_on = datetime.fromisoformat(rec['created_on'].replace('Z', '+00:00')) if rec.get('created_on') else None
-                record.modified_on = datetime.fromisoformat(rec['modified_on'].replace('Z', '+00:00')) if rec.get('modified_on') else None
-                record.settings = rec.get('settings')
-                record.tags = rec.get('tags')
+                existing_map[rec_id].update_from_cloudflare(rec)
                 updated.append(rec_id)
-            elif action == 'ignore':
+            else:
                 skipped.append(rec_id)
-                continue
         else:
-            # Add new record
-            record = Record(
-                zone_id_fk=zone.id,
-                record_id=rec.get('id'),
-                name=rec.get('name'),
-                type=rec.get('type'),
-                proxied=rec.get('proxied', False),
-                proxiable=rec.get('proxiable', True),
-                ttl=rec.get('ttl', 1),
-                active=True,
-                content=rec.get('content'),
-                comment=rec.get('comment'),
-                created_on=datetime.fromisoformat(rec['created_on'].replace('Z', '+00:00')) if rec.get('created_on') else None,
-                modified_on=datetime.fromisoformat(rec['modified_on'].replace('Z', '+00:00')) if rec.get('modified_on') else None,
-                settings=rec.get('settings'),
-                tags=rec.get('tags'),
-            )
+            record = Record(zone_id_fk=zone.id)
+            record.update_from_cloudflare(rec)
             db.session.add(record)
             added.append(rec_id)
     try:

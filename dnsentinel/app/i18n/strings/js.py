@@ -15,6 +15,7 @@ STRINGS = {
     'js.common.unexpected_error': {'en': 'Unexpected error', 'es': 'Error inesperado'},
     'js.common.show_token': {'en': 'Show token', 'es': 'Mostrar token'},
     'js.common.hide_token': {'en': 'Hide token', 'es': 'Ocultar token'},
+    'js.common.dismiss': {'en': 'Dismiss notification', 'es': 'Cerrar notificación'},
     'js.layout.show_navigation': {'en': 'Show navigation', 'es': 'Mostrar navegación'},
     'js.layout.hide_navigation': {'en': 'Hide navigation', 'es': 'Ocultar navegación'},
 
@@ -28,6 +29,16 @@ STRINGS = {
         'es': 'No se pudo validar. Inténtalo de nuevo o revisa tu conexión.',
     },
     'js.zones.validate_first': {'en': 'Please validate credentials first', 'es': 'Primero valida las credenciales'},
+
+    # ── Zone credentials (zones/detail.html) ──
+    'js.zones.replace_token_title': {'en': 'Replace API token', 'es': 'Reemplazar token de API'},
+    'js.zones.replace_token_text': {
+        'en': 'The new token is checked with Cloudflare before it replaces the current one.',
+        'es': 'El nuevo token se comprueba con Cloudflare antes de reemplazar al actual.',
+    },
+    'js.zones.new_token': {'en': 'New API token', 'es': 'Nuevo token de API'},
+    'js.zones.new_token_required': {'en': 'Paste the new token.', 'es': 'Pega el nuevo token.'},
+    'js.zones.replace_token_button': {'en': 'Check and replace', 'es': 'Comprobar y reemplazar'},
 
     # ── Record import dialogs (records/list.html) ──
     'js.records.fetching': {'en': 'Fetching Cloudflare records...', 'es': 'Obteniendo registros de Cloudflare...'},
@@ -59,11 +70,38 @@ STRINGS = {
     'js.records.updated': {'en': 'Updated:', 'es': 'Actualizados:'},
     'js.records.skipped': {'en': 'Skipped:', 'es': 'Omitidos:'},
 
-    # ── Alerts chart (dashboard/home.html) ──
-    'js.dashboard.series': {'en': 'Alerts', 'es': 'Alertas'},
-    'js.dashboard.alerts': {
-        'en': {'one': '{count} alert', 'other': '{count} alerts'},
-        'es': {'one': '{count} alerta', 'other': '{count} alertas'},
+    # ── Record actions (static/js/records.js, records/form.html) ──
+    'js.records.delete_title': {'en': 'Delete record?', 'es': '¿Eliminar el registro?'},
+    # {name} is replaced with markup; the record name is inserted as text.
+    'js.records.delete_text': {
+        'en': 'Delete {name} from Cloudflare, or only stop tracking it in DNSentinel and keep it live in Cloudflare?',
+        'es': '¿Eliminar {name} de Cloudflare, o solo dejar de seguirlo en DNSentinel y mantenerlo activo en Cloudflare?',
+    },
+    'js.records.delete_cloudflare': {'en': 'Delete from Cloudflare', 'es': 'Eliminar de Cloudflare'},
+    'js.records.delete_local': {'en': 'Only stop tracking', 'es': 'Solo dejar de seguir'},
+    'js.records.content_auto': {'en': 'Leave empty to use your current IP', 'es': 'Déjalo vacío para usar tu IP actual'},
+    'js.records.no_ipv4': {'en': 'No public IPv4 address available.', 'es': 'No hay una dirección IPv4 pública disponible.'},
+    'js.records.no_ipv6': {'en': 'No public IPv6 address available.', 'es': 'No hay una dirección IPv6 pública disponible.'},
+
+    # ── Sentinel (sentinel/index.html) ──
+    'js.sentinel.detect_failed': {
+        'en': "Couldn't detect a public IP. Check the internet connection.",
+        'es': 'No se pudo detectar una IP pública. Revisa la conexión a Internet.',
+    },
+    'js.sentinel.checking': {'en': 'Checking records…', 'es': 'Comprobando registros…'},
+    'js.sentinel.checking_text': {'en': 'Comparing your IP with Cloudflare', 'es': 'Comparando tu IP con Cloudflare'},
+    'js.sentinel.result': {
+        'en': '{checked} checked · {updated} updated · {failed} failed · {skipped} skipped',
+        'es': '{checked} comprobados · {updated} actualizados · {failed} con error · {skipped} omitidos',
+    },
+    'js.sentinel.done': {'en': 'Check complete', 'es': 'Comprobación completada'},
+    'js.sentinel.done_with_errors': {'en': 'Check finished with errors', 'es': 'La comprobación terminó con errores'},
+
+    # ── Updates chart (dashboard/home.html) ──
+    'js.dashboard.series': {'en': 'IP updates', 'es': 'Actualizaciones de IP'},
+    'js.dashboard.updates': {
+        'en': {'one': '{count} update', 'other': '{count} updates'},
+        'es': {'one': '{count} actualización', 'other': '{count} actualizaciones'},
     },
     'js.dashboard.total': {'en': 'Total: {value}', 'es': 'Total: {value}'},
     'js.dashboard.peak': {'en': 'Peak: {value} on {day}', 'es': 'Máximo: {value} el {day}'},

@@ -72,14 +72,36 @@
 {% endif %}
 {%- endmacro %}
 
-{% macro record_status(active) -%}
-{% if active %}
-<span class="badge badge--success badge--dot">{{ t('ui.active') }}</span>
-{% else %}
-<span class="badge badge--danger badge--dot">{{ t('ui.inactive') }}</span>
-{% endif %}
-{%- endmacro %}
-
 {% macro date(value, fmt='%Y-%m-%d') -%}
 {% if value and value.strftime is defined %}{{ value.strftime(fmt) }}{% elif value %}{{ value }}{% else %}<span class="text-muted">—</span>{% endif %}
+{%- endmacro %}
+
+{# A UTC timestamp, shown as relative time ("5 minutes ago") in the page
+   language by static/js/app.js; the full local date is in the tooltip. #}
+{% macro time_ago(value) -%}
+{% if value %}<time datetime="{{ value.strftime('%Y-%m-%dT%H:%M:%SZ') }}" data-relative-time>{{ value.strftime('%Y-%m-%d %H:%M') }} UTC</time>{% else %}<span class="text-muted">—</span>{% endif %}
+{%- endmacro %}
+
+{# On/off toggle around a real checkbox, so it submits with forms. #}
+{% macro switch(name, checked=false, label=none, id=none, disabled=false, attrs='') -%}
+<label class="switch">
+    <input type="checkbox" class="switch__input" name="{{ name }}"{% if id %} id="{{ id }}"{% endif %}{% if checked %} checked{% endif %}{% if disabled %} disabled{% endif %} {{ attrs|safe }}>
+    <span class="switch__track" aria-hidden="true"></span>
+    {% if label %}<span class="switch__label">{{ label }}</span>{% endif %}
+</label>
+{%- endmacro %}
+
+{# Validation message for `field`; errors maps fields to i18n keys. #}
+{% macro field_error(errors, field) -%}
+{% if errors and errors.get(field) %}<p class="field__error" id="{{ field }}-error"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>{{ t(errors[field]) }}</p>{% endif %}
+{%- endmacro %}
+
+{# Sentinel failure reasons are i18n keys or Cloudflare's own (English) messages. #}
+{% macro reason(value) -%}
+{{ t(value, default=value) if value else '' }}
+{%- endmacro %}
+
+{# Record TTL in seconds as Cloudflare shows it: Auto, 5 minutes, 1 hour… #}
+{% macro ttl_label(ttl) -%}
+{% if not ttl or ttl == 1 %}{{ t('records.ttl_auto') }}{% elif ttl < 3600 %}{{ t('records.ttl_minutes', count=ttl // 60) }}{% elif ttl < 86400 %}{{ t('records.ttl_hours', count=ttl // 3600) }}{% else %}{{ t('records.ttl_days', count=ttl // 86400) }}{% endif %}
 {%- endmacro %}

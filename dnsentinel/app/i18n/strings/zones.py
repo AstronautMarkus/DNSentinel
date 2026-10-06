@@ -34,8 +34,10 @@ STRINGS = {
         'es': 'En el panel de Cloudflare, abre tu dominio. El ID de zona está en la sección API de la página de Información general.',
     },
     'zones.create.help_token': {
-        'en': 'Go to My Profile → API Tokens and create a token with access to this zone.',
-        'es': 'Ve a Mi perfil → Tokens de API y crea un token con acceso a esta zona.',
+        'en': 'Go to My Profile → API Tokens and create a token for this zone with the Zone → Zone → Read '
+              'and Zone → DNS → Edit permissions.',
+        'es': 'Ve a Mi perfil → Tokens de API y crea un token para esta zona con los permisos Zona → Zona → Leer '
+              'y Zona → DNS → Editar.',
     },
     'zones.create.help_validate_title': {'en': 'Validate, then create', 'es': 'Valida y luego crea'},
     'zones.create.help_validate': {
@@ -56,6 +58,19 @@ STRINGS = {
     'zones.detail.cf_name_servers': {'en': 'Cloudflare name servers', 'es': 'Servidores de nombres de Cloudflare'},
     'zones.detail.original_name_servers': {'en': 'Original name servers', 'es': 'Servidores de nombres originales'},
     'zones.detail.credentials': {'en': 'Credentials', 'es': 'Credenciales'},
+    'zones.detail.replace_token': {'en': 'Replace token', 'es': 'Reemplazar token'},
+    'zones.detail.check': {'en': 'Test connection', 'es': 'Probar conexión'},
+    'zones.detail.danger_zone': {'en': 'Remove zone', 'es': 'Quitar zona'},
+    'zones.detail.delete_text': {
+        'en': 'Removes the zone, its imported records and their history from DNSentinel. Nothing changes in Cloudflare.',
+        'es': 'Quita la zona, sus registros importados y su historial de DNSentinel. En Cloudflare no cambia nada.',
+    },
+    'zones.detail.delete_title': {'en': 'Remove zone?', 'es': '¿Quitar la zona?'},
+    'zones.detail.delete_confirm': {
+        'en': '{zone} and all its imported records will be removed from DNSentinel. Your DNS in Cloudflare stays as it is.',
+        'es': '{zone} y todos sus registros importados se quitarán de DNSentinel. Tu DNS en Cloudflare queda igual.',
+    },
+    'zones.detail.delete': {'en': 'Remove zone', 'es': 'Quitar zona'},
 
     # Cloudflare zone `status` / `type` values; unknown values fall back to the raw value.
     'zones.status.active': {'en': 'Active', 'es': 'Activa'},
@@ -73,10 +88,6 @@ STRINGS = {
         'en': 'Both Zone ID and API Token are required.',
         'es': 'El ID de zona y el token de API son obligatorios.',
     },
-    'zones.flash.invalid_credentials': {
-        'en': 'Could not validate Zone ID and Token. Please check your credentials.',
-        'es': 'No se pudieron validar el ID de zona y el token. Revisa tus credenciales.',
-    },
     'zones.flash.no_name': {
         'en': 'Could not retrieve zone name from Cloudflare.',
         'es': 'No se pudo obtener el nombre de la zona desde Cloudflare.',
@@ -87,6 +98,10 @@ STRINGS = {
         'es': 'Ya tienes una zona registrada con ese ID de zona.',
     },
     'zones.flash.created': {'en': 'Zone created successfully.', 'es': 'Zona creada correctamente.'},
+    'zones.flash.deleted': {
+        'en': 'Zone {zone} removed from DNSentinel. Nothing was changed in Cloudflare.',
+        'es': 'Zona {zone} quitada de DNSentinel. No se cambió nada en Cloudflare.',
+    },
 
     # ── Validation API (create form) ──
     'zones.connection_error': {'en': 'Connection error with Cloudflare: {error}', 'es': 'Error de conexión con Cloudflare: {error}'},
@@ -106,6 +121,18 @@ STRINGS = {
     'zones.api.unauthorized': {
         'en': 'The token is invalid or expired. Generate a new token in Cloudflare.',
         'es': 'El token no es válido o expiró. Genera un token nuevo en Cloudflare.',
+    },
+    'zones.api.no_dns_permission': {
+        'en': 'The token can read the zone but not its DNS records. Give it the Zone → DNS → Edit permission.',
+        'es': 'El token puede leer la zona pero no sus registros DNS. Dale el permiso Zona → DNS → Editar.',
+    },
+    'zones.api.still_valid': {
+        'en': 'The token still works. Zone details were refreshed from Cloudflare.',
+        'es': 'El token sigue funcionando. Los datos de la zona se actualizaron desde Cloudflare.',
+    },
+    'zones.api.token_replaced': {
+        'en': 'Token replaced. DNSentinel uses it from now on.',
+        'es': 'Token reemplazado. DNSentinel lo usará a partir de ahora.',
     },
     'zones.api.unexpected': {'en': 'Unexpected error: {status}', 'es': 'Error inesperado: {status}'},
 }

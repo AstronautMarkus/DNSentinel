@@ -8,14 +8,17 @@ sys.path.insert(0, project_root)
 
 from app.config.config import Config
 from app.models.models import db
+from app.models.schema import upgrade_schema
 from app import create_app
 
 def init_db():
-    """Creates the tables in the database."""
+    """Creates missing tables and adds missing columns, keeping existing data."""
     app = create_app()
     with app.app_context():
-        db.create_all()
-        print("Database initialized.")
+        changes = upgrade_schema(db)
+        for change in changes:
+            print(f"  {change}")
+        print("Database initialized." if not changes else f"Database upgraded ({len(changes)} changes).")
 
 def reset_db(auto_confirm=False):
     """Drops all tables and recreates them."""
@@ -40,7 +43,8 @@ def print_help():
     print("  --help     Show this help")
     print("  --reset    Drop all tables and recreate them (requires confirmation)")
     print("  --fresh    Same as --reset but without confirmation")
-    print("If no flag is provided, it will only create the tables if they do not exist.")
+    print("If no flag is provided, it creates missing tables and adds missing columns,")
+    print("keeping existing data. Run it after updating DNSentinel.")
 
 if __name__ == "__main__":
     valid_flags = ["--reset", "--fresh", "--help"]

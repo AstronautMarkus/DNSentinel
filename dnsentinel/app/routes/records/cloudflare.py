@@ -1,8 +1,9 @@
 from . import records_bp
+from .form import cloudflare_error_message
 from flask import jsonify
 from flask_login import login_required, current_user
 from app.models.models import Zone
-import requests
+from app.services.cloudflare import CloudflareClient, CloudflareError
 from app.i18n import t
 
 @records_bp.route('/<zone_id>/records/cloudflare', methods=['GET'])
@@ -14,14 +15,8 @@ def get_cloudflare_records(zone_id):
     if not zone or not zone.api_token:
         return jsonify({'error': t('records.api.zone_or_token_missing')}), 404
 
-    url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records?per_page=100"
-    headers = {
-        "Authorization": f"Bearer {zone.api_token}",
-        "Content-Type": "application/json"
-    }
     try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        return jsonify(response.json())
-    except requests.RequestException as e:
-        return jsonify({'error': str(e)}), 500
+        records = CloudflareClient(zone.api_token).list_dns_records(zone.zone_id)
+    except CloudflareError as err:
+        return jsonify({'error': cloudflare_error_message(err)}), 502
+    return jsonify({'result': records})

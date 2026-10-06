@@ -9,6 +9,10 @@
         <p class="page-subtitle">{{ t('dashboard.subtitle') }}</p>
     </div>
     <div class="page-header__actions">
+        <a href="{{ url_for('sentinel.overview') }}" class="btn">
+            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+            <span>{{ t('nav.ip_sentinel') }}</span>
+        </a>
         <a href="{{ url_for('zones.list_zones') }}" class="btn">
             <i class="fa-solid fa-cloud" aria-hidden="true"></i>
             <span>{{ t('dashboard.view_zones') }}</span>
@@ -46,28 +50,33 @@
                 <p class="stat__label">{{ t('dashboard.zones') }}</p>
                 <span class="stat__icon"><i class="fa-solid fa-cloud" aria-hidden="true"></i></span>
             </div>
-            <p class="stat__value">{{ user_zones|length }}</p>
+            <p class="stat__value">{{ zone_count }}</p>
         </div>
         <div class="card stat">
             <div class="stat__head">
-                <p class="stat__label">{{ t('dashboard.alerts') }}</p>
-                <span class="stat__icon"><i class="fa-solid fa-bell" aria-hidden="true"></i></span>
+                <p class="stat__label">{{ t('dashboard.watched') }}</p>
+                <span class="stat__icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></span>
             </div>
-            <p class="stat__value">3</p>
+            <p class="stat__value">{{ watched_count }}</p>
+            <p class="stat__meta">
+                {% if not sentinel.enabled %}{{ t('sentinel.status.paused') }}{% else %}{{ t('sentinel.settings.every', count=sentinel.interval_minutes) }}{% endif %}
+            </p>
         </div>
         <div class="card stat">
             <div class="stat__head">
                 <p class="stat__label">{{ t('dashboard.updates') }}</p>
                 <span class="stat__icon"><i class="fa-solid fa-rotate" aria-hidden="true"></i></span>
             </div>
-            <p class="stat__value">5</p>
+            <p class="stat__value">{{ update_count }}</p>
+            <p class="stat__meta">{{ t('dashboard.last_7_days') }}</p>
         </div>
         <div class="card stat">
             <div class="stat__head">
-                <p class="stat__label">{{ t('dashboard.users') }}</p>
-                <span class="stat__icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
+                <p class="stat__label">{{ t('dashboard.failures') }}</p>
+                <span class="stat__icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>
             </div>
-            <p class="stat__value">2</p>
+            <p class="stat__value">{{ failure_count }}</p>
+            <p class="stat__meta">{{ t('dashboard.last_7_days') }}</p>
         </div>
     </section>
 
@@ -103,7 +112,7 @@
                             </td>
                             <td>{{ ui.copyable(zone.zone_id, t('common.copy_zone_id')) }}</td>
                             <td>{{ ui.secret(zone.api_token) }}</td>
-                            <td class="tabular">{{ user_records }}</td>
+                            <td class="tabular">{{ record_counts.get(zone.id, 0) }}</td>
                             <td class="col-date">{{ ui.date(zone.created_at) }}</td>
                         </tr>
                         {% else %}
@@ -122,15 +131,15 @@
         <div class="card">
             <div class="card__header">
                 <div>
-                    <h2 class="card__title">{{ t('dashboard.alerts_week') }}</h2>
-                    <p class="card__description">{{ t('dashboard.alerts_desc') }}</p>
+                    <h2 class="card__title">{{ t('dashboard.updates_week') }}</h2>
+                    <p class="card__description">{{ t('dashboard.updates_desc') }}</p>
                 </div>
             </div>
             <div class="card__body">
                 <div class="chart">
-                    <canvas id="alertsChart" role="img" aria-label="{{ t('dashboard.chart_label') }}"></canvas>
+                    <canvas id="updatesChart" role="img" aria-label="{{ t('dashboard.chart_label') }}"></canvas>
                 </div>
-                <p class="chart-summary" id="alertsSummary"></p>
+                <p class="chart-summary" id="updatesSummary"></p>
             </div>
         </div>
     </section>
@@ -142,10 +151,12 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Mon–Sun short names in the page language (1 Jan 2024 was a Monday).
-    var weekday = new Intl.DateTimeFormat(document.documentElement.lang, { weekday: 'short' });
-    var labels = [0, 1, 2, 3, 4, 5, 6].map(function (i) { return weekday.format(new Date(2024, 0, 1 + i)); });
-    var values = [0, 1, 0, 2, 1, 0, 3];
+    // Sentinel IP updates per day (UTC), oldest first; labels are short
+    // weekday names in the page language.
+    var days = {{ chart_days | tojson }};
+    var values = {{ chart_values | tojson }};
+    var weekday = new Intl.DateTimeFormat(document.documentElement.lang, { weekday: 'short', timeZone: 'UTC' });
+    var labels = days.map(function (day) { return weekday.format(new Date(day + 'T12:00:00Z')); });
 
     // Chart colors come from the design tokens so the chart follows the theme.
     var css = getComputedStyle(document.documentElement);
@@ -184,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var font = { family: token('--font-sans'), size: 12 };
 
-    new Chart(document.getElementById('alertsChart'), {
+    new Chart(document.getElementById('updatesChart'), {
         type: 'line',
         data: {
             labels: labels,
@@ -221,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     bodyFont: { family: font.family, size: 12 },
                     callbacks: {
                         label: function (ctx) {
-                            return t('js.dashboard.alerts', { count: ctx.parsed.y });
+                            return t('js.dashboard.updates', { count: ctx.parsed.y });
                         }
                     }
                 }
@@ -245,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var total = values.reduce(function (a, b) { return a + b; }, 0);
     var peak = Math.max.apply(null, values);
-    document.getElementById('alertsSummary').innerHTML =
+    document.getElementById('updatesSummary').innerHTML =
         '<span>' + t('js.dashboard.total', { value: '<strong>' + total + '</strong>' }) + '</span>' +
         '<span>' + t('js.dashboard.peak', { value: '<strong>' + peak + '</strong>', day: labels[values.indexOf(peak)] }) + '</span>';
 });

@@ -1,0 +1,226 @@
+{% extends 'base/admin_base.html' %}
+{% import 'base/partials/macros.html' as ui %}
+{% block title %}{{ t('records.form.edit_title') if record else t('records.form.new_title') }}{% endblock %}
+{% block content %}
+
+{% set records_url = url_for('records.list_records', zone_id=zone_id) %}
+{% set cancel_url = url_for('records.detail_record', zone_id=zone_id, record_id=record.record_id) if record else records_url %}
+{% set crumbs = [
+    (t('common.dns_zones'), url_for('zones.list_zones')),
+    (zone.name, url_for('zones.zone_detail', zone_id=zone_id)),
+    (t('common.dns_records'), records_url),
+] %}
+
+<div class="page-header">
+    <div class="page-header__main">
+        {% if record %}
+            {{ ui.breadcrumb(crumbs + [(record.name, cancel_url), (t('records.list.edit'), none)]) }}
+        {% else %}
+            {{ ui.breadcrumb(crumbs + [(t('records.form.new_title'), none)]) }}
+        {% endif %}
+        <h1 class="page-title">{{ t('records.form.edit_heading') if record else t('records.form.new_heading') }}</h1>
+        <p class="page-subtitle">{{ t('records.form.subtitle_html', zone=zone.name) }}</p>
+    </div>
+</div>
+
+<div class="grid grid--main-aside">
+    <form id="recordForm" class="card" method="post" novalidate
+          action="{{ url_for('records.edit_record', zone_id=zone_id, record_id=record.record_id) if record else url_for('records.create_record', zone_id=zone_id) }}">
+        <div class="card__header">
+            <h2 class="card__title">
+                <img class="cf-logo" src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="">
+                {{ t('records.form.card_title') }}
+            </h2>
+        </div>
+        <div class="card__body form">
+            <div class="form-row">
+                <div class="field">
+                    <label for="type" class="field__label">{{ t('common.type') }}<span class="field__required" aria-hidden="true">*</span></label>
+                    <select class="input" id="type" name="type"{% if record %} disabled{% endif %}>
+                        {% for rtype in record_types %}
+                            <option value="{{ rtype }}"{% if values.type == rtype %} selected{% endif %}>{{ rtype }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if record %}<p class="field__hint">{{ t('records.form.type_locked') }}</p>{% endif %}
+                    {{ ui.field_error(errors, 'type') }}
+                </div>
+                <div class="field">
+                    <label for="ttl" class="field__label">TTL</label>
+                    <select class="input" id="ttl" name="ttl">
+                        {% for ttl in ttl_choices %}
+                            <option value="{{ ttl }}"{% if values.ttl == ttl %} selected{% endif %}>{{ ui.ttl_label(ttl) }}</option>
+                        {% endfor %}
+                    </select>
+                    <p class="field__hint" id="ttlProxiedHint" hidden>{{ t('records.form.ttl_proxied') }}</p>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="name" class="field__label">{{ t('common.name') }}<span class="field__required" aria-hidden="true">*</span></label>
+                <div class="input-affix">
+                    <input class="input input--mono" type="text" id="name" name="name" value="{{ values.name }}"
+                           placeholder="www" required autocomplete="off" spellcheck="false"
+                           {% if errors.name %}aria-invalid="true" aria-describedby="name-error"{% endif %}>
+                    <span class="input-affix__text" title=".{{ zone.name }}">.{{ zone.name }}</span>
+                </div>
+                <p class="field__hint">{{ t('records.form.name_hint') }}</p>
+                {{ ui.field_error(errors, 'name') }}
+            </div>
+
+            <div class="field">
+                <div class="field__label-row">
+                    <label for="content" class="field__label" id="contentLabel">{{ t('common.content') }}</label>
+                    <button type="button" class="btn btn--ghost btn--xs" id="useMyIp" data-show-for="A AAAA">
+                        <i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i>
+                        <span>{{ t('records.form.use_my_ip') }}</span>
+                    </button>
+                </div>
+                <input class="input input--mono" type="text" id="content" name="content" value="{{ values.content }}"
+                       autocomplete="off" spellcheck="false"
+                       {% if errors.content %}aria-invalid="true" aria-describedby="content-error"{% endif %}>
+                <p class="field__hint" id="contentAutoHint" hidden>{{ t('records.form.content_auto_hint') }}</p>
+                {{ ui.field_error(errors, 'content') }}
+            </div>
+
+            <div class="field" data-show-for="MX">
+                <label for="priority" class="field__label">{{ t('records.form.priority') }}<span class="field__required" aria-hidden="true">*</span></label>
+                <input class="input" type="number" id="priority" name="priority" min="0" max="65535" value="{{ values.priority }}"
+                       {% if errors.priority %}aria-invalid="true" aria-describedby="priority-error"{% endif %}>
+                <p class="field__hint">{{ t('records.form.priority_hint') }}</p>
+                {{ ui.field_error(errors, 'priority') }}
+            </div>
+
+            <div class="field" data-show-for="A AAAA CNAME">
+                {{ ui.switch('proxied', values.proxied, t('records.form.proxied'), id='proxied') }}
+                <p class="field__hint">{{ t('records.form.proxied_hint') }}</p>
+            </div>
+
+            <div class="field" data-show-for="A AAAA">
+                {{ ui.switch('auto_update', values.auto_update, t('records.form.auto_update'), id='auto_update') }}
+                <p class="field__hint">{{ t('records.form.auto_update_hint') }}</p>
+            </div>
+
+            <div class="field">
+                <label for="comment" class="field__label">{{ t('records.detail.comment') }} <span class="text-muted">({{ t('records.form.optional') }})</span></label>
+                <input class="input" type="text" id="comment" name="comment" value="{{ values.comment }}" maxlength="500"
+                       {% if errors.comment %}aria-invalid="true" aria-describedby="comment-error"{% endif %}>
+                {{ ui.field_error(errors, 'comment') }}
+            </div>
+        </div>
+        <div class="card__footer">
+            <a class="btn" href="{{ cancel_url }}">{{ t('common.cancel') }}</a>
+            <button type="submit" class="btn btn--primary">
+                <i class="fa-solid {{ 'fa-floppy-disk' if record else 'fa-plus' }}" aria-hidden="true"></i>
+                <span>{{ t('records.form.save') if record else t('records.form.create') }}</span>
+            </button>
+        </div>
+    </form>
+
+    <aside class="card">
+        <div class="card__header">
+            <h2 class="card__title">
+                <i class="fa-solid fa-circle-question text-muted" aria-hidden="true"></i>
+                {{ t('records.form.help_title') }}
+            </h2>
+        </div>
+        <div class="card__body">
+            <ol class="help-list">
+                <li>
+                    <span class="help-list__step">1</span>
+                    <div>
+                        <strong>{{ t('records.form.help_cloudflare_title') }}</strong>
+                        {{ t('records.form.help_cloudflare') }}
+                    </div>
+                </li>
+                <li>
+                    <span class="help-list__step">2</span>
+                    <div>
+                        <strong>{{ t('records.form.auto_update') }}</strong>
+                        {{ t('records.form.help_auto_update') }}
+                    </div>
+                </li>
+                <li>
+                    <span class="help-list__step">3</span>
+                    <div>
+                        <strong>{{ t('records.form.proxied') }}</strong>
+                        {{ t('records.form.help_proxied') }}
+                    </div>
+                </li>
+            </ol>
+        </div>
+    </aside>
+</div>
+
+{# Content label and placeholder per record type, for the script below. #}
+<script id="recordTypeMeta" type="application/json">{{ {
+    'A': {'label': t('records.form.content_a'), 'placeholder': '203.0.113.10'},
+    'AAAA': {'label': t('records.form.content_aaaa'), 'placeholder': '2001:db8::10'},
+    'CNAME': {'label': t('records.form.content_cname'), 'placeholder': 'example.net'},
+    'TXT': {'label': t('records.form.content_txt'), 'placeholder': 'v=spf1 include:_spf.example.com ~all'},
+    'MX': {'label': t('records.form.content_mx'), 'placeholder': 'mail.' ~ zone.name},
+    'NS': {'label': t('records.form.content_ns'), 'placeholder': 'ns1.example.net'},
+} | tojson }}</script>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var form = document.getElementById('recordForm');
+  var typeSelect = form.elements.type;
+  var ttlSelect = form.elements.ttl;
+  var content = form.elements.content;
+  var proxied = form.elements.proxied;
+  var autoUpdate = form.elements.auto_update;
+  var meta = JSON.parse(document.getElementById('recordTypeMeta').textContent);
+  var ipUrl = "{{ url_for('sentinel.current_ip') }}";
+
+  function isShown(el) {
+    return !el.closest('[hidden]');
+  }
+
+  // Show the fields that apply to the selected type, and lock TTL to Auto
+  // while the record is proxied (Cloudflare requires it).
+  function sync() {
+    var type = typeSelect.value;
+    form.querySelectorAll('[data-show-for]').forEach(function (el) {
+      el.hidden = el.dataset.showFor.split(' ').indexOf(type) === -1;
+    });
+
+    var info = meta[type] || {};
+    document.getElementById('contentLabel').textContent = info.label || '';
+    var autoContent = isShown(autoUpdate) && autoUpdate.checked;
+    content.placeholder = autoContent ? t('js.records.content_auto') : (info.placeholder || '');
+    document.getElementById('contentAutoHint').hidden = !autoContent;
+
+    var lockTtl = isShown(proxied) && proxied.checked;
+    if (lockTtl) ttlSelect.value = '1';
+    ttlSelect.disabled = lockTtl;
+    document.getElementById('ttlProxiedHint').hidden = !lockTtl;
+  }
+
+  [typeSelect, proxied, autoUpdate].forEach(function (el) {
+    el.addEventListener('change', sync);
+  });
+  sync();
+
+  document.getElementById('useMyIp').addEventListener('click', function () {
+    var btn = this;
+    btn.disabled = true;
+    fetch(ipUrl, { headers: { 'Accept': 'application/json' } })
+      .then(function (resp) { return resp.json(); })
+      .then(function (data) {
+        var ip = typeSelect.value === 'AAAA' ? data.ipv6 : data.ipv4;
+        if (!ip) {
+          notify(t(typeSelect.value === 'AAAA' ? 'js.records.no_ipv6' : 'js.records.no_ipv4'), 'warning');
+          return;
+        }
+        content.value = ip;
+        content.removeAttribute('aria-invalid');
+      })
+      .catch(function () { notify(t('js.common.unexpected_error'), 'danger'); })
+      .finally(function () { btn.disabled = false; });
+  });
+});
+</script>
+{% endblock %}

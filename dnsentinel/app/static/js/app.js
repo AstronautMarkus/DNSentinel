@@ -9,12 +9,15 @@
                                 mobile: open / close the off-canvas sidebar
    [data-sidebar-close]         close the off-canvas sidebar (mobile)
    [data-dismiss]               remove the closest .toast / .alert
-   [data-confirm="message"]     ask for confirmation before following a link
-                                (optional: data-confirm-title, data-confirm-button,
-                                data-confirm-icon = Font Awesome icon name)
+   [data-confirm="message"]     ask for confirmation before following a link or
+                                submitting a form (optional: data-confirm-title,
+                                data-confirm-button, data-confirm-icon = Font
+                                Awesome icon name, data-confirm-danger)
+   time[data-relative-time]     UTC timestamp shown as "5 minutes ago", kept fresh
    [data-current-year]          filled with the current year
 
-   Also exposes window.t(key, vars) for localized UI strings (see i18n below).
+   Also exposes window.t(key, vars) for localized UI strings (see i18n below),
+   window.notify(message, category) for toasts and window.postJSON(url, data).
    ========================================================================== */
 (function () {
   'use strict';
@@ -171,32 +174,114 @@
     setTimeout(function () { el.remove(); }, 220);
   }
 
+  /* ---- Toasts from scripts ----------------------------------------------
+     Same markup as the server-side flashes (base/partials/flashes.html). */
+  var TOAST_ICONS = {
+    success: 'fa-circle-check',
+    danger: 'fa-circle-exclamation',
+    warning: 'fa-triangle-exclamation',
+    info: 'fa-circle-info'
+  };
+
+  function notify(message, category) {
+    category = TOAST_ICONS[category] ? category : 'success';
+    var stack = document.querySelector('.toast-stack');
+    if (!stack) {
+      stack = document.createElement('div');
+      stack.className = 'toast-stack';
+      stack.setAttribute('aria-live', 'polite');
+      document.body.appendChild(stack);
+    }
+    var toast = document.createElement('div');
+    var problem = category === 'danger' || category === 'warning';
+    toast.className = 'toast toast--' + category;
+    toast.setAttribute('role', problem ? 'alert' : 'status');
+    toast.innerHTML =
+      '<i class="fa-solid ' + TOAST_ICONS[category] + ' toast__icon" aria-hidden="true"></i>' +
+      '<div class="toast__body"></div>' +
+      '<button type="button" class="toast__close" data-dismiss aria-label="' + t('js.common.dismiss') + '">' +
+      '<i class="fa-solid fa-xmark" aria-hidden="true"></i></button>';
+    toast.querySelector('.toast__body').textContent = message;
+    stack.appendChild(toast);
+    if (!problem) setTimeout(function () { dismiss(toast); }, TOAST_TIMEOUT);
+  }
+  window.notify = notify;
+
+  /* ---- JSON requests ----------------------------------------------------
+     POSTs `data` as JSON and resolves with the parsed response body (the
+     app's JSON endpoints answer { ok, msg, ... } even on errors). */
+  function postJSON(url, data) {
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(data || {})
+    }).then(function (resp) {
+      return resp.json().catch(function () {
+        throw new Error(t('js.common.unexpected_error'));
+      });
+    });
+  }
+  window.postJSON = postJSON;
+
   /* ---- Confirmations ----------------------------------------------------
      Uses SweetAlert2 when the page loads it (admin pages), otherwise the
      native confirm() dialog. */
-  function confirmNavigation(link) {
-    var message = link.dataset.confirm;
-    var go = function () { window.location.href = link.href; };
+  function confirmAction(el, proceed) {
+    var message = el.dataset.confirm;
 
     if (!window.Swal) {
-      if (window.confirm(message)) go();
+      if (window.confirm(message)) proceed();
       return;
     }
 
     var options = {
-      title: link.dataset.confirmTitle || t('js.common.are_you_sure'),
+      title: el.dataset.confirmTitle || t('js.common.are_you_sure'),
       text: message,
-      icon: 'question',
+      icon: el.dataset.confirmDanger !== undefined ? 'warning' : 'question',
       showCancelButton: true,
-      confirmButtonText: link.dataset.confirmButton || t('js.common.confirm'),
+      confirmButtonText: el.dataset.confirmButton || t('js.common.confirm'),
       reverseButtons: true,
       focusCancel: true
     };
-    if (link.dataset.confirmIcon) {
-      options.iconHtml = '<i class="fa-solid ' + link.dataset.confirmIcon + '" aria-hidden="true"></i>';
+    if (el.dataset.confirmDanger !== undefined) {
+      options.customClass = { confirmButton: 'is-danger' };
+    }
+    if (el.dataset.confirmIcon) {
+      options.iconHtml = '<i class="fa-solid ' + el.dataset.confirmIcon + '" aria-hidden="true"></i>';
     }
     window.Swal.fire(options).then(function (result) {
-      if (result.isConfirmed) go();
+      if (result.isConfirmed) proceed();
+    });
+  }
+
+  /* ---- Relative times ---------------------------------------------------- */
+  var lang = document.documentElement.lang || 'en';
+  var relativeFormat = window.Intl && Intl.RelativeTimeFormat
+    ? new Intl.RelativeTimeFormat(lang, { numeric: 'auto' })
+    : null;
+  var absoluteFormat = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeStyle: 'short' });
+  var TIME_UNITS = [
+    ['year', 31536000], ['month', 2592000], ['week', 604800],
+    ['day', 86400], ['hour', 3600], ['minute', 60]
+  ];
+
+  function relativeTime(date) {
+    var seconds = (date.getTime() - Date.now()) / 1000;
+    for (var i = 0; i < TIME_UNITS.length; i++) {
+      if (Math.abs(seconds) >= TIME_UNITS[i][1]) {
+        return relativeFormat.format(Math.round(seconds / TIME_UNITS[i][1]), TIME_UNITS[i][0]);
+      }
+    }
+    return relativeFormat.format(0, 'second'); // "now"
+  }
+
+  function updateRelativeTimes() {
+    if (!relativeFormat) return;
+    document.querySelectorAll('time[data-relative-time]').forEach(function (el) {
+      var date = new Date(el.getAttribute('datetime'));
+      if (isNaN(date.getTime())) return;
+      el.textContent = relativeTime(date);
+      el.title = absoluteFormat.format(date);
     });
   }
 
@@ -208,7 +293,7 @@
     if (confirmLink) {
       event.preventDefault();
       closeDropdowns();
-      confirmNavigation(confirmLink);
+      confirmAction(confirmLink, function () { window.location.href = confirmLink.href; });
       return;
     }
 
@@ -253,6 +338,15 @@
     }
   });
 
+  document.addEventListener('submit', function (event) {
+    var form = event.target;
+    if (!form.matches('form[data-confirm]')) return;
+    event.preventDefault();
+    closeDropdowns();
+    // form.submit() skips the submit event, so this doesn't ask twice.
+    confirmAction(form, function () { form.submit(); });
+  });
+
   document.addEventListener('keydown', function (event) {
     if (event.key !== 'Escape') return;
     closeDropdowns();
@@ -278,6 +372,8 @@
   function init() {
     syncSidebarToggles();
     watchTableOverflow();
+    updateRelativeTimes();
+    setInterval(updateRelativeTimes, 30000);
 
     document.querySelectorAll('.toast[data-autohide="true"]').forEach(function (toast) {
       setTimeout(function () { dismiss(toast); }, TOAST_TIMEOUT);

@@ -18,8 +18,16 @@
             <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
             <span>{{ t('records.list.back') }}</span>
         </a>
+        {% if records %}
+        <form method="post" action="{{ url_for('records.sync_records', zone_id=zone_id) }}" class="inline-form">
+            <button type="submit" class="btn" title="{{ t('records.list.sync_hint') }}">
+                <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
+                <span>{{ t('records.list.sync') }}</span>
+            </button>
+        </form>
+        {% endif %}
         <div class="dropdown dropdown--right" id="addDropdown" data-dropdown>
-            <button type="button" class="btn btn--primary" data-dropdown-toggle aria-haspopup="menu" aria-expanded="false">
+            <button type="button" class="btn" data-dropdown-toggle aria-haspopup="menu" aria-expanded="false">
                 <i class="fa-solid fa-file-import" aria-hidden="true"></i>
                 <span>{{ t('records.list.import') }}</span>
                 <i class="fa-solid fa-chevron-down btn__caret" aria-hidden="true"></i>
@@ -41,8 +49,22 @@
                 </a>
             </div>
         </div>
+        <a href="{{ url_for('records.create_record', zone_id=zone_id) }}" class="btn btn--primary">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            <span>{{ t('records.list.add') }}</span>
+        </a>
     </div>
 </div>
+
+<div class="stack">
+{% if not sentinel.enabled and records | selectattr('auto_update') | list %}
+<div class="alert alert--warning" role="status">
+    <i class="fa-solid fa-pause" aria-hidden="true"></i>
+    <div class="alert__body">
+        <span>{{ t('records.list.sentinel_paused') }} <a href="{{ url_for('sentinel.overview') }}">{{ t('records.list.sentinel_settings') }}</a></span>
+    </div>
+</div>
+{% endif %}
 
 <div class="card">
     <div class="card__header">
@@ -61,48 +83,68 @@
                     <th>{{ t('common.content') }}</th>
                     <th>TTL</th>
                     <th>{{ t('records.proxy_status') }}</th>
-                    <th>{{ t('common.status') }}</th>
-                    <th>{{ t('common.created') }}</th>
+                    <th title="{{ t('records.auto_update_hint') }}">{{ t('records.auto_update') }}</th>
                     <th>{{ t('common.modified') }}</th>
                     <th class="col-actions"><span class="visually-hidden">{{ t('common.actions') }}</span></th>
                 </tr>
             </thead>
             <tbody>
                 {% for record in records %}
+                {% set detail_url = url_for('records.detail_record', record_id=record.record_id, zone_id=zone_id) %}
                 <tr>
                     <td>
-                        <a class="table__primary" href="{{ url_for('records.detail_record', record_id=record.record_id, zone_id=zone_id) }}">
-                            {{ record.name }}
-                        </a>
+                        <a class="table__primary" href="{{ detail_url }}">{{ record.name }}</a>
+                        {% if not record.active %}
+                            <span class="badge badge--danger" title="{{ t('records.missing_hint') }}">{{ t('records.missing') }}</span>
+                        {% endif %}
                     </td>
                     <td><span class="badge badge--code">{{ record.type }}</span></td>
                     <td>
                         <span class="table__content truncate mono" title="{{ record.content or '' }}">{{ record.content or '—' }}</span>
                     </td>
-                    <td class="tabular nowrap">{{ t('records.ttl_auto') if record.ttl == 1 else record.ttl }}</td>
+                    <td class="tabular nowrap">{{ ui.ttl_label(record.ttl) }}</td>
                     <td>{{ ui.proxy_status(record.proxied) }}</td>
-                    <td>{{ ui.record_status(record.active) }}</td>
-                    <td class="col-date">{{ ui.date(record.created_on) }}</td>
+                    <td>
+                        {% if record.supports_auto_update %}
+                        <label class="switch" title="{{ t('records.auto_update_hint') }}">
+                            <input type="checkbox" class="switch__input"
+                                   data-auto-update-url="{{ url_for('records.toggle_auto_update', zone_id=zone_id, record_id=record.record_id) }}"
+                                   aria-label="{{ t('records.auto_update_for', name=record.name) }}"
+                                   {% if record.auto_update %}checked{% endif %}{% if not record.active %} disabled{% endif %}>
+                            <span class="switch__track" aria-hidden="true"></span>
+                        </label>
+                        {% else %}
+                        <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
                     <td class="col-date">{{ ui.date(record.modified_on) }}</td>
                     <td class="col-actions">
                         <div class="btn-group">
-                            <a href="{{ url_for('records.detail_record', record_id=record.record_id, zone_id=zone_id) }}"
+                            <a href="{{ detail_url }}"
                                class="btn btn--ghost btn--icon btn--sm" title="{{ t('records.list.view') }}" aria-label="{{ t('records.list.view_record', name=record.name) }}">
                                 <i class="fa-regular fa-eye" aria-hidden="true"></i>
                             </a>
-                            <a href="#" class="btn btn--ghost btn--icon btn--sm" title="{{ t('records.list.edit') }}" aria-label="{{ t('records.list.edit_record', name=record.name) }}">
+                            {% if record.type in editable_types and record.active %}
+                            <a href="{{ url_for('records.edit_record', zone_id=zone_id, record_id=record.record_id) }}"
+                               class="btn btn--ghost btn--icon btn--sm" title="{{ t('records.list.edit') }}" aria-label="{{ t('records.list.edit_record', name=record.name) }}">
                                 <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
                             </a>
-                            <a href="#" class="btn btn--ghost btn--ghost-danger btn--icon btn--sm" title="{{ t('records.list.delete') }}" aria-label="{{ t('records.list.delete_record', name=record.name) }}">
-                                <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
-                            </a>
+                            {% endif %}
+                            <form method="post" action="{{ url_for('records.delete_record', zone_id=zone_id, record_id=record.record_id) }}"
+                                  class="inline-form" data-record-delete data-record-name="{{ record.name }}">
+                                <input type="hidden" name="mode" value="cloudflare">
+                                <button type="submit" class="btn btn--ghost btn--ghost-danger btn--icon btn--sm" title="{{ t('records.list.delete') }}" aria-label="{{ t('records.list.delete_record', name=record.name) }}">
+                                    <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+                                </button>
+                            </form>
                         </div>
                     </td>
                 </tr>
                 {% else %}
                 <tr class="is-empty">
-                    <td colspan="9">
-                        {{ ui.empty_state('fa-database', t('records.list.empty_title'), t('records.list.empty_text')) }}
+                    <td colspan="8">
+                        {{ ui.empty_state('fa-database', t('records.list.empty_title'), t('records.list.empty_text'),
+                            url_for('records.create_record', zone_id=zone_id), t('records.list.add')) }}
                     </td>
                 </tr>
                 {% endfor %}
@@ -110,10 +152,12 @@
         </table>
     </div>
 </div>
+</div>
 
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/records.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const zoneId = "{{ zone.zone_id }}";

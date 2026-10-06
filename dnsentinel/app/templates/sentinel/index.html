@@ -1,0 +1,437 @@
+{% extends 'base/admin_base.html' %}
+{% import 'base/partials/macros.html' as ui %}
+{% block title %}{{ t('sentinel.title') }}{% endblock %}
+{% block content %}
+
+{% set summary = settings.last_summary or {} %}
+
+<div class="page-header">
+    <div class="page-header__main">
+        {{ ui.breadcrumb([(t('nav.dashboard'), url_for('dashboard.home')), (t('sentinel.title'), none)]) }}
+        <h1 class="page-title">
+            {{ t('sentinel.title') }}
+            {% if not settings.enabled %}
+                <span class="badge badge--lg badge--warning badge--dot">{{ t('sentinel.status.paused') }}</span>
+            {% elif settings.last_status == 'error' %}
+                <span class="badge badge--lg badge--danger badge--dot">{{ t('sentinel.status.attention') }}</span>
+            {% else %}
+                <span class="badge badge--lg badge--success badge--dot">{{ t('sentinel.status.active') }}</span>
+            {% endif %}
+        </h1>
+        <p class="page-subtitle">{{ t('sentinel.subtitle') }}</p>
+    </div>
+    <div class="page-header__actions">
+        <button type="button" class="btn btn--primary" id="checkNowBtn"{% if not records %} disabled title="{{ t('sentinel.check_now_disabled') }}"{% endif %}>
+            <i class="fa-solid fa-satellite-dish" aria-hidden="true"></i>
+            <span>{{ t('sentinel.check_now') }}</span>
+        </button>
+    </div>
+</div>
+
+{% if not daemon_online %}
+<div class="alert alert--warning page-alert" role="status">
+    <i class="fa-solid fa-plug-circle-xmark" aria-hidden="true"></i>
+    <div class="alert__body">
+        <strong>{{ t('sentinel.offline_title') }}</strong>
+        <span>{{ t('sentinel.offline_text_html') }}</span>
+    </div>
+</div>
+{% endif %}
+
+{% if settings.last_status == 'error' and settings.last_message %}
+<div class="alert alert--danger page-alert" role="alert">
+    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+    <div class="alert__body">
+        <strong>{{ t('sentinel.last_error') }}</strong>
+        <span>{{ ui.reason(settings.last_message) }}</span>
+    </div>
+</div>
+{% endif %}
+
+<div class="stack">
+    <section class="grid grid--4" aria-label="{{ t('dashboard.summary') }}">
+        <div class="card stat">
+            <div class="stat__head">
+                <p class="stat__label">{{ t('sentinel.stat.process') }}</p>
+                <span class="stat__icon"><i class="fa-solid fa-server" aria-hidden="true"></i></span>
+            </div>
+            <p class="stat__value stat__value--text">
+                <span class="pulse{{ ' pulse--on' if daemon_online else ' pulse--error' }}" aria-hidden="true"></span>
+                {{ t('sentinel.stat.online') if daemon_online else t('sentinel.stat.offline') }}
+            </p>
+            <p class="stat__meta">
+                {% if heartbeat %}{{ t('sentinel.stat.heartbeat') }} {{ ui.time_ago(heartbeat) }}{% else %}{{ t('sentinel.stat.never_seen') }}{% endif %}
+            </p>
+        </div>
+        <div class="card stat">
+            <div class="stat__head">
+                <p class="stat__label">{{ t('sentinel.stat.last_check') }}</p>
+                <span class="stat__icon"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i></span>
+            </div>
+            <p class="stat__value stat__value--text">{{ ui.time_ago(settings.last_run_at) }}</p>
+            <p class="stat__meta">
+                {% if settings.last_run_at %}
+                    {{ t('sentinel.stat.summary', updated=summary.get('updated', 0), failed=summary.get('failed', 0)) }}
+                {% else %}
+                    {{ t('sentinel.stat.not_run') }}
+                {% endif %}
+            </p>
+        </div>
+        <div class="card stat">
+            <div class="stat__head">
+                <p class="stat__label">{{ t('sentinel.stat.next_check') }}</p>
+                <span class="stat__icon"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i></span>
+            </div>
+            <p class="stat__value stat__value--text">
+                {% if not settings.enabled %}
+                    {{ t('sentinel.status.paused') }}
+                {% elif not records %}
+                    —
+                {% elif settings.next_run_at %}
+                    {{ ui.time_ago(settings.next_run_at) }}
+                {% else %}
+                    {{ t('sentinel.stat.soon') }}
+                {% endif %}
+            </p>
+            <p class="stat__meta">{{ t('sentinel.settings.every', count=settings.interval_minutes) }}</p>
+        </div>
+        <div class="card stat">
+            <div class="stat__head">
+                <p class="stat__label">{{ t('sentinel.stat.watched') }}</p>
+                <span class="stat__icon"><i class="fa-solid fa-eye" aria-hidden="true"></i></span>
+            </div>
+            <p class="stat__value">{{ records|length }}</p>
+            <p class="stat__meta">{{ t('sentinel.stat.watched_meta') }}</p>
+        </div>
+    </section>
+
+    <section class="grid grid--2" aria-label="{{ t('sentinel.target_ips') }}">
+        {% for family, record_type, ip, detected_ip, source in [
+            ('IPv4', 'A', target_ipv4, detected.ipv4, detected.ipv4_source),
+            ('IPv6', 'AAAA', target_ipv6, detected.ipv6, detected.ipv6_source)
+        ] %}
+        <div class="card ip-card">
+            <span class="ip-card__icon"><i class="fa-solid {{ 'fa-globe' if record_type == 'A' else 'fa-network-wired' }}" aria-hidden="true"></i></span>
+            <div class="ip-card__body">
+                <p class="ip-card__label">{{ t('sentinel.target_for', family=family, type=record_type) }}</p>
+                <p class="ip-card__value">{{ ip or t('sentinel.no_address') }}</p>
+                <p class="ip-card__meta">
+                    {% if settings.ip_mode == 'manual' %}
+                        {{ t('sentinel.source_manual') }}
+                    {% elif source %}
+                        {{ t('sentinel.source_detected', source=source) }}
+                    {% else %}
+                        {{ t('sentinel.source_none', family=family) }}
+                    {% endif %}
+                </p>
+            </div>
+            {% if ip %}{{ ui.copy_button(ip, t('sentinel.copy_ip', family=family)) }}{% endif %}
+        </div>
+        {% endfor %}
+    </section>
+
+    <section class="grid grid--main-aside">
+        <form class="card" method="post" action="{{ url_for('sentinel.save_settings') }}" id="settingsForm" novalidate>
+            <div class="card__header">
+                <h2 class="card__title">
+                    <i class="fa-solid fa-sliders text-muted" aria-hidden="true"></i>
+                    {{ t('sentinel.settings.title') }}
+                </h2>
+            </div>
+            <div class="card__body form">
+                <div class="form-row">
+                    <div class="field">
+                        {{ ui.switch('enabled', form.enabled, t('sentinel.settings.enabled'), id='enabled') }}
+                        <p class="field__hint">{{ t('sentinel.settings.enabled_hint') }}</p>
+                    </div>
+                    <div class="field">
+                        <label for="interval_minutes" class="field__label">{{ t('sentinel.settings.interval') }}</label>
+                        <select class="input" id="interval_minutes" name="interval_minutes"
+                                {% if errors.interval_minutes %}aria-invalid="true" aria-describedby="interval_minutes-error"{% endif %}>
+                            {% for minutes in intervals %}
+                                <option value="{{ minutes }}"{% if form.interval_minutes == minutes %} selected{% endif %}>{{ t('sentinel.settings.every', count=minutes) }}</option>
+                            {% endfor %}
+                        </select>
+                        {{ ui.field_error(errors, 'interval_minutes') }}
+                    </div>
+                </div>
+
+                <fieldset class="field">
+                    <legend class="field__label">{{ t('sentinel.settings.ip_source') }}</legend>
+                    <div class="choices">
+                        <label class="choice">
+                            <input type="radio" name="ip_mode" value="auto"{% if form.ip_mode != 'manual' %} checked{% endif %}>
+                            <span class="choice__title">{{ t('sentinel.settings.auto') }}</span>
+                            <span class="choice__desc">{{ t('sentinel.settings.auto_desc') }}</span>
+                        </label>
+                        <label class="choice">
+                            <input type="radio" name="ip_mode" value="manual"{% if form.ip_mode == 'manual' %} checked{% endif %}>
+                            <span class="choice__title">{{ t('sentinel.settings.manual') }}</span>
+                            <span class="choice__desc">{{ t('sentinel.settings.manual_desc') }}</span>
+                        </label>
+                    </div>
+                    <p class="field__hint">
+                        {{ t('sentinel.settings.detected_now') }}
+                        <strong class="mono" id="detectedIpv4">{{ detected.ipv4 or '—' }}</strong>
+                        · IPv6 <strong class="mono" id="detectedIpv6">{{ detected.ipv6 or '—' }}</strong>
+                        <button type="button" class="btn btn--ghost btn--xs" id="detectBtn">
+                            <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
+                            <span>{{ t('sentinel.settings.detect_again') }}</span>
+                        </button>
+                    </p>
+                </fieldset>
+
+                <div class="form-row" id="manualFields"{% if form.ip_mode != 'manual' and not (errors.get('manual_ipv4') or errors.get('manual_ipv6')) %} hidden{% endif %}>
+                    {% for field, family, placeholder in [('manual_ipv4', 'IPv4', '203.0.113.10'), ('manual_ipv6', 'IPv6', '2001:db8::10')] %}
+                    <div class="field">
+                        <div class="field__label-row">
+                            <label for="{{ field }}" class="field__label">{{ t('sentinel.settings.manual_ip', family=family) }}</label>
+                            <button type="button" class="btn btn--ghost btn--xs" data-use-detected="{{ field }}">
+                                <i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i>
+                                <span>{{ t('sentinel.settings.use_detected') }}</span>
+                            </button>
+                        </div>
+                        <input class="input input--mono" type="text" id="{{ field }}" name="{{ field }}" value="{{ form[field] }}"
+                               placeholder="{{ placeholder }}" autocomplete="off" spellcheck="false"
+                               {% if errors.get(field) %}aria-invalid="true" aria-describedby="{{ field }}-error"{% endif %}>
+                        {{ ui.field_error(errors, field) }}
+                    </div>
+                    {% endfor %}
+                    <p class="field__hint">{{ t('sentinel.settings.manual_hint') }}</p>
+                </div>
+            </div>
+            <div class="card__footer">
+                <button type="submit" class="btn btn--primary">
+                    <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                    <span>{{ t('sentinel.settings.save') }}</span>
+                </button>
+            </div>
+        </form>
+
+        <aside class="card">
+            <div class="card__header">
+                <h2 class="card__title">
+                    <i class="fa-solid fa-circle-question text-muted" aria-hidden="true"></i>
+                    {{ t('sentinel.help.title') }}
+                </h2>
+            </div>
+            <div class="card__body">
+                <ol class="help-list">
+                    <li>
+                        <span class="help-list__step">1</span>
+                        <div>
+                            <strong>{{ t('sentinel.help.watch_title') }}</strong>
+                            {{ t('sentinel.help.watch') }}
+                        </div>
+                    </li>
+                    <li>
+                        <span class="help-list__step">2</span>
+                        <div>
+                            <strong>{{ t('sentinel.help.source_title') }}</strong>
+                            {{ t('sentinel.help.source') }}
+                        </div>
+                    </li>
+                    <li>
+                        <span class="help-list__step">3</span>
+                        <div>
+                            <strong>{{ t('sentinel.help.loop_title') }}</strong>
+                            {{ t('sentinel.help.loop') }}
+                        </div>
+                    </li>
+                    <li>
+                        <span class="help-list__step">4</span>
+                        <div>
+                            <strong>{{ t('sentinel.help.service_title') }}</strong>
+                            {{ t('sentinel.help.service_html') }}
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </aside>
+    </section>
+
+    <section class="card">
+        <div class="card__header">
+            <h2 class="card__title">
+                <i class="fa-solid fa-eye text-muted" aria-hidden="true"></i>
+                {{ t('sentinel.records.title') }}
+                <span class="badge">{{ records|length }}</span>
+            </h2>
+        </div>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{{ t('common.name') }}</th>
+                        <th>{{ t('sentinel.records.zone') }}</th>
+                        <th>{{ t('common.type') }}</th>
+                        <th>{{ t('sentinel.records.current') }}</th>
+                        <th>{{ t('sentinel.records.target') }}</th>
+                        <th>{{ t('common.status') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td>
+                            <a class="table__primary" href="{{ url_for('records.detail_record', zone_id=record.zone.zone_id, record_id=record.record_id) }}">{{ record.name }}</a>
+                        </td>
+                        <td><a href="{{ url_for('records.list_records', zone_id=record.zone.zone_id) }}">{{ record.zone.name }}</a></td>
+                        <td><span class="badge badge--code">{{ record.type }}</span></td>
+                        <td class="mono">{{ record.content or '—' }}</td>
+                        <td class="mono">{{ record.target_ip or '—' }}</td>
+                        <td>
+                            {% if not record.active %}
+                                <span class="badge badge--danger badge--dot">{{ t('records.missing') }}</span>
+                            {% elif not record.target_ip %}
+                                <span class="badge badge--warning badge--dot">{{ t('sentinel.records.no_ip') }}</span>
+                            {% elif record.in_sync %}
+                                <span class="badge badge--success badge--dot">{{ t('sentinel.records.in_sync') }}</span>
+                            {% else %}
+                                <span class="badge badge--info badge--dot">{{ t('sentinel.records.pending') }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr class="is-empty">
+                        <td colspan="6">
+                            {{ ui.empty_state('fa-eye-slash', t('sentinel.records.empty_title'), t('sentinel.records.empty_text'),
+                                url_for('zones.list_zones'), t('dashboard.view_zones'), 'fa-cloud') }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="card__header">
+            <div>
+                <h2 class="card__title">
+                    <i class="fa-solid fa-clock-rotate-left text-muted" aria-hidden="true"></i>
+                    {{ t('sentinel.history.title') }}
+                </h2>
+                <p class="card__description">{{ t('sentinel.history.desc') }}</p>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{{ t('sentinel.history.when') }}</th>
+                        <th>{{ t('records.detail.record') }}</th>
+                        <th>{{ t('sentinel.history.change') }}</th>
+                        <th>{{ t('common.status') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for update in history %}
+                    <tr>
+                        <td class="col-date">{{ ui.time_ago(update.timestamp) }}</td>
+                        <td>
+                            <a class="table__primary" href="{{ url_for('records.detail_record', zone_id=update.record.zone.zone_id, record_id=update.record.record_id) }}">{{ update.record.name }}</a>
+                            <span class="badge badge--code">{{ update.record.type }}</span>
+                        </td>
+                        <td>
+                            <span class="ip-change">
+                                {% if update.old_ip %}<span class="ip-change__old">{{ update.old_ip }}</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>{% endif %}
+                                <span>{{ update.new_ip or '—' }}</span>
+                            </span>
+                        </td>
+                        <td>
+                            {% if update.status == 'updated' %}
+                                <span class="badge badge--success badge--dot">{{ t('sentinel.history.updated') }}</span>
+                            {% else %}
+                                <span class="badge badge--danger badge--dot">{{ t('sentinel.history.failed') }}</span>
+                                <span class="text-muted">{{ ui.reason(update.response) }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr class="is-empty">
+                        <td colspan="4">
+                            {{ ui.empty_state('fa-clock-rotate-left', t('sentinel.history.empty_title'), t('sentinel.history.empty_text')) }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var checkUrl = "{{ url_for('sentinel.check_now') }}";
+  var ipUrl = "{{ url_for('sentinel.current_ip') }}";
+  var form = document.getElementById('settingsForm');
+  var manualFields = document.getElementById('manualFields');
+  var detected = { manual_ipv4: {{ detected.ipv4 | tojson }}, manual_ipv6: {{ detected.ipv6 | tojson }} };
+
+  // Manual IP fields only matter in manual mode.
+  form.querySelectorAll('input[name="ip_mode"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      manualFields.hidden = form.elements.ip_mode.value !== 'manual';
+    });
+  });
+
+  document.getElementById('detectBtn').addEventListener('click', function () {
+    var btn = this;
+    btn.disabled = true;
+    fetch(ipUrl + '?refresh=1', { headers: { 'Accept': 'application/json' } })
+      .then(function (resp) { return resp.json(); })
+      .then(function (data) {
+        detected.manual_ipv4 = data.detected.ipv4;
+        detected.manual_ipv6 = data.detected.ipv6;
+        document.getElementById('detectedIpv4').textContent = data.detected.ipv4 || '—';
+        document.getElementById('detectedIpv6').textContent = data.detected.ipv6 || '—';
+        if (!data.detected.ipv4 && !data.detected.ipv6) notify(t('js.sentinel.detect_failed'), 'warning');
+      })
+      .catch(function () { notify(t('js.common.unexpected_error'), 'danger'); })
+      .finally(function () { btn.disabled = false; });
+  });
+
+  form.querySelectorAll('[data-use-detected]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var field = btn.dataset.useDetected;
+      if (!detected[field]) {
+        notify(t(field === 'manual_ipv6' ? 'js.records.no_ipv6' : 'js.records.no_ipv4'), 'warning');
+        return;
+      }
+      form.elements[field].value = detected[field];
+      form.elements[field].removeAttribute('aria-invalid');
+    });
+  });
+
+  var checkBtn = document.getElementById('checkNowBtn');
+  checkBtn.addEventListener('click', function () {
+    Swal.fire({
+      title: t('js.sentinel.checking'),
+      text: t('js.sentinel.checking_text'),
+      allowOutsideClick: false,
+      didOpen: function () { Swal.showLoading(); }
+    });
+    postJSON(checkUrl)
+      .then(function (data) {
+        var s = data.summary || {};
+        var lines = t('js.sentinel.result', {
+          checked: s.checked || 0, updated: s.updated || 0, failed: s.failed || 0, skipped: s.skipped || 0
+        });
+        return Swal.fire({
+          icon: data.ok ? 'success' : 'error',
+          title: data.ok ? t('js.sentinel.done') : t('js.sentinel.done_with_errors'),
+          text: data.msg ? lines + ' — ' + data.msg : lines
+        });
+      })
+      .catch(function (err) {
+        return Swal.fire({ icon: 'error', title: t('js.common.error'), text: err.message || t('js.common.unexpected_error') });
+      })
+      .then(function () { window.location.reload(); });
+  });
+});
+</script>
+{% endblock %}

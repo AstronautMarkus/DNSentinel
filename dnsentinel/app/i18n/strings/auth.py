@@ -20,6 +20,7 @@ STRINGS = {
         'en': 'Login successful. Welcome, {name}!',
         'es': 'Sesión iniciada. ¡Te damos la bienvenida, {name}!',
     },
+    'auth.flash.login_required': {'en': 'Please sign in to continue.', 'es': 'Inicia sesión para continuar.'},
     'auth.flash.login_failed': {
         'en': 'Email or password is incorrect. Please try again.',
         'es': 'El correo o la contraseña son incorrectos. Inténtalo de nuevo.',

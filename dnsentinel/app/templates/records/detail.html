@@ -25,16 +25,43 @@
             <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
             <span>{{ t('records.detail.back') }}</span>
         </a>
+        {% if record %}
+        <form method="post" action="{{ url_for('records.delete_record', zone_id=zone_id, record_id=record.record_id) }}"
+              class="inline-form" data-record-delete data-record-name="{{ record.name }}">
+            <input type="hidden" name="mode" value="cloudflare">
+            <button type="submit" class="btn btn--danger">
+                <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+                <span>{{ t('records.list.delete') }}</span>
+            </button>
+        </form>
+        {% if editable and record.active %}
+        <a href="{{ url_for('records.edit_record', zone_id=zone_id, record_id=record.record_id) }}" class="btn btn--primary">
+            <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
+            <span>{{ t('records.list.edit') }}</span>
+        </a>
+        {% endif %}
+        {% endif %}
     </div>
 </div>
 
 {% if record %}
+{% if not record.active %}
+<div class="alert alert--danger page-alert" role="alert">
+    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+    <span>{{ t('records.detail.missing_alert') }}</span>
+</div>
+{% elif not editable %}
+<div class="alert page-alert" role="status">
+    <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+    <span>{{ t('records.detail.not_editable', type=record.type) }}</span>
+</div>
+{% endif %}
 <div class="grid grid--main-aside">
     <div class="stack">
         <section class="card">
             <div class="card__header">
                 <h2 class="card__title">{{ t('records.detail.record') }}</h2>
-                {{ ui.record_status(record.active) }}
+                {% if not record.active %}<span class="badge badge--danger">{{ t('records.missing') }}</span>{% endif %}
             </div>
             <dl class="properties">
                 <div class="properties__item">
@@ -51,12 +78,18 @@
                 </div>
                 <div class="properties__item">
                     <dt>TTL</dt>
-                    <dd class="tabular">{{ t('records.ttl_auto') if record.ttl == 1 else record.ttl }}</dd>
+                    <dd class="tabular">{{ ui.ttl_label(record.ttl) }}</dd>
                 </div>
                 <div class="properties__item">
                     <dt>{{ t('records.proxy_status') }}</dt>
                     <dd>{{ ui.proxy_status(record.proxied) }}</dd>
                 </div>
+                {% if record.priority is not none %}
+                <div class="properties__item">
+                    <dt>{{ t('records.form.priority') }}</dt>
+                    <dd class="tabular">{{ record.priority }}</dd>
+                </div>
+                {% endif %}
                 <div class="properties__item">
                     <dt>{{ t('records.detail.proxiable') }}</dt>
                     <dd>{{ ui.bool_badge(record.proxiable) }}</dd>
@@ -71,6 +104,65 @@
                 </div>
             </dl>
         </section>
+
+        {% if record.supports_auto_update %}
+        <section class="card">
+            <div class="card__header">
+                <div>
+                    <h2 class="card__title">
+                        <i class="fa-solid fa-shield-halved text-muted" aria-hidden="true"></i>
+                        {{ t('records.auto_update') }}
+                    </h2>
+                    <p class="card__description">{{ t('records.detail.auto_update_desc') }}</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" class="switch__input"
+                           data-auto-update-url="{{ url_for('records.toggle_auto_update', zone_id=zone_id, record_id=record.record_id) }}"
+                           aria-label="{{ t('records.auto_update_for', name=record.name) }}"
+                           {% if record.auto_update %}checked{% endif %}{% if not record.active %} disabled{% endif %}>
+                    <span class="switch__track" aria-hidden="true"></span>
+                </label>
+            </div>
+            <div class="table-wrap">
+                <table class="table table--compact">
+                    <thead>
+                        <tr>
+                            <th>{{ t('sentinel.history.when') }}</th>
+                            <th>{{ t('sentinel.history.change') }}</th>
+                            <th>{{ t('common.status') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for update in history %}
+                        <tr>
+                            <td class="col-date">{{ ui.time_ago(update.timestamp) }}</td>
+                            <td>
+                                <span class="ip-change">
+                                    {% if update.old_ip %}<span class="ip-change__old">{{ update.old_ip }}</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>{% endif %}
+                                    <span>{{ update.new_ip or '—' }}</span>
+                                </span>
+                            </td>
+                            <td>
+                                {% if update.status == 'updated' %}
+                                    <span class="badge badge--success badge--dot">{{ t('sentinel.history.updated') }}</span>
+                                {% else %}
+                                    <span class="badge badge--danger badge--dot" title="{{ ui.reason(update.response) }}">{{ t('sentinel.history.failed') }}</span>
+                                    <span class="text-muted">{{ ui.reason(update.response) }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr class="is-empty">
+                            <td colspan="3">
+                                <p class="table-note">{{ t('records.detail.no_history') }}</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        {% endif %}
 
         <section class="card">
             <div class="card__header">
@@ -144,4 +236,8 @@
 </div>
 {% endif %}
 
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/records.js') }}"></script>
 {% endblock %}

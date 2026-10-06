@@ -33,6 +33,7 @@ STRINGS = {
     'nav.section_general': {'en': 'General', 'es': 'General'},
     'nav.dashboard': {'en': 'Dashboard', 'es': 'Panel'},
     'nav.go_to_dashboard': {'en': 'Go to dashboard', 'es': 'Ir al panel'},
+    'nav.ip_sentinel': {'en': 'IP sentinel', 'es': 'Centinela de IP'},
 
     # ── Layout ──
     'layout.dynamic_ip_manager': {'en': 'Dynamic IP manager', 'es': 'Gestor de IP dinámica'},
@@ -59,6 +60,4 @@ STRINGS = {
     'ui.off': {'en': 'Off', 'es': 'Desactivado'},
     'ui.proxied': {'en': 'Proxied', 'es': 'Con proxy'},
     'ui.dns_only': {'en': 'DNS only', 'es': 'Solo DNS'},
-    'ui.active': {'en': 'Active', 'es': 'Activo'},
-    'ui.inactive': {'en': 'Inactive', 'es': 'Inactivo'},
 }

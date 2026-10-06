@@ -8,6 +8,9 @@
      'active': endpoint in ('zones.list_zones', 'zones.zone_detail') or endpoint.startswith('records.')},
     {'label': t('common.add_zone'), 'icon': 'fa-circle-plus', 'url': url_for('zones.create_zone'),
      'active': endpoint == 'zones.create_zone'},
+    {'section': 'Sentinel'},
+    {'label': t('nav.ip_sentinel'), 'icon': 'fa-shield-halved', 'url': url_for('sentinel.overview'),
+     'active': endpoint.startswith('sentinel.')},
 ] %}
 <aside class="sidebar" id="sidebar" aria-label="{{ t('nav.sidebar') }}">
     <a class="sidebar__brand" href="{{ url_for('dashboard.home') }}">

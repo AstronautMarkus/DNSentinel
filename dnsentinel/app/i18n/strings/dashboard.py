@@ -16,9 +16,10 @@ STRINGS = {
     # ── Stats ──
     'dashboard.summary': {'en': 'Summary', 'es': 'Resumen'},
     'dashboard.zones': {'en': 'Zones', 'es': 'Zonas'},
-    'dashboard.alerts': {'en': 'Alerts', 'es': 'Alertas'},
-    'dashboard.updates': {'en': 'Updates', 'es': 'Actualizaciones'},
-    'dashboard.users': {'en': 'Users', 'es': 'Usuarios'},
+    'dashboard.watched': {'en': 'Watched records', 'es': 'Registros vigilados'},
+    'dashboard.updates': {'en': 'IP updates', 'es': 'Actualizaciones de IP'},
+    'dashboard.failures': {'en': 'Failed updates', 'es': 'Actualizaciones fallidas'},
+    'dashboard.last_7_days': {'en': 'Last 7 days', 'es': 'Últimos 7 días'},
 
     # ── Zones card ──
     'dashboard.cf_zones': {'en': 'Cloudflare DNS zones', 'es': 'Zonas DNS de Cloudflare'},
@@ -28,11 +29,14 @@ STRINGS = {
         'es': 'Conecta una zona de Cloudflare para empezar a mantener sincronizados sus registros DNS.',
     },
 
-    # ── Alerts chart ──
-    'dashboard.alerts_week': {'en': 'Alerts this week', 'es': 'Alertas de esta semana'},
-    'dashboard.alerts_desc': {'en': 'Daily alert count, last 7 days', 'es': 'Alertas por día, últimos 7 días'},
+    # ── Updates chart ──
+    'dashboard.updates_week': {'en': 'IP updates this week', 'es': 'Actualizaciones de IP de esta semana'},
+    'dashboard.updates_desc': {
+        'en': 'Records updated by the sentinel per day (UTC), last 7 days',
+        'es': 'Registros actualizados por el centinela por día (UTC), últimos 7 días',
+    },
     'dashboard.chart_label': {
-        'en': 'Line chart of alerts per day this week',
-        'es': 'Gráfico de líneas de alertas por día de esta semana',
+        'en': 'Line chart of IP updates per day this week',
+        'es': 'Gráfico de líneas de actualizaciones de IP por día de esta semana',
     },
 }

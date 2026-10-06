@@ -6,6 +6,11 @@ Errors (exit code 1):
   * a translation has different {placeholders} than the English text
   * a t('...') call in a template, route or script uses an unknown key
 
+Python code also passes keys around as plain strings, rendered later with
+t(value) (form errors, sentinel failure reasons): any string literal in a
+.py file that names a known key, or an f-string prefix like
+f'sentinel.ip_error.{reason}', counts as a use.
+
 Warnings:
   * a key is defined but never used
 
@@ -25,7 +30,12 @@ from app.i18n.strings import STRINGS
 
 # t('key'), t("key") — a key ending in '.' is a dynamic prefix: t('zones.status.' ~ status)
 KEY_USAGE = re.compile(r"""\bt\(\s*['"]([a-z0-9_.]+)['"]""")
-SCANNED = (('templates', '.html'), ('routes', '.py'), ('static/js', '.js'))
+SCANNED = (('templates', '.html'), ('static/js', '.js'), ('', '.py'))
+# The string tables themselves, and this script's examples, are not usages.
+SKIPPED_DIRS = ('i18n', 'scripts')
+# In .py files: 'records.form.error.ipv4' and f'sentinel.ip_error.{...}'
+PY_KEY_LITERAL = re.compile(r"""(?<![\w.])['"]([a-z0-9_]+(?:\.[a-z0-9_]+)+)['"]""")
+PY_KEY_PREFIX = re.compile(r"""\bf['"]([a-z0-9_]+(?:\.[a-z0-9_]+)*\.)\{""")
 
 
 def placeholders(text):
@@ -69,15 +79,21 @@ def check_entries():
 def scan_usages():
     used = {}
     for folder, ext in SCANNED:
-        root = os.path.join(app_dir, folder)
-        for dirpath, _, filenames in os.walk(root):
+        root = os.path.normpath(os.path.join(app_dir, folder))
+        for dirpath, dirnames, filenames in os.walk(root):
+            if dirpath == app_dir:
+                dirnames[:] = [d for d in dirnames if d not in SKIPPED_DIRS]
             for filename in filenames:
                 if not filename.endswith(ext):
                     continue
                 path = os.path.join(dirpath, filename)
                 with open(path, encoding='utf-8') as fh:
                     for lineno, line in enumerate(fh, 1):
-                        for key in KEY_USAGE.findall(line):
+                        keys = KEY_USAGE.findall(line)
+                        if ext == '.py':
+                            keys += [key for key in PY_KEY_LITERAL.findall(line) if key in STRINGS]
+                            keys += PY_KEY_PREFIX.findall(line)
+                        for key in keys:
                             used.setdefault(key, []).append(f'{os.path.relpath(path, app_dir)}:{lineno}')
     return used
 
