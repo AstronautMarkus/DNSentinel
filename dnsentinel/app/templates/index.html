@@ -55,13 +55,162 @@
             </div>
         </div>
 
+        {# Animated walkthrough — driven by static/js/ip-demo.js #}
         <div class="ip-demo" id="ip-demo">
             <div class="ip-demo__header">
                 <h3 class="ip-demo__title">The problem with having a dynamic IP address</h3>
-                <span id="ip-demo-status"></span>
+                <div class="ip-demo__controls">
+                    <span class="badge badge--dot badge--success" data-demo-status>All sites online</span>
+                    <button type="button" class="btn btn--sm" data-demo-toggle aria-pressed="false">
+                        <i class="fa-solid fa-pause" aria-hidden="true"></i>
+                        <span>Pause</span>
+                    </button>
+                </div>
             </div>
-            <ol class="ip-flow" id="ip-flow"></ol>
-            <div class="ip-demo__footer" id="ip-demo-caption"></div>
+
+            <div class="demo-stage" data-demo-stage aria-hidden="true">
+                <svg class="demo-wires" data-demo-wires>
+                    <path class="demo-wire" data-wire="query"></path>
+                    <path class="demo-wire" data-wire="request"></path>
+                    <path class="demo-wire" data-wire="update"></path>
+                </svg>
+                <span class="demo-internet" data-demo-internet><i class="fa-solid fa-globe"></i> Internet</span>
+
+                <div class="demo-node demo-node--browser">
+                    <p class="demo-node__label"><i class="fa-solid fa-user"></i> Visitor</p>
+                    <div class="demo-browser" data-demo-browser>
+                        <div class="demo-browser__bar">
+                            <span class="demo-browser__dots"><i></i><i></i><i></i></span>
+                            <span class="demo-browser__url"><i class="fa-solid fa-lock"></i> example.com</span>
+                            <i class="fa-solid fa-rotate-right demo-browser__reload"></i>
+                        </div>
+                        <div class="demo-browser__view" data-view="idle" data-demo-view>
+                            <div class="demo-view demo-view--idle">
+                                <span class="demo-view__search"><i class="fa-solid fa-magnifying-glass"></i> example.com</span>
+                            </div>
+                            <div class="demo-view demo-view--loading">
+                                <span class="demo-spinner"></span>
+                                <span data-demo-loading>Looking up example.com…</span>
+                            </div>
+                            <div class="demo-view demo-view--ok">
+                                <div class="demo-mock">
+                                    <div class="demo-mock__nav"><span class="demo-mock__logo"></span><span></span><span></span><span></span></div>
+                                    <div class="demo-mock__hero">
+                                        <strong>example.com</strong>
+                                        <span>Served from your home server</span>
+                                    </div>
+                                    <div class="demo-mock__cards"><span></span><span></span><span></span></div>
+                                </div>
+                            </div>
+                            <div class="demo-view demo-view--error">
+                                <i class="fa-regular fa-face-frown"></i>
+                                <strong>This site can't be reached</strong>
+                                <span>example.com took too long to respond.</span>
+                                <code>ERR_CONNECTION_TIMED_OUT</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demo-node demo-node--dns">
+                    <p class="demo-node__label">
+                        <img class="cf-logo" src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="">
+                        Cloudflare DNS
+                    </p>
+                    <div class="demo-dns" data-demo-dns>
+                        <div class="demo-dns__row demo-dns__row--head"><span>Type</span><span>Name</span><span>Points to</span></div>
+                        <div class="demo-dns__row" data-record><span class="demo-dns__type">A</span><span>example.com</span><span class="demo-dns__ip" data-record-ip>203.0.113.24</span></div>
+                        <div class="demo-dns__row" data-record><span class="demo-dns__type">A</span><span>nas.example.com</span><span class="demo-dns__ip" data-record-ip>203.0.113.24</span></div>
+                        <div class="demo-dns__row" data-record><span class="demo-dns__type">A</span><span>vpn.example.com</span><span class="demo-dns__ip" data-record-ip>203.0.113.24</span></div>
+                        <p class="demo-dns__note" data-demo-dns-note><i class="fa-solid fa-circle-check"></i> <span>Records match your IP</span></p>
+                    </div>
+                </div>
+
+                <div class="demo-node demo-node--home">
+                    <p class="demo-node__label"><i class="fa-solid fa-house"></i> Your home network</p>
+                    <div class="demo-home" data-demo-home>
+                        <span class="demo-isp" data-demo-isp>
+                            <i class="fa-solid fa-tower-broadcast"></i> ISP
+                            <i class="fa-solid fa-bolt demo-isp__bolt"></i>
+                        </span>
+                        <div class="demo-home__row demo-agent" data-demo-agent>
+                            <img class="demo-home__icon demo-agent__logo" src="{{ url_for('static', filename='img/DNSentinel.svg') }}" alt="">
+                            <div class="demo-home__text">
+                                <p class="demo-home__name">DNSentinel</p>
+                                <p class="demo-home__meta" data-demo-agent-text>Not running</p>
+                            </div>
+                        </div>
+                        <div class="demo-home__row" data-demo-server>
+                            <span class="demo-home__icon"><i class="fa-solid fa-server"></i></span>
+                            <div class="demo-home__text">
+                                <p class="demo-home__name">Home server</p>
+                                <p class="demo-home__meta">Website · NAS · VPN</p>
+                            </div>
+                        </div>
+                        <div class="demo-home__row" data-demo-router>
+                            <span class="demo-home__icon"><i class="fa-solid fa-network-wired"></i></span>
+                            <div class="demo-home__text">
+                                <p class="demo-home__name">Router <span class="demo-home__tag">New IP</span></p>
+                                <p class="demo-home__ip" data-demo-router-ip>203.0.113.24</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demo-packets" data-demo-packets></div>
+            </div>
+
+            <div class="demo-sites" aria-hidden="true">
+                <span class="demo-sites__label">Your sites</span>
+                <ul class="demo-sites__list">
+                    <li class="demo-site" data-demo-site>
+                        <span class="demo-site__icon"><i class="fa-solid fa-globe"></i></span>
+                        <span class="demo-site__name">example.com<small>Website</small></span>
+                        <span class="demo-site__status">Online</span>
+                    </li>
+                    <li class="demo-site" data-demo-site>
+                        <span class="demo-site__icon"><i class="fa-solid fa-hard-drive"></i></span>
+                        <span class="demo-site__name">nas.example.com<small>File storage</small></span>
+                        <span class="demo-site__status">Online</span>
+                    </li>
+                    <li class="demo-site" data-demo-site>
+                        <span class="demo-site__icon"><i class="fa-solid fa-lock"></i></span>
+                        <span class="demo-site__name">vpn.example.com<small>VPN</small></span>
+                        <span class="demo-site__status">Online</span>
+                    </li>
+                </ul>
+            </div>
+
+            <ol class="demo-steps">
+                <li>
+                    <button type="button" class="demo-step" data-demo-step="0">
+                        <span class="demo-step__bar"><span></span></span>
+                        <span class="demo-step__title"><span class="demo-step__num">1</span> Everything works</span>
+                        <span class="demo-step__text">A visitor opens example.com. Cloudflare DNS answers with your public IP and the request reaches your home server.</span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="demo-step" data-demo-step="1">
+                        <span class="demo-step__bar"><span></span></span>
+                        <span class="demo-step__title"><span class="demo-step__num">2</span> Your ISP changes your IP</span>
+                        <span class="demo-step__text">Dynamic IPs change without warning. Your router gets a new address, but the DNS records still point to the old one.</span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="demo-step" data-demo-step="2">
+                        <span class="demo-step__bar"><span></span></span>
+                        <span class="demo-step__title"><span class="demo-step__num">3</span> Everything goes down</span>
+                        <span class="demo-step__text">DNS keeps sending visitors to the old IP. Nobody answers there, so every site on it becomes unreachable.</span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="demo-step" data-demo-step="3">
+                        <span class="demo-step__bar"><span></span></span>
+                        <span class="demo-step__title"><span class="demo-step__num">4</span> DNSentinel fixes it</span>
+                        <span class="demo-step__text">DNSentinel detects the new IP and updates your Cloudflare records automatically. Your sites are back online.</span>
+                    </button>
+                </li>
+            </ol>
         </div>
 
         <p class="ip-demo__note">
@@ -127,71 +276,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-(function () {
-    var flow = document.getElementById('ip-flow');
-    var status = document.getElementById('ip-demo-status');
-    var caption = document.getElementById('ip-demo-caption');
-    var PHASE_MS = 4000;
-
-    function randomIp() {
-        return Array.from({ length: 4 }, function () { return Math.floor(Math.random() * 256); }).join('.');
-    }
-
-    function node(opts) {
-        var classes = ['ip-flow__node'];
-        if (opts.error) classes.push('is-error');
-        if (opts.dimmed) classes.push('is-dimmed');
-        if (opts.link) classes.push('link-' + opts.link);
-        return '<li class="' + classes.join(' ') + '">' +
-            '<span class="ip-flow__icon"><i class="fa-solid ' + opts.icon + '" aria-hidden="true"></i></span>' +
-            '<span class="ip-flow__step">' + opts.step + '</span>' +
-            '<span class="ip-flow__value">' + opts.value + '</span>' +
-            (opts.badge || '') +
-            '</li>';
-    }
-
-    function render(synced, dnsIp, routerIp) {
-        flow.innerHTML = [
-            node({ icon: 'fa-laptop', step: '1. User', value: 'Visits site', dimmed: !synced }),
-            node({ icon: 'fa-globe', step: '2. DNS', value: 'IP: <span class="mono">' + dnsIp + '</span>',
-                   dimmed: !synced, link: synced ? null : 'error' }),
-            node({ icon: 'fa-wifi', step: '3. Router', value: '<span class="mono">' + routerIp + '</span>',
-                   error: !synced, link: synced ? null : 'idle',
-                   badge: synced ? '<span class="badge badge--success">OK</span>'
-                                 : '<span class="badge badge--danger">IP changed</span>' }),
-            node({ icon: 'fa-server', step: '4. Server', value: synced ? 'Received' : 'Not received',
-                   dimmed: !synced,
-                   badge: synced ? '<span class="badge badge--success">Response</span>'
-                                 : '<span class="badge badge--danger">No response</span>' })
-        ].join('');
-
-        status.innerHTML = synced
-            ? '<span class="badge badge--success badge--dot">DNS in sync</span>'
-            : '<span class="badge badge--danger badge--dot">DNS out of date</span>';
-        caption.innerHTML = synced
-            ? '<i class="fa-solid fa-circle-check is-ok" aria-hidden="true"></i>' +
-              '<span>The DNS record matches the router\'s public IP, so requests reach your server.</span>'
-            : '<i class="fa-solid fa-circle-exclamation is-error" aria-hidden="true"></i>' +
-              '<span>Your ISP assigned a new IP, but DNS still points to the old one. Visitors can\'t reach your server.</span>';
-
-        flow.classList.remove('is-entering');
-        void flow.offsetWidth;
-        flow.classList.add('is-entering');
-    }
-
-    function loop() {
-        var ip1 = randomIp();
-        var ip2 = randomIp();
-        while (ip2 === ip1) ip2 = randomIp();
-        render(true, ip1, ip1);
-        setTimeout(function () {
-            render(false, ip1, ip2);
-            setTimeout(loop, PHASE_MS);
-        }, PHASE_MS);
-    }
-
-    loop();
-})();
-</script>
+<script src="{{ url_for('static', filename='js/ip-demo.js') }}"></script>
 {% endblock %}
