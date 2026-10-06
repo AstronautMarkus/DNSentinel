@@ -1,14 +1,15 @@
 {# Reusable UI building blocks. Import with:
-   {% import 'base/partials/macros.html' as ui %} #}
+   {% import 'base/partials/macros.html' as ui %}
+   Default labels call t() at call time, so they follow the page language. #}
 
-{% macro copy_button(value, label='Copy') -%}
+{% macro copy_button(value, label=t('ui.copy')) -%}
 <button type="button" class="btn btn--ghost btn--icon btn--xs" data-copy="{{ value }}" title="{{ label }}" aria-label="{{ label }}">
     <i class="fa-regular fa-copy" aria-hidden="true"></i>
 </button>
 {%- endmacro %}
 
 {# Monospace value + copy button. `wrap` lets long values break instead of truncating. #}
-{% macro copyable(value, label='Copy', wrap=false) -%}
+{% macro copyable(value, label=t('ui.copy'), wrap=false) -%}
 <span class="copyable{% if wrap %} copyable--wrap{% endif %}">
     <span class="copyable__value" title="{{ value }}">{{ value }}</span>
     {{ copy_button(value, label) }}
@@ -19,16 +20,16 @@
 {% macro secret(value, wrap=false) -%}
 <span class="copyable{% if wrap %} copyable--wrap{% endif %}">
     <span class="copyable__value is-masked" data-secret="{{ value or '' }}">••••••••••••</span>
-    <button type="button" class="btn btn--ghost btn--icon btn--xs" data-secret-toggle aria-pressed="false" title="Show token" aria-label="Show token">
+    <button type="button" class="btn btn--ghost btn--icon btn--xs" data-secret-toggle aria-pressed="false" title="{{ t('js.common.show_token') }}" aria-label="{{ t('js.common.show_token') }}">
         <i class="fa-regular fa-eye" aria-hidden="true"></i>
     </button>
-    {{ copy_button(value or '', 'Copy token') }}
+    {{ copy_button(value or '', t('ui.copy_token')) }}
 </span>
 {%- endmacro %}
 
 {# items: list of (label, url) tuples; the last item is the current page. #}
 {% macro breadcrumb(items) -%}
-<nav class="breadcrumb" aria-label="Breadcrumb">
+<nav class="breadcrumb" aria-label="{{ t('nav.breadcrumb') }}">
     <ol>
         {% for label, url in items %}
             {% if loop.last %}
@@ -55,7 +56,7 @@
 </div>
 {%- endmacro %}
 
-{% macro bool_badge(value, yes='Yes', no='No', yes_variant='success', no_variant='') -%}
+{% macro bool_badge(value, yes=t('ui.yes'), no=t('ui.no'), yes_variant='success', no_variant='') -%}
 {% if value %}
 <span class="badge{% if yes_variant %} badge--{{ yes_variant }}{% endif %}">{{ yes }}</span>
 {% else %}
@@ -65,17 +66,17 @@
 
 {% macro proxy_status(proxied) -%}
 {% if proxied %}
-<span class="proxy proxy--on"><i class="fa-solid fa-cloud" aria-hidden="true"></i>Proxied</span>
+<span class="proxy proxy--on"><i class="fa-solid fa-cloud" aria-hidden="true"></i>{{ t('ui.proxied') }}</span>
 {% else %}
-<span class="proxy"><i class="fa-solid fa-cloud" aria-hidden="true"></i>DNS only</span>
+<span class="proxy"><i class="fa-solid fa-cloud" aria-hidden="true"></i>{{ t('ui.dns_only') }}</span>
 {% endif %}
 {%- endmacro %}
 
 {% macro record_status(active) -%}
 {% if active %}
-<span class="badge badge--success badge--dot">Active</span>
+<span class="badge badge--success badge--dot">{{ t('ui.active') }}</span>
 {% else %}
-<span class="badge badge--danger badge--dot">Inactive</span>
+<span class="badge badge--danger badge--dot">{{ t('ui.inactive') }}</span>
 {% endif %}
 {%- endmacro %}
 

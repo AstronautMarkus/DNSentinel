@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from app.models.models import db, Zone
 import requests
 from datetime import datetime
+from app.i18n import t
 
 @zones_bp.route('/cloudflare/create', methods=['GET', 'POST'])
 @login_required
@@ -13,7 +14,7 @@ def create_zone():
         api_token = request.form.get('api_token')
 
         if not zone_id or not api_token:
-            flash('Both Zone ID and API Token are required.', 'danger')
+            flash(t('zones.flash.missing_fields'), 'danger')
             return render_template('zones/create.html')
 
         url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}"
@@ -24,24 +25,24 @@ def create_zone():
         try:
             resp = requests.get(url, headers=headers, timeout=10)
         except Exception as e:
-            flash(f'Connection error with Cloudflare: {str(e)}', 'danger')
+            flash(t('zones.connection_error', error=str(e)), 'danger')
             return render_template('zones/create.html')
 
         if resp.status_code != 200:
-            flash('Could not validate Zone ID and Token. Please check your credentials.', 'danger')
+            flash(t('zones.flash.invalid_credentials'), 'danger')
             return render_template('zones/create.html')
 
         data = resp.json().get('result', {})
         name = data.get('name')
         if not name:
-            flash('Could not retrieve zone name from Cloudflare.', 'danger')
+            flash(t('zones.flash.no_name'), 'danger')
             return render_template('zones/create.html')
 
         if Zone.query.filter_by(name=name).first():
-            flash('A zone with that name already exists.', 'warning')
+            flash(t('zones.flash.name_exists'), 'warning')
             return render_template('zones/create.html')
         if Zone.query.filter_by(zone_id=zone_id, user_id=current_user.id).first():
-            flash('You already have a zone registered with that Zone ID.', 'warning')
+            flash(t('zones.flash.id_exists'), 'warning')
             return render_template('zones/create.html')
 
         new_zone = Zone(
@@ -62,7 +63,7 @@ def create_zone():
         )
         db.session.add(new_zone)
         db.session.commit()
-        flash('Zone created successfully.', 'success')
+        flash(t('zones.flash.created'), 'success')
         return redirect(url_for('dashboard.home'))
 
     return render_template('zones/create.html')

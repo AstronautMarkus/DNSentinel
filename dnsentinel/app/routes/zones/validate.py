@@ -1,6 +1,7 @@
 from . import zones_bp
 from flask import request, jsonify
 import requests
+from app.i18n import t
 
 @zones_bp.route('/cloudflare/validate', methods=['POST'])
 def validate_zone():
@@ -8,7 +9,7 @@ def validate_zone():
     zone_id = data.get('zone_id')
     api_token = data.get('api_token')
     if not zone_id or not api_token:
-        return jsonify({'ok': False, 'msg': 'Missing data. Please complete all fields.'}), 400
+        return jsonify({'ok': False, 'msg': t('zones.api.missing_data')}), 400
 
     url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}"
     headers = {
@@ -18,15 +19,15 @@ def validate_zone():
     try:
         resp = requests.get(url, headers=headers, timeout=10)
     except Exception as e:
-        return jsonify({'ok': False, 'msg': f'Connection error with Cloudflare: {str(e)}'}), 500
+        return jsonify({'ok': False, 'msg': t('zones.connection_error', error=str(e))}), 500
 
     if resp.status_code == 200:
-        return jsonify({'ok': True, 'msg': 'Zone and token are valid! You can continue with the creation.'})
+        return jsonify({'ok': True, 'msg': t('zones.api.valid')})
     elif resp.status_code == 403:
-        return jsonify({'ok': False, 'msg': 'The token is valid, but does not have permission to access this zone. Check the permissions in Cloudflare.'})
+        return jsonify({'ok': False, 'msg': t('zones.api.forbidden')})
     elif resp.status_code == 404:
-        return jsonify({'ok': False, 'msg': 'The Zone ID does not exist or is not accessible with this token. Please check that the Zone ID is correct.'})
+        return jsonify({'ok': False, 'msg': t('zones.api.not_found')})
     elif resp.status_code == 401:
-        return jsonify({'ok': False, 'msg': 'The token is invalid or expired. Generate a new token in Cloudflare.'})
+        return jsonify({'ok': False, 'msg': t('zones.api.unauthorized')})
     else:
-        return jsonify({'ok': False, 'msg': f'Unexpected error: {resp.status_code}'}), 400
+        return jsonify({'ok': False, 'msg': t('zones.api.unexpected', status=resp.status_code)}), 400

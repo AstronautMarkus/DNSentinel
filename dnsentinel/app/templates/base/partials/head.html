@@ -8,3 +8,5 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">
+{# UI strings for static/js/app.js's t() — the js.* keys, already in the page language. #}
+<script id="i18n-data" type="application/json">{{ js_strings() | tojson }}</script>

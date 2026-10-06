@@ -19,6 +19,9 @@
   var root = document.getElementById('ip-demo');
   if (!root) return;
 
+  // Localized strings (js.demo.*), provided by static/js/app.js.
+  var t = window.t;
+
   var DOMAIN = 'example.com';
   var OLD_IP = '203.0.113.24';
   var NEW_IP = '198.51.100.77';
@@ -176,10 +179,10 @@
 
   /* ---- Scene state ------------------------------------------------------ */
   var STATUS = {
-    online: ['success', 'All sites online'],
-    changed: ['warning', 'IP changed'],
-    down: ['danger', 'Sites down'],
-    fixing: ['info', 'Updating DNS']
+    online: ['success', t('js.demo.status_online')],
+    changed: ['warning', t('js.demo.status_changed')],
+    down: ['danger', t('js.demo.status_down')],
+    fixing: ['info', t('js.demo.status_fixing')]
   };
 
   function setStatus(key) {
@@ -206,16 +209,16 @@
   function setDnsNote(state) {
     dns.classList.toggle('is-stale', state === 'stale');
     var notes = {
-      ok: ['fa-circle-check', 'Records match your IP'],
-      stale: ['fa-triangle-exclamation', 'Records still point to ' + OLD_IP],
-      updated: ['fa-circle-check', 'Updated by DNSentinel']
+      ok: ['fa-circle-check', t('js.demo.dns_ok')],
+      stale: ['fa-triangle-exclamation', t('js.demo.dns_stale', { ip: OLD_IP })],
+      updated: ['fa-circle-check', t('js.demo.dns_updated')]
     };
     dnsNote.innerHTML = '<i class="fa-solid ' + notes[state][0] + '"></i> <span>' + notes[state][1] + '</span>';
   }
 
   function setSite(site, online) {
     site.classList.toggle('is-down', !online);
-    site.querySelector('.demo-site__status').textContent = online ? 'Online' : 'Down';
+    site.querySelector('.demo-site__status').textContent = online ? t('js.demo.site_online') : t('js.demo.site_down');
   }
 
   // Staggered on the demo clock so a jump to another step cancels it.
@@ -257,13 +260,13 @@
     records.forEach(function (row) { setRecordIp(row, OLD_IP, scene.stale); });
     setDnsNote(scene.stale ? 'stale' : 'ok');
     setSites(scene.sites);
-    setAgent('off', 'Not running');
+    setAgent('off', t('js.demo.agent_off'));
     setStatus(scene.status);
   }
 
   /* ---- Story beats ------------------------------------------------------ */
   async function resolveDomain(answerIp, stale) {
-    setView('loading', 'Looking up ' + DOMAIN + '…');
+    setView('loading', t('js.demo.looking_up', { domain: DOMAIN }));
     land(await send('query', DOMAIN + '?', 'dns', { icon: 'fa-magnifying-glass' }));
     flash(records[0], 'is-hit', 900);
     await wait(250);
@@ -271,7 +274,7 @@
   }
 
   async function loadPage(ip, speed) {
-    setView('loading', 'Connecting to ' + ip + '…');
+    setView('loading', t('js.demo.connecting', { ip: ip }));
     land(await send('request', 'GET /', 'http', { duration: 1500 * speed }));
     flash(router, 'is-pulse');
     await wait(250 * speed);
@@ -315,10 +318,10 @@
       run: async function () {
         await wait(600);
         await resolveDomain(OLD_IP, true);
-        setView('loading', 'Connecting to ' + OLD_IP + '…');
+        setView('loading', t('js.demo.connecting', { ip: OLD_IP }));
         var packet = await send('request', 'GET /', 'http', { duration: 1500, stopAt: 0.8, keepWire: true });
         setWire('request', 'broken');
-        lose(packet, 'Nobody at ' + OLD_IP, 'request', 0.8);
+        lose(packet, t('js.demo.nobody_at', { ip: OLD_IP }), 'request', 0.8);
         await wait(1300);
         setView('error');
         setStatus('down');
@@ -329,11 +332,11 @@
       duration: 11500,
       run: async function () {
         await wait(500);
-        setAgent('on', 'New IP detected: ' + NEW_IP);
+        setAgent('on', t('js.demo.new_ip', { ip: NEW_IP }));
         flash(agent, 'is-pulse');
         await wait(1100);
         setStatus('fixing');
-        setAgent('working', 'Updating Cloudflare records…');
+        setAgent('working', t('js.demo.updating'));
         land(await send('update', 'A → ' + NEW_IP, 'update', { icon: 'fa-arrows-rotate', duration: 1400 }));
         for (var i = 0; i < records.length; i++) {
           setRecordIp(records[i], NEW_IP, false);
@@ -341,7 +344,7 @@
           await wait(200);
         }
         setDnsNote('updated');
-        setAgent('on', 'Cloudflare records updated');
+        setAgent('on', t('js.demo.updated'));
         router.classList.remove('is-new');
         qa('.demo-lost').forEach(function (marker) { marker.remove(); });
         setWire('request', '');
@@ -397,7 +400,7 @@
     playing = value;
     root.classList.toggle('is-paused', !playing);
     toggleBtn.querySelector('i').className = 'fa-solid ' + (playing ? 'fa-pause' : 'fa-play');
-    toggleBtn.querySelector('span').textContent = playing ? 'Pause' : 'Play';
+    toggleBtn.querySelector('span').textContent = playing ? t('js.demo.pause') : t('js.demo.play');
   }
 
   toggleBtn.addEventListener('click', function () { setPlaying(!playing); });

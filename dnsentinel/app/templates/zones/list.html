@@ -1,18 +1,18 @@
 {% extends 'base/admin_base.html' %}
 {% import 'base/partials/macros.html' as ui %}
-{% block title %}Cloudflare DNS Zones{% endblock %}
+{% block title %}{{ t('zones.list.title') }}{% endblock %}
 {% block content %}
 
 <div class="page-header">
     <div class="page-header__main">
-        {{ ui.breadcrumb([('Dashboard', url_for('dashboard.home')), ('DNS zones', none)]) }}
-        <h1 class="page-title">DNS zones</h1>
-        <p class="page-subtitle">Cloudflare zones connected to DNSentinel.</p>
+        {{ ui.breadcrumb([(t('nav.dashboard'), url_for('dashboard.home')), (t('common.dns_zones'), none)]) }}
+        <h1 class="page-title">{{ t('common.dns_zones') }}</h1>
+        <p class="page-subtitle">{{ t('zones.list.subtitle') }}</p>
     </div>
     <div class="page-header__actions">
         <a href="{{ url_for('zones.create_zone') }}" class="btn btn--primary">
             <i class="fa-solid fa-plus" aria-hidden="true"></i>
-            <span>Add zone</span>
+            <span>{{ t('common.add_zone') }}</span>
         </a>
     </div>
 </div>
@@ -21,7 +21,7 @@
     <div class="card__header">
         <h2 class="card__title">
             <img class="cf-logo" src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="">
-            Added zones
+            {{ t('zones.list.added') }}
             <span class="badge">{{ user_zones|length }}</span>
         </h2>
     </div>
@@ -29,11 +29,11 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Zone ID</th>
-                    <th>API token</th>
-                    <th>Created</th>
-                    <th class="col-actions"><span class="visually-hidden">Actions</span></th>
+                    <th>{{ t('common.name') }}</th>
+                    <th>{{ t('common.zone_id') }}</th>
+                    <th>{{ t('common.api_token') }}</th>
+                    <th>{{ t('common.created') }}</th>
+                    <th class="col-actions"><span class="visually-hidden">{{ t('common.actions') }}</span></th>
                 </tr>
             </thead>
             <tbody>
@@ -44,18 +44,18 @@
                             <i class="fa-solid fa-globe" aria-hidden="true"></i>{{ zone.name }}
                         </a>
                     </td>
-                    <td>{{ ui.copyable(zone.zone_id, 'Copy zone ID') }}</td>
+                    <td>{{ ui.copyable(zone.zone_id, t('common.copy_zone_id')) }}</td>
                     <td>{{ ui.secret(zone.api_token) }}</td>
                     <td class="col-date">{{ ui.date(zone.created_at) }}</td>
                     <td class="col-actions">
                         <div class="btn-group">
                             <a href="{{ url_for('zones.zone_detail', zone_id=zone.zone_id) }}" class="btn btn--sm">
                                 <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                                <span>Details</span>
+                                <span>{{ t('common.details') }}</span>
                             </a>
                             <a href="{{ url_for('records.list_records', zone_id=zone.zone_id) }}" class="btn btn--sm">
                                 <i class="fa-solid fa-list" aria-hidden="true"></i>
-                                <span>DNS records</span>
+                                <span>{{ t('common.dns_records') }}</span>
                             </a>
                         </div>
                     </td>
@@ -63,9 +63,8 @@
                 {% else %}
                 <tr class="is-empty">
                     <td colspan="5">
-                        {{ ui.empty_state('fa-cloud', 'No zones yet',
-                            'Connect a Cloudflare zone with its Zone ID and an API token to start managing its DNS records.',
-                            url_for('zones.create_zone'), 'Add zone') }}
+                        {{ ui.empty_state('fa-cloud', t('common.no_zones'), t('zones.list.empty_text'),
+                            url_for('zones.create_zone'), t('common.add_zone')) }}
                     </td>
                 </tr>
                 {% endfor %}

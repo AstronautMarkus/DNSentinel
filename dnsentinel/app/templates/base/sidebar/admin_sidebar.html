@@ -1,20 +1,20 @@
 {% set endpoint = request.endpoint or '' %}
 {% set nav_items = [
-    {'section': 'General'},
-    {'label': 'Dashboard', 'icon': 'fa-gauge-high', 'url': url_for('dashboard.home'),
+    {'section': t('nav.section_general')},
+    {'label': t('nav.dashboard'), 'icon': 'fa-gauge-high', 'url': url_for('dashboard.home'),
      'active': endpoint.startswith('dashboard.')},
     {'section': 'Cloudflare'},
-    {'label': 'DNS zones', 'icon': 'fa-cloud', 'url': url_for('zones.list_zones'),
+    {'label': t('common.dns_zones'), 'icon': 'fa-cloud', 'url': url_for('zones.list_zones'),
      'active': endpoint in ('zones.list_zones', 'zones.zone_detail') or endpoint.startswith('records.')},
-    {'label': 'Add zone', 'icon': 'fa-circle-plus', 'url': url_for('zones.create_zone'),
+    {'label': t('common.add_zone'), 'icon': 'fa-circle-plus', 'url': url_for('zones.create_zone'),
      'active': endpoint == 'zones.create_zone'},
 ] %}
-<aside class="sidebar" id="sidebar" aria-label="Sidebar">
+<aside class="sidebar" id="sidebar" aria-label="{{ t('nav.sidebar') }}">
     <a class="sidebar__brand" href="{{ url_for('dashboard.home') }}">
         <img src="{{ url_for('static', filename='img/DNSentinel.svg') }}" alt="">
         <span>DNSentinel</span>
     </a>
-    <nav class="sidebar__nav" aria-label="Main navigation">
+    <nav class="sidebar__nav" aria-label="{{ t('nav.main') }}">
         {% for item in nav_items %}
             {% if item.section %}
                 <p class="sidebar__heading">{{ item.section }}</p>
@@ -30,7 +30,7 @@
         <img class="cf-logo" src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="">
         <div>
             <strong>Cloudflare DNS</strong>
-            <span>Dynamic IP manager</span>
+            <span>{{ t('layout.dynamic_ip_manager') }}</span>
         </div>
     </div>
 </aside>

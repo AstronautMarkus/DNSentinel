@@ -87,6 +87,14 @@ body.site {
   background: var(--gray-100);
 }
 
+/* Narrow phones: logo only, so the language switcher and both auth links
+   fit on one row (same trade-off as .topbar__brand in the app shell). */
+@media (max-width: 480px) {
+  .site-header .brand span {
+    display: none;
+  }
+}
+
 .site-footer {
   padding-block: var(--space-12) var(--space-8);
   font-size: var(--text-sm);

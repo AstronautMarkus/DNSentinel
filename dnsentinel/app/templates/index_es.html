@@ -1,5 +1,5 @@
 {% extends 'base/base.html' %}
-{% block title %}Dynamic DNS for Cloudflare{% endblock %}
+{% block title %}DNS dinámico para Cloudflare{% endblock %}
 {% block content %}
 
 <section class="hero">
@@ -7,25 +7,25 @@
         <div>
             <span class="hero__eyebrow">
                 <i class="fa-solid fa-cloud" aria-hidden="true"></i>
-                Cloudflare DNS · Dynamic IP
+                DNS de Cloudflare · IP dinámica
             </span>
-            <h1 class="hero__title">Comprehensive DNS management for dynamic IPs.</h1>
+            <h1 class="hero__title">Gestión integral de DNS para IPs dinámicas.</h1>
             <p class="hero__lead">
-                DNSentinel keeps your Cloudflare DNS records pointing at your current IP address,
-                automatically and in the background, from inside your own network.
+                DNSentinel mantiene tus registros DNS de Cloudflare apuntando a tu dirección IP actual,
+                de forma automática y en segundo plano, desde tu propia red.
             </p>
             <div class="hero__actions">
                 <a href="{{ url_for('auth.login') }}" class="btn btn--primary btn--lg">
-                    <span>Get started</span>
+                    <span>Comenzar</span>
                     <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                 </a>
-                <a href="#how-it-works" class="btn btn--on-dark btn--lg">How it works</a>
+                <a href="#how-it-works" class="btn btn--on-dark btn--lg">Cómo funciona</a>
             </div>
             <p class="hero__note">
                 <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
                 <span>
-                    Requires a public IP from your ISP. It won't help behind CG-NAT, and you don't need it
-                    if you use a tunnel. <a href="#before-you-start">Check your connection</a>.
+                    Requiere una IP pública de tu ISP. No sirve detrás de CG-NAT y no lo necesitas
+                    si usas un túnel. <a href="#before-you-start">Revisa tu conexión</a>.
                 </span>
             </p>
         </div>
@@ -41,23 +41,23 @@
     <div class="container">
         <div class="split">
             <div>
-                <p class="eyebrow">Overview</p>
-                <h2 class="section__title">What is DNSentinel?</h2>
+                <p class="eyebrow">Descripción general</p>
+                <h2 class="section__title">¿Qué es DNSentinel?</h2>
                 <p class="section__lead">
-                    <strong>DNSentinel</strong> is a simple yet powerful web application designed with a single,
-                    focused purpose: <span class="highlight">automatically keep your dynamic IP address synchronized
-                    with your DNS server</span>, especially when your Internet Service Provider (ISP) frequently
-                    changes your IP address.
+                    <strong>DNSentinel</strong> es una aplicación web simple pero potente, diseñada con un único
+                    propósito: <span class="highlight">mantener tu dirección IP dinámica sincronizada automáticamente
+                    con tu servidor DNS</span>, sobre todo cuando tu proveedor de Internet (ISP) cambia
+                    tu dirección IP con frecuencia.
                 </p>
             </div>
             <div>
-                <p class="eyebrow">Audience</p>
-                <h2 class="section__title">Who is it for?</h2>
+                <p class="eyebrow">Público</p>
+                <h2 class="section__title">¿Para quién es?</h2>
                 <p class="section__lead">
-                    Perfect for users who manage services at home or in small offices with <strong>dynamic IP
-                    addresses</strong>, meaning their ISP changes their IP address periodically, often without them
-                    even noticing. <strong>DNSentinel</strong> ensures their services and websites remain accessible
-                    without interruptions, even when their IP changes.
+                    Ideal para quienes administran servicios en casa o en oficinas pequeñas con <strong>direcciones IP
+                    dinámicas</strong>, es decir, su ISP cambia su dirección IP periódicamente, muchas veces sin que
+                    lo noten. <strong>DNSentinel</strong> asegura que sus servicios y sitios web sigan accesibles
+                    sin interrupciones, incluso cuando su IP cambia.
                 </p>
             </div>
         </div>
@@ -65,7 +65,7 @@
         {# Animated walkthrough — driven by static/js/ip-demo.js #}
         <div class="ip-demo" id="ip-demo">
             <div class="ip-demo__header">
-                <h3 class="ip-demo__title">The problem with having a dynamic IP address</h3>
+                <h3 class="ip-demo__title">El problema de tener una dirección IP dinámica</h3>
                 <div class="ip-demo__controls">
                     <span class="badge badge--dot badge--success" data-demo-status>{{ t('js.demo.status_online') }}</span>
                     <button type="button" class="btn btn--sm" data-demo-toggle aria-pressed="false">
@@ -84,7 +84,7 @@
                 <span class="demo-internet" data-demo-internet><i class="fa-solid fa-globe"></i> Internet</span>
 
                 <div class="demo-node demo-node--browser">
-                    <p class="demo-node__label"><i class="fa-solid fa-user"></i> Visitor</p>
+                    <p class="demo-node__label"><i class="fa-solid fa-user"></i> Visitante</p>
                     <div class="demo-browser" data-demo-browser>
                         <div class="demo-browser__bar">
                             <span class="demo-browser__dots"><i></i><i></i><i></i></span>
@@ -104,15 +104,15 @@
                                     <div class="demo-mock__nav"><span class="demo-mock__logo"></span><span></span><span></span><span></span></div>
                                     <div class="demo-mock__hero">
                                         <strong>example.com</strong>
-                                        <span>Served from your home server</span>
+                                        <span>Servido desde tu servidor doméstico</span>
                                     </div>
                                     <div class="demo-mock__cards"><span></span><span></span><span></span></div>
                                 </div>
                             </div>
                             <div class="demo-view demo-view--error">
                                 <i class="fa-regular fa-face-frown"></i>
-                                <strong>This site can't be reached</strong>
-                                <span>example.com took too long to respond.</span>
+                                <strong>No se puede acceder a este sitio</strong>
+                                <span>example.com tardó demasiado en responder.</span>
                                 <code>ERR_CONNECTION_TIMED_OUT</code>
                             </div>
                         </div>
@@ -125,7 +125,7 @@
                         Cloudflare DNS
                     </p>
                     <div class="demo-dns" data-demo-dns>
-                        <div class="demo-dns__row demo-dns__row--head"><span>Type</span><span>Name</span><span>Points to</span></div>
+                        <div class="demo-dns__row demo-dns__row--head"><span>Tipo</span><span>Nombre</span><span>Apunta a</span></div>
                         <div class="demo-dns__row" data-record><span class="demo-dns__type">A</span><span>example.com</span><span class="demo-dns__ip" data-record-ip>203.0.113.24</span></div>
                         <div class="demo-dns__row" data-record><span class="demo-dns__type">A</span><span>nas.example.com</span><span class="demo-dns__ip" data-record-ip>203.0.113.24</span></div>
                         <div class="demo-dns__row" data-record><span class="demo-dns__type">A</span><span>vpn.example.com</span><span class="demo-dns__ip" data-record-ip>203.0.113.24</span></div>
@@ -134,7 +134,7 @@
                 </div>
 
                 <div class="demo-node demo-node--home">
-                    <p class="demo-node__label"><i class="fa-solid fa-house"></i> Your home network</p>
+                    <p class="demo-node__label"><i class="fa-solid fa-house"></i> Tu red doméstica</p>
                     <div class="demo-home" data-demo-home>
                         <span class="demo-isp" data-demo-isp>
                             <i class="fa-solid fa-tower-broadcast"></i> ISP
@@ -150,14 +150,14 @@
                         <div class="demo-home__row" data-demo-server>
                             <span class="demo-home__icon"><i class="fa-solid fa-server"></i></span>
                             <div class="demo-home__text">
-                                <p class="demo-home__name">Home server</p>
-                                <p class="demo-home__meta">Website · NAS · VPN</p>
+                                <p class="demo-home__name">Servidor doméstico</p>
+                                <p class="demo-home__meta">Sitio web · NAS · VPN</p>
                             </div>
                         </div>
                         <div class="demo-home__row" data-demo-router>
                             <span class="demo-home__icon"><i class="fa-solid fa-network-wired"></i></span>
                             <div class="demo-home__text">
-                                <p class="demo-home__name">Router <span class="demo-home__tag">New IP</span></p>
+                                <p class="demo-home__name">Router <span class="demo-home__tag">IP nueva</span></p>
                                 <p class="demo-home__ip" data-demo-router-ip>203.0.113.24</p>
                             </div>
                         </div>
@@ -168,16 +168,16 @@
             </div>
 
             <div class="demo-sites" aria-hidden="true">
-                <span class="demo-sites__label">Your sites</span>
+                <span class="demo-sites__label">Tus sitios</span>
                 <ul class="demo-sites__list">
                     <li class="demo-site" data-demo-site>
                         <span class="demo-site__icon"><i class="fa-solid fa-globe"></i></span>
-                        <span class="demo-site__name">example.com<small>Website</small></span>
+                        <span class="demo-site__name">example.com<small>Sitio web</small></span>
                         <span class="demo-site__status">{{ t('js.demo.site_online') }}</span>
                     </li>
                     <li class="demo-site" data-demo-site>
                         <span class="demo-site__icon"><i class="fa-solid fa-hard-drive"></i></span>
-                        <span class="demo-site__name">nas.example.com<small>File storage</small></span>
+                        <span class="demo-site__name">nas.example.com<small>Almacenamiento</small></span>
                         <span class="demo-site__status">{{ t('js.demo.site_online') }}</span>
                     </li>
                     <li class="demo-site" data-demo-site>
@@ -192,39 +192,39 @@
                 <li>
                     <button type="button" class="demo-step" data-demo-step="0">
                         <span class="demo-step__bar"><span></span></span>
-                        <span class="demo-step__title"><span class="demo-step__num">1</span> Everything works</span>
-                        <span class="demo-step__text">A visitor opens example.com. Cloudflare DNS answers with your public IP and the request reaches your home server.</span>
+                        <span class="demo-step__title"><span class="demo-step__num">1</span> Todo funciona</span>
+                        <span class="demo-step__text">Un visitante abre example.com. El DNS de Cloudflare responde con tu IP pública y la solicitud llega a tu servidor doméstico.</span>
                     </button>
                 </li>
                 <li>
                     <button type="button" class="demo-step" data-demo-step="1">
                         <span class="demo-step__bar"><span></span></span>
-                        <span class="demo-step__title"><span class="demo-step__num">2</span> Your ISP changes your IP</span>
-                        <span class="demo-step__text">Dynamic IPs change without warning. Your router gets a new address, but the DNS records still point to the old one.</span>
+                        <span class="demo-step__title"><span class="demo-step__num">2</span> Tu ISP cambia tu IP</span>
+                        <span class="demo-step__text">Las IPs dinámicas cambian sin aviso. Tu router recibe una dirección nueva, pero los registros DNS siguen apuntando a la anterior.</span>
                     </button>
                 </li>
                 <li>
                     <button type="button" class="demo-step" data-demo-step="2">
                         <span class="demo-step__bar"><span></span></span>
-                        <span class="demo-step__title"><span class="demo-step__num">3</span> Everything goes down</span>
-                        <span class="demo-step__text">DNS keeps sending visitors to the old IP. Nobody answers there, so every site on it becomes unreachable.</span>
+                        <span class="demo-step__title"><span class="demo-step__num">3</span> Todo se cae</span>
+                        <span class="demo-step__text">El DNS sigue enviando a los visitantes a la IP anterior. Ahí nadie responde, así que todos los sitios quedan inaccesibles.</span>
                     </button>
                 </li>
                 <li>
                     <button type="button" class="demo-step" data-demo-step="3">
                         <span class="demo-step__bar"><span></span></span>
-                        <span class="demo-step__title"><span class="demo-step__num">4</span> DNSentinel fixes it</span>
-                        <span class="demo-step__text">DNSentinel detects the new IP and updates your Cloudflare records automatically. Your sites are back online.</span>
+                        <span class="demo-step__title"><span class="demo-step__num">4</span> DNSentinel lo arregla</span>
+                        <span class="demo-step__text">DNSentinel detecta la IP nueva y actualiza tus registros de Cloudflare automáticamente. Tus sitios vuelven a estar en línea.</span>
                     </button>
                 </li>
             </ol>
         </div>
 
         <p class="ip-demo__note">
-            The problem with having a <strong>dynamic IP</strong> (not static) is that your IP address can change
-            without warning, which may cause interruptions in access to your services and websites. For most users
-            who do not have a static IP provided by their provider, solving this can be impossible or very expensive,
-            limiting the available options.
+            El problema de tener una <strong>IP dinámica</strong> (no estática) es que tu dirección IP puede cambiar
+            sin aviso, lo que puede interrumpir el acceso a tus servicios y sitios web. Para la mayoría de los usuarios
+            que no tienen una IP estática entregada por su proveedor, resolver esto puede ser imposible o muy caro,
+            lo que limita las opciones disponibles.
         </p>
     </div>
 </section>
@@ -232,34 +232,34 @@
 <section class="section section--muted" id="how-it-works">
     <div class="container">
         <div class="section__header">
-            <p class="eyebrow">How it works</p>
-            <h2 class="section__title">Your DNS follows your IP</h2>
+            <p class="eyebrow">Cómo funciona</p>
+            <h2 class="section__title">Tu DNS sigue a tu IP</h2>
             <p class="section__lead">
-                <strong>DNSentinel</strong> automatically updates your router's IP address in the background,
-                ensuring your DNS always points to the correct IP. This way, your services and websites remain
-                accessible regardless of any IP changes made by your Internet provider.
+                <strong>DNSentinel</strong> actualiza automáticamente la dirección IP de tu router en segundo plano,
+                asegurando que tu DNS siempre apunte a la IP correcta. Así, tus servicios y sitios web siguen
+                accesibles sin importar los cambios de IP que haga tu proveedor de Internet.
             </p>
         </div>
         <div class="features">
             <article class="feature">
                 <div class="feature__icon"><i class="fa-solid fa-rotate" aria-hidden="true"></i></div>
-                <h3 class="feature__title">Automatic IP updates</h3>
-                <p class="feature__text">Detects when your public IP changes and updates your Cloudflare records in the background.</p>
+                <h3 class="feature__title">Actualización automática de IP</h3>
+                <p class="feature__text">Detecta cuándo cambia tu IP pública y actualiza tus registros de Cloudflare en segundo plano.</p>
             </article>
             <article class="feature">
                 <div class="feature__icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></div>
-                <h3 class="feature__title">Runs on your network</h3>
-                <p class="feature__text">DNSentinel runs only in your local network and talks directly to the Cloudflare API.</p>
+                <h3 class="feature__title">Funciona en tu red</h3>
+                <p class="feature__text">DNSentinel se ejecuta solo en tu red local y se comunica directamente con la API de Cloudflare.</p>
             </article>
             <article class="feature">
                 <div class="feature__icon"><i class="fa-solid fa-signal" aria-hidden="true"></i></div>
-                <h3 class="feature__title">Reduced downtime</h3>
-                <p class="feature__text">Your services and websites stay reachable, even right after your ISP changes your IP.</p>
+                <h3 class="feature__title">Menos tiempo fuera de línea</h3>
+                <p class="feature__text">Tus servicios y sitios web siguen accesibles, incluso justo después de que tu ISP cambie tu IP.</p>
             </article>
             <article class="feature">
                 <div class="feature__icon"><i class="fa-solid fa-sliders" aria-hidden="true"></i></div>
-                <h3 class="feature__title">Easy setup</h3>
-                <p class="feature__text">Connect a zone with its Zone ID and an API token, then import your existing records.</p>
+                <h3 class="feature__title">Configuración sencilla</h3>
+                <p class="feature__text">Conecta una zona con su ID de zona y un token de API, y luego importa tus registros existentes.</p>
             </article>
         </div>
     </div>
@@ -268,65 +268,65 @@
 <section class="section" id="before-you-start">
     <div class="container">
         <div class="section__header">
-            <p class="eyebrow">Before you start</p>
-            <h2 class="section__title">Is DNSentinel right for your connection?</h2>
+            <p class="eyebrow">Antes de empezar</p>
+            <h2 class="section__title">¿DNSentinel sirve para tu conexión?</h2>
             <p class="section__lead">
-                DNSentinel solves one specific problem: a <strong>public IP address that changes</strong>.
-                Updating DNS only helps if visitors from the Internet can actually reach that IP, so check
-                which of these cases matches your connection before you set it up.
+                DNSentinel resuelve un problema concreto: una <strong>dirección IP pública que cambia</strong>.
+                Actualizar el DNS solo sirve si los visitantes desde Internet pueden llegar de verdad a esa IP, así que
+                revisa cuál de estos casos corresponde a tu conexión antes de configurarlo.
             </p>
         </div>
         <div class="fit-grid">
             <article class="fit fit--yes">
                 <div class="fit__head">
                     <span class="fit__icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span>
-                    <span class="badge badge--success">Works</span>
+                    <span class="badge badge--success">Funciona</span>
                 </div>
-                <h3 class="fit__title">Dynamic public IP</h3>
+                <h3 class="fit__title">IP pública dinámica</h3>
                 <p class="fit__text">
-                    Your router gets a real public IP from your ISP, and that IP changes from time to time.
-                    Port forwarding works, but your DNS records go stale after every change.
-                    This is exactly the case DNSentinel is built for.
+                    Tu router recibe una IP pública real de tu ISP, y esa IP cambia de vez en cuando.
+                    La redirección de puertos funciona, pero tus registros DNS quedan desactualizados tras cada cambio.
+                    Este es justo el caso para el que se creó DNSentinel.
                 </p>
                 <p class="fit__hint">
-                    <strong>What to do:</strong> connect your Cloudflare zone and import the records
-                    that point to your home IP.
+                    <strong>Qué hacer:</strong> conecta tu zona de Cloudflare e importa los registros
+                    que apuntan a la IP de tu casa.
                 </p>
             </article>
             <article class="fit fit--no">
                 <div class="fit__head">
                     <span class="fit__icon"><i class="fa-solid fa-ban" aria-hidden="true"></i></span>
-                    <span class="badge badge--danger">Won't work</span>
+                    <span class="badge badge--danger">No funciona</span>
                 </div>
-                <h3 class="fit__title">Behind CG-NAT</h3>
+                <h3 class="fit__title">Detrás de CG-NAT</h3>
                 <p class="fit__text">
-                    With Carrier-Grade NAT, your ISP shares one public IP among many customers and your
-                    router only gets a private address. DNSentinel would detect that shared IP and write it
-                    to your records, but incoming connections stop at your ISP's NAT and never reach your
-                    network. Your sites stay unreachable no matter how up to date your DNS is.
+                    Con CG-NAT (Carrier-Grade NAT), tu ISP comparte una IP pública entre muchos clientes y tu
+                    router solo recibe una dirección privada. DNSentinel detectaría esa IP compartida y la escribiría
+                    en tus registros, pero las conexiones entrantes se quedan en el NAT de tu ISP y nunca llegan a tu
+                    red. Tus sitios siguen inaccesibles por muy actualizado que esté tu DNS.
                 </p>
                 <p class="fit__hint">
-                    <strong>How to tell:</strong> look at the WAN IP on your router's status page. If it
-                    doesn't match your public IP, especially if it's in the <code>100.64.x.x</code>
-                    to <code>100.127.x.x</code> range, you are most likely behind CG-NAT. Ask your ISP for a
-                    public IP, or use a tunnel instead.
+                    <strong>Cómo saberlo:</strong> revisa la IP WAN en la página de estado de tu router. Si
+                    no coincide con tu IP pública, sobre todo si está en el rango <code>100.64.x.x</code>
+                    a <code>100.127.x.x</code>, lo más probable es que estés detrás de CG-NAT. Pídele a tu ISP una
+                    IP pública o usa un túnel.
                 </p>
             </article>
             <article class="fit fit--skip">
                 <div class="fit__head">
                     <span class="fit__icon"><i class="fa-solid fa-route" aria-hidden="true"></i></span>
-                    <span class="badge">Not needed</span>
+                    <span class="badge">No es necesario</span>
                 </div>
-                <h3 class="fit__title">Using a tunnel</h3>
+                <h3 class="fit__title">Si usas un túnel</h3>
                 <p class="fit__text">
-                    Cloudflare Tunnel, ngrok, Tailscale Funnel and similar tools open an outbound connection
-                    from your server, and your DNS points to the tunnel (for example a CNAME to
-                    <code>&lt;id&gt;.cfargotunnel.com</code>), not to your IP. Your IP can change and
-                    nothing breaks, so there is nothing for DNSentinel to update.
+                    Cloudflare Tunnel, ngrok, Tailscale Funnel y herramientas similares abren una conexión saliente
+                    desde tu servidor, y tu DNS apunta al túnel (por ejemplo, un CNAME a
+                    <code>&lt;id&gt;.cfargotunnel.com</code>), no a tu IP. Tu IP puede cambiar sin que
+                    nada se rompa, así que DNSentinel no tiene nada que actualizar.
                 </p>
                 <p class="fit__hint">
-                    <strong>What to do:</strong> keep the tunnel and leave its records out of DNSentinel.
-                    Replacing the tunnel's CNAME with an A record would send traffic around the tunnel.
+                    <strong>Qué hacer:</strong> mantén el túnel y deja sus registros fuera de DNSentinel.
+                    Reemplazar el CNAME del túnel por un registro A haría que el tráfico se saltara el túnel.
                 </p>
             </article>
         </div>
@@ -337,12 +337,12 @@
     <div class="container">
         <div class="cta">
             <div>
-                <h2 class="cta__title">Stop chasing IP changes.</h2>
-                <p class="cta__text">Connect your first Cloudflare zone in a couple of minutes.</p>
+                <h2 class="cta__title">Deja de perseguir los cambios de IP.</h2>
+                <p class="cta__text">Conecta tu primera zona de Cloudflare en un par de minutos.</p>
             </div>
             <div class="cta__actions">
-                <a href="{{ url_for('auth.register') }}" class="btn btn--primary btn--lg">Create account</a>
-                <a href="{{ url_for('auth.login') }}" class="btn btn--on-dark btn--lg">Sign in</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn--primary btn--lg">Crear cuenta</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn--on-dark btn--lg">Iniciar sesión</a>
             </div>
         </div>
     </div>

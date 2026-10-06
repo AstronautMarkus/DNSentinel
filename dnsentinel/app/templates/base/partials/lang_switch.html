@@ -1,0 +1,10 @@
+{# Language switcher: one link per other supported language (a single link
+   while there are two). Include inside {% with lang_switch_class='...' %}. #}
+{% for lang in SUPPORTED_LANGUAGES if lang != current_lang %}
+<a class="lang-switch {{ lang_switch_class }}" href="{{ language_switch_url(lang) }}"
+   hreflang="{{ lang }}" lang="{{ lang }}" title="{{ LANGUAGE_NAMES[lang] }}" aria-label="{{ LANGUAGE_NAMES[lang] }}">
+    <i class="fa-solid fa-globe" aria-hidden="true"></i>
+    <span class="lang-switch__name">{{ LANGUAGE_NAMES[lang] }}</span>
+    <span class="lang-switch__code">{{ lang | upper }}</span>
+</a>
+{% endfor %}

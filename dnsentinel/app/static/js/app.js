@@ -13,6 +13,8 @@
                                 (optional: data-confirm-title, data-confirm-button,
                                 data-confirm-icon = Font Awesome icon name)
    [data-current-year]          filled with the current year
+
+   Also exposes window.t(key, vars) for localized UI strings (see i18n below).
    ========================================================================== */
 (function () {
   'use strict';
@@ -22,6 +24,35 @@
   var SIDEBAR_KEY = 'dnsentinel.sidebar';
   // Must match the breakpoint in layout.css
   var desktopQuery = window.matchMedia('(min-width: 1025px)');
+
+  /* ---- i18n -------------------------------------------------------------
+     The server embeds the js.* strings (app/i18n/strings/js.py), already in
+     the page language, as JSON in <script id="i18n-data">. Placeholders
+     look like {name}; plural entries are picked with vars.count. */
+  var STRINGS = {};
+  try {
+    STRINGS = JSON.parse(document.getElementById('i18n-data').textContent);
+  } catch (err) { /* no data: t() falls back to the key */ }
+
+  function t(key, vars) {
+    var text = STRINGS[key];
+    if (text === undefined || text === null) return key;
+    if (typeof text === 'object') text = vars && vars.count === 1 ? text.one : text.other;
+    if (!vars) return text;
+    return text.replace(/\{(\w+)\}/g, function (match, name) {
+      return Object.prototype.hasOwnProperty.call(vars, name) ? String(vars[name]) : match;
+    });
+  }
+  window.t = t;
+
+  /* SweetAlert2 (admin pages load it before this file) gets localized
+     default buttons, so every Swal.fire() in the templates inherits them. */
+  if (window.Swal) {
+    window.Swal = window.Swal.mixin({
+      confirmButtonText: t('js.common.ok'),
+      cancelButtonText: t('js.common.cancel')
+    });
+  }
 
   /* ---- Clipboard --------------------------------------------------------
      navigator.clipboard only exists in secure contexts (HTTPS / localhost).
@@ -71,8 +102,9 @@
     value.textContent = reveal ? value.dataset.secret : MASK;
     value.classList.toggle('is-masked', !reveal);
     btn.setAttribute('aria-pressed', String(reveal));
-    btn.setAttribute('aria-label', reveal ? 'Hide token' : 'Show token');
-    btn.title = reveal ? 'Hide token' : 'Show token';
+    var label = reveal ? t('js.common.hide_token') : t('js.common.show_token');
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
     var icon = btn.querySelector('i');
     if (icon) icon.className = reveal ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
   }
@@ -101,10 +133,11 @@
 
   function syncSidebarToggles() {
     var open = isSidebarOpen();
+    var label = open ? t('js.layout.hide_navigation') : t('js.layout.show_navigation');
     document.querySelectorAll('[data-sidebar-toggle]').forEach(function (btn) {
       btn.setAttribute('aria-expanded', String(open));
-      btn.setAttribute('aria-label', open ? 'Hide navigation' : 'Show navigation');
-      btn.title = open ? 'Hide navigation' : 'Show navigation';
+      btn.setAttribute('aria-label', label);
+      btn.title = label;
     });
   }
 
@@ -151,12 +184,11 @@
     }
 
     var options = {
-      title: link.dataset.confirmTitle || 'Are you sure?',
+      title: link.dataset.confirmTitle || t('js.common.are_you_sure'),
       text: message,
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: link.dataset.confirmButton || 'Confirm',
-      cancelButtonText: 'Cancel',
+      confirmButtonText: link.dataset.confirmButton || t('js.common.confirm'),
       reverseButtons: true,
       focusCancel: true
     };

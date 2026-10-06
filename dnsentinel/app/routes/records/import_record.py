@@ -3,21 +3,22 @@ from flask import jsonify, request
 from flask_login import login_required
 from app.models.models import db, Zone, Record
 from datetime import datetime
+from app.i18n import t
 
 @records_bp.route('/<zone_id>/records/import', methods=['POST'])
 @login_required
 def import_record(zone_id):
     zone = Zone.query.filter_by(zone_id=zone_id).first()
     if not zone:
-        return jsonify({'error': 'Zone not found'}), 404
+        return jsonify({'error': t('records.api.zone_not_found')}), 404
 
     data = request.get_json()
     if not data:
-        return jsonify({'error': 'Invalid JSON'}), 400
+        return jsonify({'error': t('records.api.invalid_json')}), 400
 
     existing_record = Record.query.filter_by(zone_id_fk=zone.id, name=data.get('name')).first()
     if existing_record:
-        return jsonify({'error': 'A record with this name already exists in the zone'}), 409
+        return jsonify({'error': t('records.api.name_exists')}), 409
 
     try:
         record = Record(
@@ -52,12 +53,12 @@ def check_existing_records(zone_id):
     """
     zone = Zone.query.filter_by(zone_id=zone_id).first()
     if not zone:
-        return jsonify({'error': 'Zone not found'}), 404
+        return jsonify({'error': t('records.api.zone_not_found')}), 404
 
     data = request.get_json()
     record_ids = data.get('record_ids', [])
     if not isinstance(record_ids, list):
-        return jsonify({'error': 'Invalid record_ids'}), 400
+        return jsonify({'error': t('records.api.invalid_ids')}), 400
 
     existing = Record.query.filter(
         Record.zone_id_fk == zone.id,
@@ -79,7 +80,7 @@ def import_bulk_records(zone_id):
     """
     zone = Zone.query.filter_by(zone_id=zone_id).first()
     if not zone:
-        return jsonify({'error': 'Zone not found'}), 404
+        return jsonify({'error': t('records.api.zone_not_found')}), 404
 
     data = request.get_json()
     records = data.get('records', [])

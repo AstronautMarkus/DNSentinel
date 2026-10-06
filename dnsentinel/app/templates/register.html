@@ -1,39 +1,39 @@
 {% extends 'base/base.html' %}
-{% block title %}Create account{% endblock %}
+{% block title %}{{ t('common.create_account') }}{% endblock %}
 {% block content %}
 <section class="auth">
     <div class="auth__card">
         <img class="auth__logo" src="{{ url_for('static', filename='img/DNSentinel.svg') }}" alt="DNSentinel">
-        <h1 class="auth__title">Create account</h1>
-        <p class="auth__subtitle">Create your DNSentinel account.</p>
+        <h1 class="auth__title">{{ t('common.create_account') }}</h1>
+        <p class="auth__subtitle">{{ t('auth.register.subtitle') }}</p>
 
         <form method="post" class="form">
             <div class="field">
-                <label for="name" class="field__label">Name<span class="field__required" aria-hidden="true">*</span></label>
+                <label for="name" class="field__label">{{ t('common.name') }}<span class="field__required" aria-hidden="true">*</span></label>
                 <div class="input-group">
                     <i class="fa-solid fa-user input-group__icon" aria-hidden="true"></i>
-                    <input type="text" class="input" id="name" name="name" required autocomplete="name" placeholder="John Doe">
+                    <input type="text" class="input" id="name" name="name" required autocomplete="name" placeholder="{{ t('auth.name_placeholder') }}">
                 </div>
             </div>
             <div class="field">
-                <label for="email" class="field__label">Email<span class="field__required" aria-hidden="true">*</span></label>
+                <label for="email" class="field__label">{{ t('auth.email') }}<span class="field__required" aria-hidden="true">*</span></label>
                 <div class="input-group">
                     <i class="fa-solid fa-envelope input-group__icon" aria-hidden="true"></i>
-                    <input type="email" class="input" id="email" name="email" required autocomplete="email" placeholder="john@example.com">
+                    <input type="email" class="input" id="email" name="email" required autocomplete="email" placeholder="{{ t('auth.email_placeholder') }}">
                 </div>
             </div>
             <div class="field">
-                <label for="password" class="field__label">Password<span class="field__required" aria-hidden="true">*</span></label>
+                <label for="password" class="field__label">{{ t('auth.password') }}<span class="field__required" aria-hidden="true">*</span></label>
                 <div class="input-group">
                     <i class="fa-solid fa-lock input-group__icon" aria-hidden="true"></i>
                     <input type="password" class="input" id="password" name="password" required
                            autocomplete="new-password" placeholder="••••••••">
                 </div>
             </div>
-            <button type="submit" class="btn btn--primary btn--lg btn--block">Create account</button>
+            <button type="submit" class="btn btn--primary btn--lg btn--block">{{ t('common.create_account') }}</button>
         </form>
 
-        <p class="auth__footer">Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a></p>
+        <p class="auth__footer">{{ t('auth.register.has_account') }} <a href="{{ url_for('auth.login') }}">{{ t('common.sign_in') }}</a></p>
     </div>
 </section>
 {% endblock %}

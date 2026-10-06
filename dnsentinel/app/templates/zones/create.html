@@ -1,13 +1,13 @@
 {% extends 'base/admin_base.html' %}
 {% import 'base/partials/macros.html' as ui %}
-{% block title %}Add a Zone{% endblock %}
+{% block title %}{{ t('zones.create.title') }}{% endblock %}
 {% block content %}
 
 <div class="page-header">
     <div class="page-header__main">
-        {{ ui.breadcrumb([('DNS zones', url_for('zones.list_zones')), ('Add zone', none)]) }}
-        <h1 class="page-title">Add Cloudflare DNS zone</h1>
-        <p class="page-subtitle">Fill out the form below to add a Cloudflare DNS zone in DNSentinel.</p>
+        {{ ui.breadcrumb([(t('common.dns_zones'), url_for('zones.list_zones')), (t('common.add_zone'), none)]) }}
+        <h1 class="page-title">{{ t('zones.create.heading') }}</h1>
+        <p class="page-subtitle">{{ t('zones.create.subtitle') }}</p>
     </div>
 </div>
 
@@ -16,38 +16,38 @@
         <div class="card__header">
             <h2 class="card__title">
                 <img class="cf-logo" src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="">
-                Zone credentials
+                {{ t('zones.create.credentials') }}
             </h2>
         </div>
         <div class="card__body form">
             <div class="field">
-                <label for="zone_id" class="field__label">Zone ID<span class="field__required" aria-hidden="true">*</span></label>
+                <label for="zone_id" class="field__label">{{ t('common.zone_id') }}<span class="field__required" aria-hidden="true">*</span></label>
                 <div class="input-group">
                     <i class="fa-solid fa-fingerprint input-group__icon" aria-hidden="true"></i>
                     <input class="input input--mono" type="text" id="zone_id" name="zone_id" placeholder="023e105f4ecef8ad9ca31a8372d0c353"
                            required autocomplete="off" spellcheck="false">
                 </div>
-                <p class="field__hint">The zone identifier shown on the zone's Overview page in Cloudflare.</p>
+                <p class="field__hint">{{ t('zones.create.zone_id_hint') }}</p>
             </div>
             <div class="field">
-                <label for="api_token" class="field__label">API token<span class="field__required" aria-hidden="true">*</span></label>
+                <label for="api_token" class="field__label">{{ t('common.api_token') }}<span class="field__required" aria-hidden="true">*</span></label>
                 <div class="input-group">
                     <i class="fa-solid fa-key input-group__icon" aria-hidden="true"></i>
-                    <input class="input input--mono" type="text" id="api_token" name="api_token" placeholder="API token"
+                    <input class="input input--mono" type="text" id="api_token" name="api_token" placeholder="{{ t('common.api_token') }}"
                            required autocomplete="off" spellcheck="false">
                 </div>
-                <p class="field__hint">Credentials are validated against Cloudflare before the zone is created.</p>
+                <p class="field__hint">{{ t('zones.create.token_hint') }}</p>
             </div>
         </div>
         <div class="card__footer">
-            <a class="btn" href="{{ url_for('zones.list_zones') }}">Cancel</a>
+            <a class="btn" href="{{ url_for('zones.list_zones') }}">{{ t('common.cancel') }}</a>
             <button id="validateBtn" class="btn btn--primary" type="button">
                 <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-                <span>Validate credentials</span>
+                <span>{{ t('zones.create.validate') }}</span>
             </button>
             <button id="createBtn" class="btn btn--success" type="submit" hidden>
                 <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                <span>Create zone</span>
+                <span>{{ t('zones.create.submit') }}</span>
             </button>
         </div>
     </form>
@@ -56,7 +56,7 @@
         <div class="card__header">
             <h2 class="card__title">
                 <i class="fa-solid fa-circle-question text-muted" aria-hidden="true"></i>
-                Where to find these
+                {{ t('zones.create.help_title') }}
             </h2>
         </div>
         <div class="card__body">
@@ -64,22 +64,22 @@
                 <li>
                     <span class="help-list__step">1</span>
                     <div>
-                        <strong>Zone ID</strong>
-                        In the Cloudflare dashboard, open your domain. The Zone ID is in the API section of the Overview page.
+                        <strong>{{ t('common.zone_id') }}</strong>
+                        {{ t('zones.create.help_zone_id') }}
                     </div>
                 </li>
                 <li>
                     <span class="help-list__step">2</span>
                     <div>
-                        <strong>API token</strong>
-                        Go to My Profile → API Tokens and create a token with access to this zone.
+                        <strong>{{ t('common.api_token') }}</strong>
+                        {{ t('zones.create.help_token') }}
                     </div>
                 </li>
                 <li>
                     <span class="help-list__step">3</span>
                     <div>
-                        <strong>Validate, then create</strong>
-                        DNSentinel checks the credentials with Cloudflare before the zone can be created.
+                        <strong>{{ t('zones.create.help_validate_title') }}</strong>
+                        {{ t('zones.create.help_validate') }}
                     </div>
                 </li>
             </ol>
@@ -105,8 +105,8 @@
       const api_token = form.elements['api_token'].value;
 
       Swal.fire({
-        title: 'Validating...',
-        text: 'Checking credentials with Cloudflare',
+        title: t('js.zones.validating'),
+        text: t('js.zones.validating_text'),
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
@@ -123,9 +123,8 @@
           if (data.ok) {
             Swal.fire({
               icon: 'success',
-              title: 'Validated!',
+              title: t('js.zones.validated'),
               html: `<p>${data.msg}</p>`,
-              confirmButtonText: 'OK',
               allowOutsideClick: false
             }).then(() => {
               validated = true;
@@ -135,9 +134,8 @@
           } else {
             Swal.fire({
               icon: 'error',
-              title: 'Validation Error',
+              title: t('js.zones.validation_error'),
               html: `<p>${data.msg}</p>`,
-              confirmButtonText: 'OK',
               allowOutsideClick: false
             });
           }
@@ -145,9 +143,8 @@
         .catch(() => {
           Swal.fire({
             icon: 'error',
-            title: 'Error',
-            html: '<p>Could not validate. Please try again or check your connection.</p>',
-            confirmButtonText: 'OK',
+            title: t('js.common.error'),
+            html: `<p>${t('js.zones.validation_failed')}</p>`,
             allowOutsideClick: false
           });
         });
@@ -158,8 +155,7 @@
         e.preventDefault();
         Swal.fire({
           icon: 'warning',
-          title: 'Please validate credentials first',
-          confirmButtonText: 'OK'
+          title: t('js.zones.validate_first')
         });
       }
     });

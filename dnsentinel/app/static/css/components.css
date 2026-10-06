@@ -713,6 +713,29 @@ a.table__primary:hover {
   }
 }
 
+/* ---- Language switcher -------------------------------------------------
+   Full language name on wide screens, the two-letter code on narrow ones. */
+
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.lang-switch__code {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .lang-switch__name {
+    display: none;
+  }
+
+  .lang-switch__code {
+    display: inline;
+  }
+}
+
 /* ==========================================================================
    Toasts (flash messages) & inline alerts
    ========================================================================== */

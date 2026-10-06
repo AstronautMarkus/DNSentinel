@@ -1,70 +1,70 @@
 {% extends 'base/admin_base.html' %}
 {% import 'base/partials/macros.html' as ui %}
-{% block title %}Dashboard{% endblock %}
+{% block title %}{{ t('nav.dashboard') }}{% endblock %}
 {% block content %}
 
 <div class="page-header">
     <div class="page-header__main">
-        <h1 class="page-title">Welcome back, {{ current_user.name }}</h1>
-        <p class="page-subtitle">Your DNS and IP status at a glance.</p>
+        <h1 class="page-title">{{ t('dashboard.welcome', name=current_user.name) }}</h1>
+        <p class="page-subtitle">{{ t('dashboard.subtitle') }}</p>
     </div>
     <div class="page-header__actions">
         <a href="{{ url_for('zones.list_zones') }}" class="btn">
             <i class="fa-solid fa-cloud" aria-hidden="true"></i>
-            <span>View zones</span>
+            <span>{{ t('dashboard.view_zones') }}</span>
         </a>
         <a href="{{ url_for('zones.create_zone') }}" class="btn btn--primary">
             <i class="fa-solid fa-plus" aria-hidden="true"></i>
-            <span>Add zone</span>
+            <span>{{ t('common.add_zone') }}</span>
         </a>
     </div>
 </div>
 
 <div class="stack">
-    <section class="grid grid--2" aria-label="Network addresses">
+    <section class="grid grid--2" aria-label="{{ t('dashboard.network_addresses') }}">
         <div class="card ip-card">
             <span class="ip-card__icon"><i class="fa-solid fa-globe" aria-hidden="true"></i></span>
             <div class="ip-card__body">
-                <p class="ip-card__label">Public IP address (ISP)</p>
+                <p class="ip-card__label">{{ t('dashboard.public_ip') }}</p>
                 <p class="ip-card__value">{{ isp_ip }}</p>
             </div>
-            {{ ui.copy_button(isp_ip, 'Copy public IP') }}
+            {{ ui.copy_button(isp_ip, t('dashboard.copy_public_ip')) }}
         </div>
         <div class="card ip-card">
             <span class="ip-card__icon"><i class="fa-solid fa-ethernet" aria-hidden="true"></i></span>
             <div class="ip-card__body">
-                <p class="ip-card__label">Local IP address (Ethernet)</p>
+                <p class="ip-card__label">{{ t('dashboard.local_ip') }}</p>
                 <p class="ip-card__value">{{ ethernet_ip }}</p>
             </div>
-            {{ ui.copy_button(ethernet_ip, 'Copy local IP') }}
+            {{ ui.copy_button(ethernet_ip, t('dashboard.copy_local_ip')) }}
         </div>
     </section>
 
-    <section class="grid grid--4" aria-label="Summary">
+    <section class="grid grid--4" aria-label="{{ t('dashboard.summary') }}">
         <div class="card stat">
             <div class="stat__head">
-                <p class="stat__label">Zones</p>
+                <p class="stat__label">{{ t('dashboard.zones') }}</p>
                 <span class="stat__icon"><i class="fa-solid fa-cloud" aria-hidden="true"></i></span>
             </div>
             <p class="stat__value">{{ user_zones|length }}</p>
         </div>
         <div class="card stat">
             <div class="stat__head">
-                <p class="stat__label">Alerts</p>
+                <p class="stat__label">{{ t('dashboard.alerts') }}</p>
                 <span class="stat__icon"><i class="fa-solid fa-bell" aria-hidden="true"></i></span>
             </div>
             <p class="stat__value">3</p>
         </div>
         <div class="card stat">
             <div class="stat__head">
-                <p class="stat__label">Updates</p>
+                <p class="stat__label">{{ t('dashboard.updates') }}</p>
                 <span class="stat__icon"><i class="fa-solid fa-rotate" aria-hidden="true"></i></span>
             </div>
             <p class="stat__value">5</p>
         </div>
         <div class="card stat">
             <div class="stat__head">
-                <p class="stat__label">Users</p>
+                <p class="stat__label">{{ t('dashboard.users') }}</p>
                 <span class="stat__icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
             </div>
             <p class="stat__value">2</p>
@@ -76,21 +76,21 @@
             <div class="card__header">
                 <h2 class="card__title">
                     <img class="cf-logo" src="{{ url_for('static', filename='img/Cloudflare_Logo.png') }}" alt="">
-                    Cloudflare DNS zones
+                    {{ t('dashboard.cf_zones') }}
                 </h2>
                 <a href="{{ url_for('zones.list_zones') }}" class="card__link">
-                    View all <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    {{ t('common.view_all') }} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                 </a>
             </div>
             <div class="table-wrap">
                 <table class="table table--compact">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Zone ID</th>
-                            <th>API token</th>
-                            <th>Records</th>
-                            <th>Created</th>
+                            <th>{{ t('common.name') }}</th>
+                            <th>{{ t('common.zone_id') }}</th>
+                            <th>{{ t('common.api_token') }}</th>
+                            <th>{{ t('dashboard.records') }}</th>
+                            <th>{{ t('common.created') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -101,7 +101,7 @@
                                     <i class="fa-solid fa-globe" aria-hidden="true"></i>{{ zone.name }}
                                 </a>
                             </td>
-                            <td>{{ ui.copyable(zone.zone_id, 'Copy zone ID') }}</td>
+                            <td>{{ ui.copyable(zone.zone_id, t('common.copy_zone_id')) }}</td>
                             <td>{{ ui.secret(zone.api_token) }}</td>
                             <td class="tabular">{{ user_records }}</td>
                             <td class="col-date">{{ ui.date(zone.created_at) }}</td>
@@ -109,9 +109,8 @@
                         {% else %}
                         <tr class="is-empty">
                             <td colspan="5">
-                                {{ ui.empty_state('fa-cloud', 'No zones yet',
-                                    'Connect a Cloudflare zone to start keeping its DNS records in sync.',
-                                    url_for('zones.create_zone'), 'Add zone') }}
+                                {{ ui.empty_state('fa-cloud', t('common.no_zones'), t('dashboard.empty_text'),
+                                    url_for('zones.create_zone'), t('common.add_zone')) }}
                             </td>
                         </tr>
                         {% endfor %}
@@ -123,13 +122,13 @@
         <div class="card">
             <div class="card__header">
                 <div>
-                    <h2 class="card__title">Alerts this week</h2>
-                    <p class="card__description">Daily alert count, last 7 days</p>
+                    <h2 class="card__title">{{ t('dashboard.alerts_week') }}</h2>
+                    <p class="card__description">{{ t('dashboard.alerts_desc') }}</p>
                 </div>
             </div>
             <div class="card__body">
                 <div class="chart">
-                    <canvas id="alertsChart" role="img" aria-label="Line chart of alerts per day this week"></canvas>
+                    <canvas id="alertsChart" role="img" aria-label="{{ t('dashboard.chart_label') }}"></canvas>
                 </div>
                 <p class="chart-summary" id="alertsSummary"></p>
             </div>
@@ -143,7 +142,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    var labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    // Mon–Sun short names in the page language (1 Jan 2024 was a Monday).
+    var weekday = new Intl.DateTimeFormat(document.documentElement.lang, { weekday: 'short' });
+    var labels = [0, 1, 2, 3, 4, 5, 6].map(function (i) { return weekday.format(new Date(2024, 0, 1 + i)); });
     var values = [0, 1, 0, 2, 1, 0, 3];
 
     // Chart colors come from the design tokens so the chart follows the theme.
@@ -188,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Alerts',
+                label: t('js.dashboard.series'),
                 data: values,
                 borderColor: series,
                 backgroundColor: withAlpha(series, 0.1),
@@ -220,8 +221,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     bodyFont: { family: font.family, size: 12 },
                     callbacks: {
                         label: function (ctx) {
-                            var n = ctx.parsed.y;
-                            return n + (n === 1 ? ' alert' : ' alerts');
+                            return t('js.dashboard.alerts', { count: ctx.parsed.y });
                         }
                     }
                 }
@@ -246,8 +246,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var total = values.reduce(function (a, b) { return a + b; }, 0);
     var peak = Math.max.apply(null, values);
     document.getElementById('alertsSummary').innerHTML =
-        '<span>Total: <strong>' + total + '</strong></span>' +
-        '<span>Peak: <strong>' + peak + '</strong> on ' + labels[values.indexOf(peak)] + '</span>';
+        '<span>' + t('js.dashboard.total', { value: '<strong>' + total + '</strong>' }) + '</span>' +
+        '<span>' + t('js.dashboard.peak', { value: '<strong>' + peak + '</strong>', day: labels[values.indexOf(peak)] }) + '</span>';
 });
 </script>
 {% endblock %}

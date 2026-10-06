@@ -6,17 +6,17 @@
                     <img class="brand__logo" src="{{ url_for('static', filename='img/DNSentinel.svg') }}" alt="">
                     <span>DNSentinel</span>
                 </a>
-                <p class="site-footer__tagline">Autonomous Cloudflare DNS manager that keeps your records in sync with your dynamic IP address.</p>
+                <p class="site-footer__tagline">{{ t('layout.tagline') }}</p>
             </div>
-            <nav class="site-footer__links" aria-label="Footer">
-                <a href="{{ url_for('auth.login') }}">Sign in</a>
-                <a href="{{ url_for('auth.register') }}">Create account</a>
+            <nav class="site-footer__links" aria-label="{{ t('nav.footer') }}">
+                <a href="{{ url_for('auth.login') }}">{{ t('common.sign_in') }}</a>
+                <a href="{{ url_for('auth.register') }}">{{ t('common.create_account') }}</a>
                 <a href="https://github.com/astronautmarkus" target="_blank" rel="noopener">GitHub</a>
             </nav>
         </div>
         <div class="site-footer__bottom">
-            <span>&copy; <span data-current-year></span> DNSentinel. All rights reserved.</span>
-            <span>Created by <a href="https://github.com/astronautmarkus" target="_blank" rel="noopener"><strong>AstronautMarkusDev</strong></a></span>
+            <span>&copy; <span data-current-year></span> DNSentinel. {{ t('layout.rights_reserved') }}</span>
+            <span>{{ t('layout.created_by') }} <a href="https://github.com/astronautmarkus" target="_blank" rel="noopener"><strong>AstronautMarkusDev</strong></a></span>
         </div>
     </div>
 </footer>

@@ -4,6 +4,7 @@ import requests
 import socket
 from flask_login import current_user, login_required
 from app.models.models import Zone, Record
+from app.i18n import t
 
 
 @dashboard_bp.route('/home')
@@ -13,7 +14,7 @@ def home():
     try:
         isp_ip = requests.get('https://api.ipify.org').text
     except:
-        isp_ip = "Not connected to Internet"
+        isp_ip = t('dashboard.no_internet')
 
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:

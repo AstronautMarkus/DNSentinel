@@ -7,6 +7,7 @@ from app.routes.zones import zones_bp
 from app.routes.records import records_bp
 from flask_login import LoginManager
 from app.models.models import User, db
+from app.i18n import init_i18n
 
 login_manager = LoginManager()
 
@@ -21,7 +22,9 @@ def create_app():
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
-    
+
+    init_i18n(app)
+
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')

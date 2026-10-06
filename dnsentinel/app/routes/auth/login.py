@@ -3,6 +3,7 @@ from app.models.models import User
 from app.routes.auth import auth_bp
 from werkzeug.security import check_password_hash
 from flask_login import login_user
+from app.i18n import t
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -13,9 +14,9 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
-            flash(f'Login successful. Welcome, {user.name}!', 'success')
+            flash(t('auth.flash.login_success', name=user.name), 'success')
             return redirect(url_for('dashboard.home'))
         else:
-            flash('Email or password is incorrect. Please try again.', 'danger')
+            flash(t('auth.flash.login_failed'), 'danger')
             return render_template('login.html', email=email)
     return render_template('login.html', email=email)

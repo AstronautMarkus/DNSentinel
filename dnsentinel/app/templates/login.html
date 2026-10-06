@@ -1,33 +1,33 @@
 {% extends 'base/base.html' %}
-{% block title %}Sign in{% endblock %}
+{% block title %}{{ t('common.sign_in') }}{% endblock %}
 {% block content %}
 <section class="auth">
     <div class="auth__card">
         <img class="auth__logo" src="{{ url_for('static', filename='img/DNSentinel.svg') }}" alt="DNSentinel">
-        <h1 class="auth__title">Sign in</h1>
-        <p class="auth__subtitle">Sign in to your DNSentinel account.</p>
+        <h1 class="auth__title">{{ t('common.sign_in') }}</h1>
+        <p class="auth__subtitle">{{ t('auth.login.subtitle') }}</p>
 
         <form method="post" class="form">
             <div class="field">
-                <label for="email" class="field__label">Email<span class="field__required" aria-hidden="true">*</span></label>
+                <label for="email" class="field__label">{{ t('auth.email') }}<span class="field__required" aria-hidden="true">*</span></label>
                 <div class="input-group">
                     <i class="fa-solid fa-envelope input-group__icon" aria-hidden="true"></i>
                     <input type="email" class="input" id="email" name="email" required autocomplete="email"
-                           placeholder="john@example.com" value="{{ email|default('') }}">
+                           placeholder="{{ t('auth.email_placeholder') }}" value="{{ email|default('') }}">
                 </div>
             </div>
             <div class="field">
-                <label for="password" class="field__label">Password<span class="field__required" aria-hidden="true">*</span></label>
+                <label for="password" class="field__label">{{ t('auth.password') }}<span class="field__required" aria-hidden="true">*</span></label>
                 <div class="input-group">
                     <i class="fa-solid fa-lock input-group__icon" aria-hidden="true"></i>
                     <input type="password" class="input" id="password" name="password" required
                            autocomplete="current-password" placeholder="••••••••">
                 </div>
             </div>
-            <button type="submit" class="btn btn--primary btn--lg btn--block">Sign in</button>
+            <button type="submit" class="btn btn--primary btn--lg btn--block">{{ t('common.sign_in') }}</button>
         </form>
 
-        <p class="auth__footer">Don't have an account? <a href="{{ url_for('auth.register') }}">Create one</a></p>
+        <p class="auth__footer">{{ t('auth.login.no_account') }} <a href="{{ url_for('auth.register') }}">{{ t('auth.login.create_one') }}</a></p>
     </div>
 </section>
 {% endblock %}

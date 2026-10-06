@@ -1,42 +1,42 @@
 {% extends 'base/admin_base.html' %}
 {% import 'base/partials/macros.html' as ui %}
-{% block title %}DNS Records{% endblock %}
+{% block title %}{{ t('records.list.title') }}{% endblock %}
 {% block content %}
 
 <div class="page-header">
     <div class="page-header__main">
         {{ ui.breadcrumb([
-            ('DNS zones', url_for('zones.list_zones')),
+            (t('common.dns_zones'), url_for('zones.list_zones')),
             (zone.name, url_for('zones.zone_detail', zone_id=zone_id)),
-            ('DNS records', none)
+            (t('common.dns_records'), none)
         ]) }}
-        <h1 class="page-title">DNS records</h1>
-        <p class="page-subtitle">DNS record list from the <strong>{{ zone.name }}</strong> zone.</p>
+        <h1 class="page-title">{{ t('common.dns_records') }}</h1>
+        <p class="page-subtitle">{{ t('records.list.subtitle_html', zone=zone.name) }}</p>
     </div>
     <div class="page-header__actions">
         <a href="{{ url_for('zones.zone_detail', zone_id=zone_id) }}" class="btn">
             <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-            <span>Back to zone</span>
+            <span>{{ t('records.list.back') }}</span>
         </a>
         <div class="dropdown dropdown--right" id="addDropdown" data-dropdown>
             <button type="button" class="btn btn--primary" data-dropdown-toggle aria-haspopup="menu" aria-expanded="false">
                 <i class="fa-solid fa-file-import" aria-hidden="true"></i>
-                <span>Import records</span>
+                <span>{{ t('records.list.import') }}</span>
                 <i class="fa-solid fa-chevron-down btn__caret" aria-hidden="true"></i>
             </button>
             <div class="dropdown__menu" role="menu">
                 <a href="#" class="dropdown__item" id="addSingleBtn" role="menuitem">
                     <i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i>
                     <span>
-                        <span class="dropdown__item-title">Single record</span>
-                        <span class="dropdown__item-desc">Pick one record from Cloudflare</span>
+                        <span class="dropdown__item-title">{{ t('records.list.single') }}</span>
+                        <span class="dropdown__item-desc">{{ t('records.list.single_desc') }}</span>
                     </span>
                 </a>
                 <a href="#" class="dropdown__item" id="addFullListBtn" role="menuitem">
                     <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
                     <span>
-                        <span class="dropdown__item-title">Full list</span>
-                        <span class="dropdown__item-desc">Import every record in the zone</span>
+                        <span class="dropdown__item-title">{{ t('records.list.full') }}</span>
+                        <span class="dropdown__item-desc">{{ t('records.list.full_desc') }}</span>
                     </span>
                 </a>
             </div>
@@ -48,7 +48,7 @@
     <div class="card__header">
         <h2 class="card__title">
             <i class="fa-solid fa-database text-muted" aria-hidden="true"></i>
-            Imported records
+            {{ t('records.list.imported') }}
             <span class="badge">{{ records|length }}</span>
         </h2>
     </div>
@@ -56,15 +56,15 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Content</th>
+                    <th>{{ t('common.name') }}</th>
+                    <th>{{ t('common.type') }}</th>
+                    <th>{{ t('common.content') }}</th>
                     <th>TTL</th>
-                    <th>Proxy status</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th>Modified</th>
-                    <th class="col-actions"><span class="visually-hidden">Actions</span></th>
+                    <th>{{ t('records.proxy_status') }}</th>
+                    <th>{{ t('common.status') }}</th>
+                    <th>{{ t('common.created') }}</th>
+                    <th>{{ t('common.modified') }}</th>
+                    <th class="col-actions"><span class="visually-hidden">{{ t('common.actions') }}</span></th>
                 </tr>
             </thead>
             <tbody>
@@ -79,7 +79,7 @@
                     <td>
                         <span class="table__content truncate mono" title="{{ record.content or '' }}">{{ record.content or '—' }}</span>
                     </td>
-                    <td class="tabular nowrap">{{ 'Auto' if record.ttl == 1 else record.ttl }}</td>
+                    <td class="tabular nowrap">{{ t('records.ttl_auto') if record.ttl == 1 else record.ttl }}</td>
                     <td>{{ ui.proxy_status(record.proxied) }}</td>
                     <td>{{ ui.record_status(record.active) }}</td>
                     <td class="col-date">{{ ui.date(record.created_on) }}</td>
@@ -87,13 +87,13 @@
                     <td class="col-actions">
                         <div class="btn-group">
                             <a href="{{ url_for('records.detail_record', record_id=record.record_id, zone_id=zone_id) }}"
-                               class="btn btn--ghost btn--icon btn--sm" title="View" aria-label="View {{ record.name }}">
+                               class="btn btn--ghost btn--icon btn--sm" title="{{ t('records.list.view') }}" aria-label="{{ t('records.list.view_record', name=record.name) }}">
                                 <i class="fa-regular fa-eye" aria-hidden="true"></i>
                             </a>
-                            <a href="#" class="btn btn--ghost btn--icon btn--sm" title="Edit" aria-label="Edit {{ record.name }}">
+                            <a href="#" class="btn btn--ghost btn--icon btn--sm" title="{{ t('records.list.edit') }}" aria-label="{{ t('records.list.edit_record', name=record.name) }}">
                                 <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
                             </a>
-                            <a href="#" class="btn btn--ghost btn--ghost-danger btn--icon btn--sm" title="Delete" aria-label="Delete {{ record.name }}">
+                            <a href="#" class="btn btn--ghost btn--ghost-danger btn--icon btn--sm" title="{{ t('records.list.delete') }}" aria-label="{{ t('records.list.delete_record', name=record.name) }}">
                                 <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
                             </a>
                         </div>
@@ -102,8 +102,7 @@
                 {% else %}
                 <tr class="is-empty">
                     <td colspan="9">
-                        {{ ui.empty_state('fa-database', 'No records available',
-                            'Import records from Cloudflare to start managing them with DNSentinel.') }}
+                        {{ ui.empty_state('fa-database', t('records.list.empty_title'), t('records.list.empty_text')) }}
                     </td>
                 </tr>
                 {% endfor %}
@@ -127,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('addSingleBtn').addEventListener('click', async function(e) {
     e.preventDefault();
     Swal.fire({
-      title: 'Fetching Cloudflare records...',
+      title: t('js.records.fetching'),
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
@@ -135,17 +134,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     try {
       const resp = await fetch(cloudflareUrl);
-      if (!resp.ok) throw new Error('Failed to fetch records');
+      if (!resp.ok) throw new Error(t('js.records.fetch_failed'));
       const data = await resp.json();
       if (!data.result || !Array.isArray(data.result) || data.result.length === 0) {
-        Swal.fire('No records found', '', 'info');
+        Swal.fire(t('js.records.none_found'), '', 'info');
         return;
       }
       const options = data.result.map(r => {
         return `<option value="${r.id}">${r.type} - ${r.name} (${r.content})</option>`;
       }).join('');
       const { value: selectedId } = await Swal.fire({
-        title: 'Select a record to import',
+        title: t('js.records.select_one'),
         width: '40em',
         html: `<select id="swal-record-select" class="swal2-select" style="width:90%;max-width:400px;">${options}</select>`,
         focusConfirm: false,
@@ -158,18 +157,18 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!selectedId) return;
       const selectedRecord = data.result.find(r => r.id === selectedId);
       if (!selectedRecord) {
-        Swal.fire('Record not found', '', 'error');
+        Swal.fire(t('js.records.not_found'), '', 'error');
         return;
       }
       const confirm = await Swal.fire({
-        title: 'Import this record?',
+        title: t('js.records.confirm_single'),
         html: `<pre style="text-align:left">${JSON.stringify(selectedRecord, null, 2)}</pre>`,
         showCancelButton: true,
-        confirmButtonText: 'Import'
+        confirmButtonText: t('js.records.import')
       });
       if (!confirm.isConfirmed) return;
       Swal.fire({
-        title: 'Importing...',
+        title: t('js.records.importing'),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
       });
@@ -180,29 +179,29 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       if (!importResp.ok) {
         const err = await importResp.json().catch(() => ({}));
-        Swal.fire('Error', err.error || 'Failed to import', 'error');
+        Swal.fire(t('js.common.error'), err.error || t('js.records.import_failed'), 'error');
         return;
       }
-      Swal.fire('Imported!', '', 'success').then(() => window.location.reload());
+      Swal.fire(t('js.records.imported'), '', 'success').then(() => window.location.reload());
     } catch (err) {
-      Swal.fire('Error', err.message || 'Unexpected error', 'error');
+      Swal.fire(t('js.common.error'), err.message || t('js.common.unexpected_error'), 'error');
     }
   });
 
   document.getElementById('addFullListBtn').addEventListener('click', async function(e) {
     e.preventDefault();
     Swal.fire({
-      title: 'Fetching Cloudflare records...',
+      title: t('js.records.fetching'),
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading()
     });
     try {
       // 1. Get all records from Cloudflare
       const resp = await fetch(cloudflareUrl);
-      if (!resp.ok) throw new Error('Failed to fetch records');
+      if (!resp.ok) throw new Error(t('js.records.fetch_failed'));
       const data = await resp.json();
       if (!data.result || !Array.isArray(data.result) || data.result.length === 0) {
-        Swal.fire('No records found', '', 'info');
+        Swal.fire(t('js.records.none_found'), '', 'info');
         return;
       }
       // 2. Ask backend which records already exist
@@ -212,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ record_ids: recordIds })
       });
-      if (!checkResp.ok) throw new Error('Failed to check existing records');
+      if (!checkResp.ok) throw new Error(t('js.records.check_failed'));
       const checkData = await checkResp.json();
       const existing = checkData.existing || [];
       // 3. If some exist, ask user what to do
@@ -220,14 +219,13 @@ document.addEventListener('DOMContentLoaded', function() {
       if (existing.length > 0) {
         const names = existing.map(r => r.name).join('<br>');
         const { value: userAction } = await Swal.fire({
-          title: 'Some records already exist',
-          html: `The following records already exist:<br><b>${names}</b><br><br>What do you want to do?`,
+          title: t('js.records.exist_title'),
+          html: `${t('js.records.exist_intro')}<br><b>${names}</b><br><br>${t('js.records.exist_question')}`,
           icon: 'warning',
           showCancelButton: true,
           showDenyButton: true,
-          confirmButtonText: 'Replace',
-          denyButtonText: 'Ignore',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: t('js.records.replace'),
+          denyButtonText: t('js.records.ignore'),
           focusCancel: true
         });
         if (userAction === true) {
@@ -241,15 +239,15 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       // 4. Confirm import
       const confirm = await Swal.fire({
-        title: 'Import all records?',
-        html: `You are about to import <b>${data.result.length}</b> records.<br>Action: <b>${action.charAt(0).toUpperCase() + action.slice(1)}</b>`,
+        title: t('js.records.confirm_all'),
+        html: `${t('js.records.confirm_all_text', { count: data.result.length, n: `<b>${data.result.length}</b>` })}<br>${t('js.records.action')} <b>${t('js.records.' + action)}</b>`,
         showCancelButton: true,
-        confirmButtonText: 'Import'
+        confirmButtonText: t('js.records.import')
       });
       if (!confirm.isConfirmed) return;
       // 5. Import all
       Swal.fire({
-        title: 'Importing records...',
+        title: t('js.records.importing_all'),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
       });
@@ -260,21 +258,21 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       if (!importResp.ok) {
         const err = await importResp.json().catch(() => ({}));
-        Swal.fire('Error', err.error || 'Failed to import', 'error');
+        Swal.fire(t('js.common.error'), err.error || t('js.records.import_failed'), 'error');
         return;
       }
       const result = await importResp.json();
       Swal.fire({
-        title: 'Import finished',
+        title: t('js.records.import_finished'),
         html: `
-          <b>Added:</b> ${result.added?.length || 0}<br>
-          <b>Updated:</b> ${result.updated?.length || 0}<br>
-          <b>Skipped:</b> ${result.skipped?.length || 0}
+          <b>${t('js.records.added')}</b> ${result.added?.length || 0}<br>
+          <b>${t('js.records.updated')}</b> ${result.updated?.length || 0}<br>
+          <b>${t('js.records.skipped')}</b> ${result.skipped?.length || 0}
         `,
         icon: 'success'
       }).then(() => window.location.reload());
     } catch (err) {
-      Swal.fire('Error', err.message || 'Unexpected error', 'error');
+      Swal.fire(t('js.common.error'), err.message || t('js.common.unexpected_error'), 'error');
     }
   });
 });

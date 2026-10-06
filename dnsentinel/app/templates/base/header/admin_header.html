@@ -1,5 +1,5 @@
 <header class="topbar">
-    <button type="button" class="btn btn--ghost btn--icon topbar__menu" data-sidebar-toggle aria-controls="sidebar" aria-expanded="true" aria-label="Hide navigation" title="Hide navigation">
+    <button type="button" class="btn btn--ghost btn--icon topbar__menu" data-sidebar-toggle aria-controls="sidebar" aria-expanded="true" aria-label="{{ t('js.layout.hide_navigation') }}" title="{{ t('js.layout.hide_navigation') }}">
         <i class="fa-solid fa-bars" aria-hidden="true"></i>
     </button>
     <a class="brand topbar__brand" href="{{ url_for('dashboard.home') }}">
@@ -10,6 +10,7 @@
     <div class="topbar__spacer"></div>
 
     <div class="topbar__actions">
+        {% with lang_switch_class = 'btn btn--ghost btn--sm' %}{% include 'base/partials/lang_switch.html' %}{% endwith %}
         {% if current_user.is_authenticated %}
             <div class="dropdown dropdown--right" data-dropdown>
                 <button type="button" class="user-menu" data-dropdown-toggle aria-haspopup="menu" aria-expanded="false">
@@ -24,18 +25,18 @@
                     </div>
                     <div class="dropdown__divider"></div>
                     <a class="dropdown__item" role="menuitem" href="{{ url_for('auth.logout') }}"
-                       data-confirm="You'll be signed out of DNSentinel. Your DNS records will keep updating in the background."
-                       data-confirm-title="Log out?"
-                       data-confirm-button="Log out"
+                       data-confirm="{{ t('layout.logout_confirm_text') }}"
+                       data-confirm-title="{{ t('layout.logout_confirm_title') }}"
+                       data-confirm-button="{{ t('layout.logout') }}"
                        data-confirm-icon="fa-arrow-right-from-bracket">
                         <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
-                        <span>Log out</span>
+                        <span>{{ t('layout.logout') }}</span>
                     </a>
                 </div>
             </div>
         {% else %}
-            <a class="btn btn--ghost btn--sm" href="{{ url_for('auth.login') }}">Sign in</a>
-            <a class="btn btn--primary btn--sm" href="{{ url_for('auth.register') }}">Create account</a>
+            <a class="btn btn--ghost btn--sm" href="{{ url_for('auth.login') }}">{{ t('common.sign_in') }}</a>
+            <a class="btn btn--primary btn--sm" href="{{ url_for('auth.register') }}">{{ t('common.create_account') }}</a>
         {% endif %}
     </div>
 </header>
