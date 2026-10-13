@@ -615,6 +615,17 @@ body.app {
   font-weight: var(--weight-medium);
 }
 
+/* The installer: more fields, in sections. */
+.auth__card--wide {
+  max-width: 560px;
+}
+
+.auth__section {
+  padding-top: var(--space-5);
+  font-size: var(--text-base);
+  border-top: 1px solid var(--color-divider);
+}
+
 @media (max-width: 480px) {
   .auth {
     padding-block: var(--space-8);

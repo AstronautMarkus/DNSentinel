@@ -35,8 +35,7 @@
                 </div>
             </div>
         {% else %}
-            <a class="btn btn--ghost btn--sm" href="{{ url_for('auth.login') }}">{{ t('common.sign_in') }}</a>
-            <a class="btn btn--primary btn--sm" href="{{ url_for('auth.register') }}">{{ t('common.create_account') }}</a>
+            <a class="btn btn--primary btn--sm" href="{{ url_for('auth.login') }}">{{ t('common.sign_in') }}</a>
         {% endif %}
     </div>
 </header>

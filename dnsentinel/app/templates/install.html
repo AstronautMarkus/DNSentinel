@@ -1,0 +1,111 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ t('install.title') }}{% endblock %}
+{# Served by the installer app (see create_installer): only /install, /static and /lang exist. #}
+{% block header %}
+<header class="site-header">
+    <div class="container site-header__inner">
+        <span class="brand">
+            <img class="brand__logo" src="{{ url_for('static', filename='img/DNSentinel.svg') }}" alt="">
+            <span>DNSentinel</span>
+        </span>
+        <nav class="site-nav" aria-label="{{ t('nav.main') }}">
+            {% with lang_switch_class = 'site-nav__link' %}{% include 'base/partials/lang_switch.html' %}{% endwith %}
+        </nav>
+    </div>
+</header>
+{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<section class="auth">
+    <div class="auth__card auth__card--wide">
+        <img class="auth__logo" src="{{ url_for('static', filename='img/DNSentinel.svg') }}" alt="DNSentinel">
+        <h1 class="auth__title">{{ t('install.title') }}</h1>
+        <p class="auth__subtitle">{{ t('install.subtitle') }}</p>
+
+        {% if no_token %}
+        <div class="alert alert--warning" role="status">
+            <i class="fa-solid fa-key" aria-hidden="true"></i>
+            <div class="alert__body">
+                <strong>{{ t('install.no_token_title') }}</strong>
+                <span>{{ t('install.no_token_html') }}</span>
+            </div>
+        </div>
+        {% else %}
+        <form method="post" class="form">
+            {% if error %}
+            <div class="alert alert--danger" role="alert">
+                <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                <div class="alert__body">{{ error }}</div>
+            </div>
+            {% endif %}
+
+            <div class="field">
+                <label for="token" class="field__label">{{ t('install.token') }}<span class="field__required" aria-hidden="true">*</span></label>
+                <div class="input-group">
+                    <i class="fa-solid fa-key input-group__icon" aria-hidden="true"></i>
+                    <input type="text" class="input input--mono" id="token" name="token" required autocomplete="off" spellcheck="false"
+                           value="{{ form.token }}">
+                </div>
+                <p class="field__hint">{{ t('install.token_hint_html') }}</p>
+            </div>
+
+            <h2 class="auth__section">{{ t('install.database') }}</h2>
+            <div class="form-row">
+                <div class="field">
+                    <label for="db_host" class="field__label">{{ t('install.db_host') }}<span class="field__required" aria-hidden="true">*</span></label>
+                    <input type="text" class="input" id="db_host" name="db_host" required autocomplete="off" value="{{ form.db_host }}">
+                </div>
+                <div class="field">
+                    <label for="db_port" class="field__label">{{ t('install.db_port') }}<span class="field__required" aria-hidden="true">*</span></label>
+                    <input type="text" class="input" id="db_port" name="db_port" required inputmode="numeric" pattern="[0-9]+" value="{{ form.db_port }}">
+                </div>
+            </div>
+            <div class="field">
+                <label for="db_name" class="field__label">{{ t('install.db_name') }}<span class="field__required" aria-hidden="true">*</span></label>
+                <input type="text" class="input" id="db_name" name="db_name" required autocomplete="off" value="{{ form.db_name }}">
+                <p class="field__hint">{{ t('install.db_hint') }}</p>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label for="db_user" class="field__label">{{ t('install.db_user') }}<span class="field__required" aria-hidden="true">*</span></label>
+                    <input type="text" class="input" id="db_user" name="db_user" required autocomplete="off" value="{{ form.db_user }}">
+                </div>
+                <div class="field">
+                    <label for="db_password" class="field__label">{{ t('auth.password') }}</label>
+                    <input type="password" class="input" id="db_password" name="db_password" autocomplete="off">
+                </div>
+            </div>
+
+            <h2 class="auth__section">{{ t('install.account') }}</h2>
+            <div class="field">
+                <label for="name" class="field__label">{{ t('common.name') }}<span class="field__required" aria-hidden="true">*</span></label>
+                <div class="input-group">
+                    <i class="fa-solid fa-user input-group__icon" aria-hidden="true"></i>
+                    <input type="text" class="input" id="name" name="name" required autocomplete="name"
+                           placeholder="{{ t('auth.name_placeholder') }}" value="{{ form.name }}">
+                </div>
+            </div>
+            <div class="field">
+                <label for="email" class="field__label">{{ t('auth.email') }}<span class="field__required" aria-hidden="true">*</span></label>
+                <div class="input-group">
+                    <i class="fa-solid fa-envelope input-group__icon" aria-hidden="true"></i>
+                    <input type="email" class="input" id="email" name="email" required autocomplete="email"
+                           placeholder="{{ t('auth.email_placeholder') }}" value="{{ form.email }}">
+                </div>
+            </div>
+            <div class="field">
+                <label for="password" class="field__label">{{ t('auth.password') }}<span class="field__required" aria-hidden="true">*</span></label>
+                <div class="input-group">
+                    <i class="fa-solid fa-lock input-group__icon" aria-hidden="true"></i>
+                    <input type="password" class="input" id="password" name="password" required minlength="{{ min_password }}"
+                           autocomplete="new-password" placeholder="••••••••">
+                </div>
+                <p class="field__hint">{{ t('install.password_hint', min=min_password) }}</p>
+            </div>
+
+            <button type="submit" class="btn btn--primary btn--lg btn--block">{{ t('install.submit') }}</button>
+        </form>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

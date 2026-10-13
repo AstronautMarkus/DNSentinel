@@ -8,12 +8,12 @@
     {% block head %}{% endblock %}
 </head>
 <body class="site">
-    {% include 'base/header/header.html' %}
+    {% block header %}{% include 'base/header/header.html' %}{% endblock %}
     {% include 'base/partials/flashes.html' %}
     <main class="site__main">
         {% block content %}{% endblock %}
     </main>
-    {% include 'base/footer/footer.html' %}
+    {% block footer %}{% include 'base/footer/footer.html' %}{% endblock %}
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>

@@ -1,17 +1,20 @@
 """
 Run the DNSentinel IP sentinel on its own, without the web dashboard.
 
-    python sentinel.py           # loop forever (systemd, launchd, Docker…)
+    python sentinel.py           # loop forever (the dnsentinel-sentinel service)
     python sentinel.py --once    # check every enabled user now, then exit (cron)
 
-The web app (main.py) also runs the sentinel in a background thread unless
-SENTINEL_EMBEDDED=false; a database lease keeps the two from doubling up.
+The web app (main.py) can also run it in a background thread when the
+config's sentinel.embedded is true; a database lease keeps the two from
+doubling up.
 """
 import argparse
 import signal
 import sys
+import time
 
 from app import create_app
+from app.config.config import is_installed
 from app.sentinel import SentinelRunner, configure_logging
 
 
@@ -19,6 +22,15 @@ def main():
     parser = argparse.ArgumentParser(description='Keep Cloudflare DNS records pointed at your public IP.')
     parser.add_argument('--once', action='store_true', help='run one check for every enabled user and exit')
     args = parser.parse_args()
+
+    if not is_installed():
+        if args.once:
+            print('DNSentinel is not installed yet: open the web installer first.')
+            return 1
+        # The service starts with the web one, before anyone has gone through the installer.
+        print('DNSentinel is not installed yet; waiting for the web installer...', flush=True)
+        while not is_installed():
+            time.sleep(10)
 
     configure_logging()
     runner = SentinelRunner(create_app())

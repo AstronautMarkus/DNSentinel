@@ -207,3 +207,5 @@ marimo/_lsp/
 __marimo__/
 
 .DS_Store
+# DNSentinel settings and their key (see app/config/config.py)
+dnsentinel/config/

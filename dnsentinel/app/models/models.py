@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
+from werkzeug.security import generate_password_hash
 
 db = SQLAlchemy()
 
@@ -27,6 +28,9 @@ def parse_cloudflare_datetime(value):
 
 class User(db.Model):
     __tablename__ = 'users'
+
+    MIN_PASSWORD_LENGTH = 8
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -49,6 +53,16 @@ class User(db.Model):
 
     def get_id(self):
         return str(self.id)
+
+    @classmethod
+    def save_account(cls, name, email, password):
+        """Create the account, or give the existing one a new name and password. There is no sign-up page."""
+        user = cls.query.filter_by(email=email).first() or cls(email=email)
+        user.name = name
+        user.password = generate_password_hash(password)
+        db.session.add(user)
+        db.session.commit()
+        return user
 
     def __repr__(self):
         return f"<User(name={self.name}, email={self.email})>"

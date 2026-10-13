@@ -23,7 +23,6 @@ STRINGS = {
     'common.add_zone': {'en': 'Add zone', 'es': 'Agregar zona'},
     'common.no_zones': {'en': 'No zones yet', 'es': 'Aún no hay zonas'},
     'common.sign_in': {'en': 'Sign in', 'es': 'Iniciar sesión'},
-    'common.create_account': {'en': 'Create account', 'es': 'Crear cuenta'},
 
     # ── Navigation (headers, sidebar, footers) ──
     'nav.main': {'en': 'Main navigation', 'es': 'Navegación principal'},

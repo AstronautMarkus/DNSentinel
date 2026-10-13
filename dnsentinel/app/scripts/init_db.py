@@ -6,7 +6,6 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, '..', '..'))
 sys.path.insert(0, project_root)
 
-from app.config.config import Config
 from app.models.models import db
 from app.models.schema import upgrade_schema
 from app import create_app
@@ -33,7 +32,7 @@ def reset_db(auto_confirm=False):
             db.drop_all()
             print("Tables dropped.")
             db.create_all()
-            print("Database reinitialized.")
+            print("Database reinitialized. Add a sign-in account with: python manage.py user EMAIL")
         else:
             print("Operation cancelled.")
 
